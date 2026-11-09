@@ -1,35 +1,50 @@
-name: Deploy Sphinx docs to Pages
+
+name: Deploy Sphinx docs to GitHub Pages
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      # 1. Descargar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
+      # 2. Configurar Python
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.8'
+          python-version: '3.12'
 
+      # 3. Instalar dependencias de Sphinx
       - name: Install dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme sphinx-copybutton sphinx-tabs
+          python -m pip install --upgrade pip
+          python -m pip install \
+            sphinx \
+            sphinx_rtd_theme \
+            sphinx-copybutton \
+            sphinx-tabs
 
-      - name: Build docs
+      # 4. Generar documentación HTML
+      - name: Build Sphinx documentation
         run: |
-          cd docs
-          python -m sphinx source build/html
-          touch build/html/.nojekyll
+          python -m sphinx -b html docs/source docs/build/html
+          touch docs/build/html/.nojekyll
 
+      # 5. Publicar en GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: docs/build/html
+          publish_dir: ./docs/build/html
