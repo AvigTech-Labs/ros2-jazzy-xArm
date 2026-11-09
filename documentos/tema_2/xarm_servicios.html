@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Práctica xArm: servicios, acciones y parámetros &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Solución del reto de programación: monitor de articulaciones" href="xarm_reto_resuelto.html" />
+    <link rel="prev" title="Práctica xArm: nodos, tópicos y mensajes" href="xarm_comunicacion.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Práctica xArm: servicios, acciones y parámetros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#objetivos">Objetivos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#servicio-propio-lectura-del-estado">1. Servicio propio: lectura del estado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parametros-del-nodo">2. Parámetros del nodo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#descubrir-acciones-en-moveit-2">3. Descubrir acciones en MoveIt 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interfaces-del-robot-real-solo-lectura-y-estudio">4. Interfaces del robot real: solo lectura y estudio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reto">Reto</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Práctica xArm: servicios, acciones y parámetros</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="practica-xarm-servicios-acciones-y-parametros">
+<h1>Práctica xArm: servicios, acciones y parámetros<a class="headerlink" href="#practica-xarm-servicios-acciones-y-parametros" title="Link to this heading"></a></h1>
+<section id="objetivos">
+<h2>Objetivos<a class="headerlink" href="#objetivos" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Comprender que un <strong>tópico</strong> distribuye mensajes, mientras que un
+<strong>servicio</strong> realiza una solicitud y devuelve una respuesta.</p></li>
+<li><p>Diferenciar <strong>acciones</strong> (objetivos de ejecución prolongada,
+realimentación y resultado) de servicios síncronos.</p></li>
+<li><p>Localizar los parámetros y endpoints ofrecidos por un sistema real.</p></li>
+</ul>
+</section>
+<section id="servicio-propio-lectura-del-estado">
+<h2>1. Servicio propio: lectura del estado<a class="headerlink" href="#servicio-propio-lectura-del-estado" title="Link to this heading"></a></h2>
+<p>Con el monitor de <a class="reference internal" href="xarm_comunicacion.html"><span class="doc">Práctica xArm: nodos, tópicos y mensajes</span></a> en marcha, ejecuta:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>service<span class="w"> </span><span class="nb">type</span><span class="w"> </span>/avigtech/xarm/obtener_estado
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>std_srvs/srv/Trigger
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/avigtech/xarm/obtener_estado<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>std_srvs/srv/Trigger<span class="w"> </span><span class="s1">'{}'</span>
+</pre></div>
+</div>
+<p>El nodo devuelve <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code> si ha recibido un estado y un resumen
+en <code class="docutils literal notranslate"><span class="pre">message</span></code>. Si aún no llegaron datos, devuelve <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">false</span></code>.</p>
+<p>Un servicio <code class="docutils literal notranslate"><span class="pre">Trigger</span></code> resulta adecuado para esta consulta porque no
+requiere argumentos; la decisión de mover un manipulador <strong>no</strong> se
+implementa como parte de este ejercicio.</p>
+</section>
+<section id="parametros-del-nodo">
+<h2>2. Parámetros del nodo<a class="headerlink" href="#parametros-del-nodo" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>param<span class="w"> </span>list<span class="w"> </span>/avigtech_xarm/monitor_articular
+ros2<span class="w"> </span>param<span class="w"> </span>get<span class="w"> </span>/avigtech_xarm/monitor_articular<span class="w"> </span>topic_articular
+ros2<span class="w"> </span>param<span class="w"> </span>get<span class="w"> </span>/avigtech_xarm/monitor_articular<span class="w"> </span>frecuencia_hz
+ros2<span class="w"> </span>param<span class="w"> </span>describe<span class="w"> </span>/avigtech_xarm/monitor_articular<span class="w"> </span>frecuencia_hz
+</pre></div>
+</div>
+<p>El parámetro <code class="docutils literal notranslate"><span class="pre">frecuencia_hz</span></code> configura la tasa del resumen al
+<strong>arrancar</strong> el nodo. En esta versión didáctica cambiarlo con
+<code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">param</span> <span class="pre">set</span></code> durante la ejecución no recrea automáticamente el
+temporizador. Reinicia el nodo para aplicar otro valor.</p>
+</section>
+<section id="descubrir-acciones-en-moveit-2">
+<h2>3. Descubrir acciones en MoveIt 2<a class="headerlink" href="#descubrir-acciones-en-moveit-2" title="Link to this heading"></a></h2>
+<p>Detén el monitor y el escenario anterior si hay conflictos, e inicia:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_moveit_config<span class="w"> </span>xarm6_moveit_fake.launch.py
+</pre></div>
+</div>
+<p>Abre una segunda terminal con el entorno del workspace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>node<span class="w"> </span>list
+ros2<span class="w"> </span>service<span class="w"> </span>list<span class="w"> </span>-t
+</pre></div>
+</div>
+<p>Según los controladores y el planificador que se hayan lanzado, puede
+haber acciones de trayectoria basadas en
+<code class="docutils literal notranslate"><span class="pre">control_msgs/action/FollowJointTrajectory</span></code> u otras interfaces.
+Comprueba las existentes en vez de asumir un nombre de endpoint.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>control_msgs/action/FollowJointTrajectory
+ros2<span class="w"> </span>pkg<span class="w"> </span>executables<span class="w"> </span>xarm_planner
+</pre></div>
+</div>
+<p><strong>Actividad:</strong> identifica qué información tiene el objetivo, qué
+proporciona la realimentación y qué aparece al terminar una acción.
+No envíes objetivos a un robot físico como parte de esta lección.</p>
+</section>
+<section id="interfaces-del-robot-real-solo-lectura-y-estudio">
+<h2>4. Interfaces del robot real: solo lectura y estudio<a class="headerlink" href="#interfaces-del-robot-real-solo-lectura-y-estudio" title="Link to this heading"></a></h2>
+<p>El paquete oficial <code class="docutils literal notranslate"><span class="pre">xarm_api</span></code> expone servicios de control y tópicos
+asociados al equipo físico. El fabricante documenta, entre otros,
+<code class="docutils literal notranslate"><span class="pre">/xarm/motion_enable</span></code>, <code class="docutils literal notranslate"><span class="pre">/xarm/set_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">/xarm/set_state</span></code> y
+<code class="docutils literal notranslate"><span class="pre">/xarm/set_position</span></code> para un xArm 6 (los nombres dependen del
+namespace y de la configuración). Estas interfaces <strong>no tienen por qué
+existir</strong> al lanzar solamente <code class="docutils literal notranslate"><span class="pre">xarm6_moveit_fake.launch.py</span></code>.</p>
+<p>Para el laboratorio de hardware real deben comprobarse la versión del
+firmware, zona libre, límites, paro de emergencia y procedimiento de
+recuperación. El primer laboratorio es exclusivamente de inspección.</p>
+<p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/tree/jazzy/xarm_api">Referencia oficial de xarm_api</a>.</p>
+</section>
+<section id="reto">
+<h2>Reto<a class="headerlink" href="#reto" title="Link to this heading"></a></h2>
+<p>Dibuja un esquema con cuatro flechas distintas: el flujo
+<code class="docutils literal notranslate"><span class="pre">JointState</span></code> hacia el monitor, el resumen de texto hacia otros
+nodos, la llamada al servicio <code class="docutils literal notranslate"><span class="pre">Trigger</span></code> y una acción de planificación
+identificada mediante <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">action</span> <span class="pre">list</span> <span class="pre">-t</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="xarm_comunicacion.html" class="btn btn-neutral float-left" title="Práctica xArm: nodos, tópicos y mensajes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="xarm_reto_resuelto.html" class="btn btn-neutral float-right" title="Solución del reto de programación: monitor de articulaciones" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

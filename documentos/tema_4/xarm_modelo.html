@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Práctica xArm: URDF, Xacro, TF2 y control &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Práctica xArm: planificación con MoveIt 2" href="xarm_moveit.html" />
+    <link rel="prev" title="Gemelo Digital" href="gemelo_digital.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Práctica xArm: URDF, Xacro, TF2 y control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#urdf-y-xacro-que-estudiar">URDF y Xacro: qué estudiar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transformaciones-y-tf2">Transformaciones y TF2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#de-urdf-a-ros2-control">De URDF a ros2_control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lecturas">Lecturas</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Práctica xArm: URDF, Xacro, TF2 y control</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="practica-xarm-urdf-xacro-tf2-y-control">
+<h1>Práctica xArm: URDF, Xacro, TF2 y control<a class="headerlink" href="#practica-xarm-urdf-xacro-tf2-y-control" title="Link to this heading"></a></h1>
+<p>El paquete <code class="docutils literal notranslate"><span class="pre">xarm_description</span></code> es el punto de partida para comprender
+la geometría y la estructura cinemática del xArm 6. Esta unidad conecta
+los conceptos de <a class="reference internal" href="modelo_digital.html"><span class="doc">Modelo digital</span></a> y <a class="reference internal" href="gemelo_digital.html"><span class="doc">Gemelo Digital</span></a> con un
+modelo real mantenido por su fabricante.</p>
+<section id="urdf-y-xacro-que-estudiar">
+<h2>URDF y Xacro: qué estudiar<a class="headerlink" href="#urdf-y-xacro-que-estudiar" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">link</span></code>: define un eslabón con geometría visual, colisión e inercia.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">joint</span></code>: representa una relación móvil o fija entre dos eslabones.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">origin</span></code>: define la transformación geométrica entre marcos.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">axis</span></code> y <code class="docutils literal notranslate"><span class="pre">limit</span></code>: describen el eje y rango articular.</p></li>
+<li><p>Xacro: permite macros y parámetros para mantener variantes de modelos.</p></li>
+</ul>
+<p>En el workspace, examina los archivos oficiales <strong>sin editarlos</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src/xarm_ros2
+find<span class="w"> </span>xarm_description<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">'*.xacro'</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">'*.urdf'</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-30
+ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>xarm_description
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El archivo de entrada Xacro puede cambiar con las revisiones del
+repositorio. Identifícalo en el lanzamiento oficial, en vez de
+copiar rutas del paquete de ROS 1 o generar un URDF alternativo.</p>
+</div>
+</section>
+<section id="transformaciones-y-tf2">
+<h2>Transformaciones y TF2<a class="headerlink" href="#transformaciones-y-tf2" title="Link to this heading"></a></h2>
+<p>Inicia la visualización de la descripción:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_description<span class="w"> </span>xarm6_rviz_display.launch.py
+</pre></div>
+</div>
+<p>Con el entorno activo en otra terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>list<span class="w"> </span>-t<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">'tf|joint_states'</span>
+ros2<span class="w"> </span>run<span class="w"> </span>tf2_tools<span class="w"> </span>view_frames
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">view_frames</span></code> genera información gráfica sobre los marcos recibidos
+(si hay un publicador TF activo). Si no aparece un marco, no se debe
+inventar un nombre: revisa las transformaciones efectivamente emitidas.</p>
+<p><strong>Ejercicio:</strong> elige tres eslabones consecutivos y explica qué
+transformaciones dependen de las posiciones articulares y cuáles son
+fijas. Contrasta con las matrices homogéneas que conoces.</p>
+</section>
+<section id="de-urdf-a-ros2-control">
+<h2>De URDF a ros2_control<a class="headerlink" href="#de-urdf-a-ros2-control" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ros2_control</span></code> permite separar la descripción del hardware, los
+controladores y las interfaces de comando/estado. El paquete
+<code class="docutils literal notranslate"><span class="pre">xarm_controller</span></code> contiene integraciones propias del fabricante.</p>
+<p>Para aprender los comandos de inspección, primero inicia el escenario
+con controlador de demostración de MoveIt:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_moveit_config<span class="w"> </span>xarm6_moveit_fake.launch.py
+</pre></div>
+</div>
+<p>En otra terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>control<span class="w"> </span>list_controllers
+ros2<span class="w"> </span>control<span class="w"> </span>list_hardware_interfaces
+ros2<span class="w"> </span>action<span class="w"> </span>list<span class="w"> </span>-t
+</pre></div>
+</div>
+<p>La disponibilidad de <code class="docutils literal notranslate"><span class="pre">controller_manager</span></code> y el conjunto de
+interfaces depende del escenario que inicies. Si una consulta falla,
+registra el mensaje e identifica qué componente no se lanzó.</p>
+<p><strong>Diferencia clave:</strong> los controladores fake no son un banco de pruebas
+para esfuerzo, fricción, golpes o seguridad del equipo físico.</p>
+</section>
+<section id="lecturas">
+<h2>Lecturas<a class="headerlink" href="#lecturas" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/tree/jazzy">xarm_ros2 oficial</a>.</p></li>
+<li><p><a class="reference external" href="https://control.ros.org/jazzy/index.html">ros2_control para Jazzy</a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="gemelo_digital.html" class="btn btn-neutral float-left" title="Gemelo Digital" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="xarm_moveit.html" class="btn btn-neutral float-right" title="Práctica xArm: planificación con MoveIt 2" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Práctica xArm: planificación con MoveIt 2 &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Behavior Trees en ROS 2 para el control de dos robots SCARA" href="behavior_trees.html" />
+    <link rel="prev" title="Práctica xArm: URDF, Xacro, TF2 y control" href="xarm_modelo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Práctica xArm: planificación con MoveIt 2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#proposito">Propósito</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conceptos">Conceptos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#primera-practica">Primera práctica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observar-que-ocurre-en-ros-2">Observar qué ocurre en ROS 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#planificacion-mediante-api-siguiente-nivel">Planificación mediante API: siguiente nivel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ampliacion-opcional-gazebo-harmonic">Ampliación opcional: Gazebo Harmonic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reto-de-evaluacion">Reto de evaluación</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Práctica xArm: planificación con MoveIt 2</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="practica-xarm-planificacion-con-moveit-2">
+<h1>Práctica xArm: planificación con MoveIt 2<a class="headerlink" href="#practica-xarm-planificacion-con-moveit-2" title="Link to this heading"></a></h1>
+<section id="proposito">
+<h2>Propósito<a class="headerlink" href="#proposito" title="Link to this heading"></a></h2>
+<p>Estudiar el paso desde una <strong>posición articular</strong> hasta una trayectoria
+planificada y validada en RViz 2 utilizando el modelo xArm 6 de la rama
+Jazzy. Se trabaja inicialmente sin actuadores reales.</p>
+</section>
+<section id="conceptos">
+<h2>Conceptos<a class="headerlink" href="#conceptos" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Espacio articular:</strong> vector <code class="docutils literal notranslate"><span class="pre">q</span> <span class="pre">=</span> <span class="pre">[q1,</span> <span class="pre">q2,</span> <span class="pre">q3,</span> <span class="pre">q4,</span> <span class="pre">q5,</span> <span class="pre">q6]</span></code>.</p></li>
+<li><p><strong>Pose cartesiana:</strong> posición y orientación del efector final.</p></li>
+<li><p><strong>Cinemática directa:</strong> obtener la pose del efector a partir de <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p></li>
+<li><p><strong>Cinemática inversa:</strong> encontrar configuraciones <code class="docutils literal notranslate"><span class="pre">q</span></code> para una pose.</p></li>
+<li><p><strong>Planificación:</strong> generar una trayectoria compatible con los límites,
+el escenario de colisión y el grupo de planificación.</p></li>
+<li><p><strong>Ejecución fake:</strong> representar el movimiento sin controlar el brazo real.</p></li>
+</ul>
+</section>
+<section id="primera-practica">
+<h2>Primera práctica<a class="headerlink" href="#primera-practica" title="Link to this heading"></a></h2>
+<p>Con el entorno configurado automáticamente en <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_moveit_config<span class="w"> </span>xarm6_moveit_fake.launch.py
+</pre></div>
+</div>
+<p>En RViz 2, ubica el panel <strong>MotionPlanning</strong>:</p>
+<ol class="arabic simple">
+<li><p>Selecciona el grupo de planificación que corresponda al brazo.</p></li>
+<li><p>Revisa la configuración articular inicial y los límites mostrados.</p></li>
+<li><p>Configura un objetivo alcanzable mediante el panel interactivo.</p></li>
+<li><p>Pulsa <strong>Plan</strong> y analiza la trayectoria previa a ejecutarla.</p></li>
+<li><p>Con el controlador de demostración, compara lo planificado con la
+visualización del movimiento sin usar hardware real.</p></li>
+</ol>
+<p>El nombre del grupo y los pasos exactos del panel pueden variar con
+la configuración MoveIt de la rama instalada. Registra el nombre que
+aparezca en tu sesión.</p>
+</section>
+<section id="observar-que-ocurre-en-ros-2">
+<h2>Observar qué ocurre en ROS 2<a class="headerlink" href="#observar-que-ocurre-en-ros-2" title="Link to this heading"></a></h2>
+<p>En otra terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>node<span class="w"> </span>list
+ros2<span class="w"> </span>topic<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>action<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>control<span class="w"> </span>list_controllers
+</pre></div>
+</div>
+<p><strong>Actividad:</strong> identifica un nodo de planificación, un tópico de
+estado y una acción o controlador que intervenga en el flujo, si los
+expone esta configuración. Explica por qué no son lo mismo.</p>
+</section>
+<section id="planificacion-mediante-api-siguiente-nivel">
+<h2>Planificación mediante API: siguiente nivel<a class="headerlink" href="#planificacion-mediante-api-siguiente-nivel" title="Link to this heading"></a></h2>
+<p>El repositorio oficial incluye <code class="docutils literal notranslate"><span class="pre">xarm_planner</span></code> para ejemplos de
+planificación mediante interfaces de MoveIt 2. Para ejecutar sus demos
+utiliza <strong>una sesión alternativa</strong>, no simultánea con el lanzamiento
+anterior:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_planner<span class="w"> </span>xarm6_planner_fake.launch.py
+</pre></div>
+</div>
+<p>El fabricante ofrece clientes de prueba para planificación en
+espacio articular y cartesiano. Antes de ejecutarlos, estudia qué
+trayectorias solicitan, examina su código y verifica que estés en
+modo <code class="docutils literal notranslate"><span class="pre">fake</span></code>. Consulta las instrucciones actualizadas en
+<a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/blob/jazzy/ReadMe.md">ReadMe.md de Jazzy</a>.</p>
+</section>
+<section id="ampliacion-opcional-gazebo-harmonic">
+<h2>Ampliación opcional: Gazebo Harmonic<a class="headerlink" href="#ampliacion-opcional-gazebo-harmonic" title="Link to this heading"></a></h2>
+<p>La rama Jazzy indica soporte para Gazebo Harmonic. Su README también
+menciona limitaciones de plugins, de modo que no se presupone paridad
+con los ejemplos antiguos de Gazebo Classic. La guía básica utiliza
+RViz 2 y MoveIt fake para evitar requisitos gráficos y controladores
+adicionales; un laboratorio de física requiere validar las dependencias
+de Gazebo para la revisión exacta del repositorio.</p>
+</section>
+<section id="reto-de-evaluacion">
+<h2>Reto de evaluación<a class="headerlink" href="#reto-de-evaluacion" title="Link to this heading"></a></h2>
+<p>Documenta dos objetivos articulares seguros (en representación fake),
+compara sus rutas y explica cómo influyen el estado inicial, los
+límites de las juntas y las restricciones de colisión.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="xarm_modelo.html" class="btn btn-neutral float-left" title="Práctica xArm: URDF, Xacro, TF2 y control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="behavior_trees.html" class="btn btn-neutral float-right" title="Behavior Trees en ROS 2 para el control de dos robots SCARA" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
