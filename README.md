@@ -8,6 +8,6 @@ nov - 2026
 
 ---
 
-🚀 **[Ver la documentación en línea](https://avigtech-labs.github.io/ros2-basico-espe/)**
+🚀 **[Ver la documentación en línea](https://avigtech-labs.github.io/ros2-jazzy-xArm/)**
 
 ---
