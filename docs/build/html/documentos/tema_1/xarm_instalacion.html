@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instalación de xArm ROS 2 para Jazzy &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Conceptos Básicos" href="../tema_2/conceptos_basicos.html" />
+    <link rel="prev" title="Compatibilidad, dependencias y validación en Jazzy" href="compatibilidad_jazzy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Instalación de xArm ROS 2 para Jazzy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#verificar-el-entorno">1. Verificar el entorno</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preparar-las-herramientas">2. Preparar las herramientas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clonar-la-rama-correcta">3. Clonar la rama correcta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resolver-dependencias-y-compilar">4. Resolver dependencias y compilar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resolver-incompatibilidades-de-gazebo-harmonic-en-jazzy">5. Resolver incompatibilidades de Gazebo Harmonic en Jazzy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#primera-ejecucion-solo-visualizacion">6. Primera ejecución: solo visualización</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#segunda-ejecucion-planificacion-con-moveit-2">7. Segunda ejecución: planificación con MoveIt 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preguntas-de-comprobacion">Preguntas de comprobación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lectura-oficial">Lectura oficial</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Instalación de xArm ROS 2 para Jazzy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="instalacion-de-xarm-ros-2-para-jazzy">
+<h1>Instalación de xArm ROS 2 para Jazzy<a class="headerlink" href="#instalacion-de-xarm-ros-2-para-jazzy" title="Link to this heading"></a></h1>
+<p>Este tutorial complementa <a class="reference internal" href="instalacionROS2.html"><span class="doc">Instalación de ROS 2 Jazzy en Ubuntu 24.04</span></a> y utiliza el repositorio
+oficial <a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/tree/jazzy">xarm_ros2</a>.
+Comienza con una ejecución <strong>sin hardware</strong>.</p>
+<section id="verificar-el-entorno">
+<h2>1. Verificar el entorno<a class="headerlink" href="#verificar-el-entorno" title="Link to this heading"></a></h2>
+<p>Abre una terminal nueva:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ROS_DISTRO</span><span class="s2">&quot;</span><span class="w">    </span><span class="c1"># Debe imprimir jazzy</span>
+lsb_release<span class="w"> </span>-rs<span class="w">       </span><span class="c1"># Debe imprimir 24.04</span>
+python3<span class="w"> </span>--version<span class="w">     </span><span class="c1"># Python 3.12 en Ubuntu 24.04</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Se recomienda Ubuntu 24.04 instalado de manera nativa para el trabajo
+con RViz, MoveIt 2 y Gazebo Harmonic.</p>
+</div>
+</section>
+<section id="preparar-las-herramientas">
+<h2>2. Preparar las herramientas<a class="headerlink" href="#preparar-las-herramientas" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>git<span class="w"> </span>python3-colcon-common-extensions<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>python3-rosdep<span class="w"> </span>ros-jazzy-moveit<span class="w"> </span>ros-jazzy-ros2-control<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ros-jazzy-ros2-controllers
+
+<span class="c1"># Si rosdep se inicializó anteriormente, omite esta instrucción.</span>
+sudo<span class="w"> </span>rosdep<span class="w"> </span>init
+rosdep<span class="w"> </span>update
+</pre></div>
+</div>
+<p>El repositorio puede requerir dependencias adicionales. Se resolverán con
+<code class="docutils literal notranslate"><span class="pre">rosdep</span></code> antes de construir el workspace.</p>
+</section>
+<section id="clonar-la-rama-correcta">
+<h2>3. Clonar la rama correcta<a class="headerlink" href="#clonar-la-rama-correcta" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/ros2_ws/src
+<span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src
+git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>jazzy<span class="w"> </span>--recursive<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>https://github.com/xArm-Developer/xarm_ros2.git
+
+<span class="c1"># Verificar rama y submódulos:</span>
+git<span class="w"> </span>-C<span class="w"> </span>xarm_ros2<span class="w"> </span>branch<span class="w"> </span>--show-current
+git<span class="w"> </span>-C<span class="w"> </span>xarm_ros2<span class="w"> </span>submodule<span class="w"> </span>status
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>No descargues solo el ZIP de GitHub si vas a compilar: el proyecto
+necesita submódulos Git. Si ya clonaste sin <code class="docutils literal notranslate"><span class="pre">--recursive</span></code>, usa
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">-C</span> <span class="pre">~/ros2_ws/src/xarm_ros2</span> <span class="pre">submodule</span> <span class="pre">update</span> <span class="pre">--init</span> <span class="pre">--recursive</span></code>.</p>
+</div>
+</section>
+<section id="resolver-dependencias-y-compilar">
+<h2>4. Resolver dependencias y compilar<a class="headerlink" href="#resolver-dependencias-y-compilar" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+<span class="nb">cd</span><span class="w"> </span>~/ros2_ws
+rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>--ignore-src<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--rosdistro<span class="w"> </span>jazzy<span class="w"> </span>-y
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+<p><strong>Cargar el workspace automáticamente en terminales nuevas (una vez):</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>grep<span class="w"> </span>-qxF<span class="w"> </span><span class="s1">&#39;source ~/ros2_ws/install/setup.bash&#39;</span><span class="w"> </span>~/.bashrc<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source ~/ros2_ws/install/setup.bash&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
+</pre></div>
+</div>
+<p>La configuración de <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> debe activar <strong>primero Jazzy</strong> y
+<strong>después el workspace</strong>. No repitas el <code class="docutils literal notranslate"><span class="pre">echo</span></code> si la línea ya existe;
+verifica con <code class="docutils literal notranslate"><span class="pre">tail</span> <span class="pre">-n</span> <span class="pre">10</span> <span class="pre">~/.bashrc</span></code>. Si prefieres el procedimiento
+completo, consulta <a class="reference internal" href="instalacionROS2.html"><span class="doc">Instalación de ROS 2 Jazzy en Ubuntu 24.04</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Las dependencias y la compilación deben verificarse en Ubuntu 24.04
+con ROS Jazzy instalado. No mezcles paquetes de otra distribución.
+Consulta el README de la <strong>rama jazzy</strong> si cambian las dependencias.</p>
+</div>
+</section>
+<section id="resolver-incompatibilidades-de-gazebo-harmonic-en-jazzy">
+<h2>5. Resolver incompatibilidades de Gazebo Harmonic en Jazzy<a class="headerlink" href="#resolver-incompatibilidades-de-gazebo-harmonic-en-jazzy" title="Link to this heading"></a></h2>
+<p>Al compilar la rama <code class="docutils literal notranslate"><span class="pre">jazzy</span></code> del fabricante puede aparecer el error:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CMake Error at CMakeLists.txt:20 (find_package):
+  Could not find a package configuration file provided by &quot;gz-sim8&quot;
+  with any of the following names:
+    gz-sim8Config.cmake
+    gz-sim8-config.cmake
+</pre></div>
+</div>
+<p>El problema se presenta en <code class="docutils literal notranslate"><span class="pre">xarm_gazebo</span></code>. No significa que hayan fallado
+los paquetes <code class="docutils literal notranslate"><span class="pre">xarm_description</span></code>, <code class="docutils literal notranslate"><span class="pre">xarm_msgs</span></code> o <code class="docutils literal notranslate"><span class="pre">xarm_controller</span></code>.
+El aviso de <code class="docutils literal notranslate"><span class="pre">on_init(const</span> <span class="pre">HardwareInfo&amp;)</span> <span class="pre">is</span> <span class="pre">deprecated</span></code> en
+<code class="docutils literal notranslate"><span class="pre">xarm_controller</span></code> es una <strong>advertencia</strong>, no el fallo de compilación.</p>
+<p><strong>Paso A. Verificar los paquetes vendor de Jazzy</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-gz-sim-vendor<span class="w"> </span>ros-jazzy-sdformat-vendor
+<span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>gz_sim_vendor
+ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>sdformat_vendor
+</pre></div>
+</div>
+<p><strong>Paso B. Adaptar la búsqueda de dependencias en CMake</strong></p>
+<p>Abre el archivo local (esto modifica la copia clonada del fabricante):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nano<span class="w"> </span>~/ros2_ws/src/xarm_ros2/xarm_gazebo/CMakeLists.txt
+</pre></div>
+</div>
+<p>Si la versión de tu rama contiene las instrucciones:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">find_package</span><span class="p">(</span><span class="s">ament_cmake</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">gz-sim8</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">sdformat14</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Sustituye esas tres líneas por:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">find_package</span><span class="p">(</span><span class="s">ament_cmake</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">gz_sim_vendor</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">sdformat_vendor</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">gz-sim</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">sdformat</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>En el mismo archivo, si se enlaza con el objetivo versionado:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">gazebo_mimic_joint_plugin</span>
+<span class="w">  </span><span class="s">gz-sim8::gz-sim8</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Utiliza el objetivo expuesto por el paquete vendor:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">gazebo_mimic_joint_plugin</span>
+<span class="w">  </span><span class="s">gz-sim::gz-sim</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Paso C. Recompilar y verificar</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-select<span class="w"> </span>xarm_gazebo<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cmake-clean-cache
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>xarm_gazebo
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>Estas modificaciones se aplican solo si tu copia local contiene las
+instrucciones indicadas. No sustituyas ciegamente un CMakeLists más
+reciente. Si no se encuentran los objetivos <code class="docutils literal notranslate"><span class="pre">gz-sim</span></code> o <code class="docutils literal notranslate"><span class="pre">sdformat</span></code>
+después de instalar los paquetes vendor, verifica los targets que
+exporta tu revisión o usa el SDK de desarrollo compatible con
+Gazebo Harmonic; no mezcles bibliotecas de otras versiones.</p>
+</div>
+<p><strong>Incidencia documentada por la comunidad</strong></p>
+<p>La incidencia oficial <a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/issues/174">xarm_ros2 #174</a>
+(registrada el 7 de agosto de 2026) reporta que las dependencias
+<code class="docutils literal notranslate"><span class="pre">gz-sim8</span></code> y <code class="docutils literal notranslate"><span class="pre">sdformat14</span></code> tampoco se resuelven correctamente como
+<strong>claves rosdep</strong> en Ubuntu 24.04 / Jazzy. Un colaborador recomienda
+utilizar <code class="docutils literal notranslate"><span class="pre">gz_sim_vendor</span></code> y <code class="docutils literal notranslate"><span class="pre">sdformat_vendor</span></code> en <code class="docutils literal notranslate"><span class="pre">package.xml</span></code>.
+Este reporte de <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> está <strong>relacionado</strong>, pero no es el mismo
+mensaje de error de <code class="docutils literal notranslate"><span class="pre">find_package</span></code> que se muestra arriba.</p>
+<p>Si <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">install</span></code> falla por esas claves, inspecciona
+<code class="docutils literal notranslate"><span class="pre">xarm_gazebo/package.xml</span></code> y consulta la propuesta de cambio en el
+<a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/pull/175">pull request #175</a>,
+antes de ajustar las dependencias declaradas.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El repositorio oficial puede corregir estos problemas en revisiones
+posteriores. Antes de aplicar un parche local compara la rama
+<code class="docutils literal notranslate"><span class="pre">jazzy</span></code> instalada y su <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> con el código actualizado.</p>
+</div>
+</section>
+<section id="primera-ejecucion-solo-visualizacion">
+<h2>6. Primera ejecución: solo visualización<a class="headerlink" href="#primera-ejecucion-solo-visualizacion" title="Link to this heading"></a></h2>
+<p>En una terminal nueva, el entorno de Jazzy y el workspace se cargarán
+mediante <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> (configurado en el paso 4):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_description<span class="w"> </span>xarm6_rviz_display.launch.py
+</pre></div>
+</div>
+<p><strong>Comprueba:</strong> el modelo debe ser visible en RViz 2. Examina su árbol de
+juntas y la interfaz de <code class="docutils literal notranslate"><span class="pre">joint_state_publisher_gui</span></code> si está habilitada.</p>
+<p>En otra terminal, con el mismo entorno activado:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>node<span class="w"> </span>list
+ros2<span class="w"> </span>topic<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>topic<span class="w"> </span>find<span class="w"> </span>sensor_msgs/msg/JointState
+ros2<span class="w"> </span>param<span class="w"> </span>list
+</pre></div>
+</div>
+<p>El nombre del tópico articular puede variar según el lanzamiento y
+namespace. <strong>No supongas</strong> que es siempre <code class="docutils literal notranslate"><span class="pre">/xarm/joint_states</span></code>.</p>
+</section>
+<section id="segunda-ejecucion-planificacion-con-moveit-2">
+<h2>7. Segunda ejecución: planificación con MoveIt 2<a class="headerlink" href="#segunda-ejecucion-planificacion-con-moveit-2" title="Link to this heading"></a></h2>
+<p>Cierra la sesión de visualización anterior antes de lanzar el ejemplo
+siguiente, para evitar nodos y controladores duplicados.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_moveit_config<span class="w"> </span>xarm6_moveit_fake.launch.py
+</pre></div>
+</div>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">fake</span></code> permite estudiar planificación y ejecución demostrativa
+sin conectarse a un xArm real. <strong>No es simulación física de Gazebo</strong>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Para añadir el modelo de pinza en sesiones compatibles:
+<code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">launch</span> <span class="pre">xarm_moveit_config</span> <span class="pre">xarm6_moveit_fake.launch.py</span> <span class="pre">add_gripper:=true</span></code>.
+No actives simultáneamente pinza normal y de vacío.</p>
+</div>
+<p>Si no aparece <code class="docutils literal notranslate"><span class="pre">xarm_moveit_config</span></code> al ejecutar <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">launch</span></code>, comprueba
+primero que cargaste el workspace y que se compiló ese paquete:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+<span class="nb">source</span><span class="w"> </span>~/ros2_ws/install/setup.bash
+ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>xarm_moveit_config
+colcon<span class="w"> </span>list<span class="w"> </span>--names-only<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-x<span class="w"> </span>xarm_moveit_config
+</pre></div>
+</div>
+<p>Si Colcon reconoce el paquete pero ROS 2 todavía no lo encuentra, ejecuta
+<code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span> <span class="pre">--symlink-install</span> <span class="pre">--packages-up-to</span> <span class="pre">xarm_moveit_config</span></code>
+desde <code class="docutils literal notranslate"><span class="pre">~/ros2_ws</span></code> y vuelve a cargar <code class="docutils literal notranslate"><span class="pre">install/setup.bash</span></code>.</p>
+</section>
+<section id="preguntas-de-comprobacion">
+<h2>Preguntas de comprobación<a class="headerlink" href="#preguntas-de-comprobacion" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>¿Cuál es la diferencia entre el modelo URDF y el planificador MoveIt?</p></li>
+<li><p>¿Qué paquetes descubriste mediante <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">pkg</span> <span class="pre">list</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">xarm</span></code>?</p></li>
+<li><p>¿Qué cambia al cerrar un lanzamiento y abrir el otro?</p></li>
+<li><p>¿Para qué sirve <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/ros2_ws/install/setup.bash</span></code>?</p></li>
+</ol>
+</section>
+<section id="lectura-oficial">
+<h2>Lectura oficial<a class="headerlink" href="#lectura-oficial" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/blob/jazzy/ReadMe.md">README de xarm_ros2 — rama jazzy</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="compatibilidad_jazzy.html" class="btn btn-neutral float-left" title="Compatibilidad, dependencias y validación en Jazzy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="../tema_2/conceptos_basicos.html" class="btn btn-neutral float-right" title="Conceptos Básicos" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

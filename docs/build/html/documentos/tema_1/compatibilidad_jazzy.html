@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compatibilidad, dependencias y validación en Jazzy &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Instalación de xArm ROS 2 para Jazzy" href="xarm_instalacion.html" />
+    <link rel="prev" title="Instalación de ROS 2 Jazzy en Ubuntu 24.04" href="instalacionROS2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Compatibilidad, dependencias y validación en Jazzy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#objetivo">Objetivo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#versiones-y-dependencias">Versiones y dependencias</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#instalacion-tipica-de-componentes-roboticos">Instalación típica de componentes robóticos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#limites-de-las-pruebas">Límites de las pruebas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lista-de-verificacion-en-ubuntu-24-04">Lista de verificación en Ubuntu 24.04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#buenas-practicas-de-seguridad">Buenas prácticas de seguridad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fuentes-oficiales">Fuentes oficiales</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Compatibilidad, dependencias y validación en Jazzy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="compatibilidad-dependencias-y-validacion-en-jazzy">
+<h1>Compatibilidad, dependencias y validación en Jazzy<a class="headerlink" href="#compatibilidad-dependencias-y-validacion-en-jazzy" title="Link to this heading"></a></h1>
+<section id="objetivo">
+<h2>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h2>
+<p>Esta documentación conserva la estructura y los ejemplos didácticos de
+AvigTech y actualiza su plataforma a ROS 2 Jazzy en Ubuntu 24.04.
+Los fragmentos están orientados al aprendizaje y pueden depender de
+archivos de hardware, calibración o modelos no incluidos en el ZIP.</p>
+</section>
+<section id="versiones-y-dependencias">
+<h2>Versiones y dependencias<a class="headerlink" href="#versiones-y-dependencias" title="Link to this heading"></a></h2>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Plataforma de referencia</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 65.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Componente</p></th>
+<th class="head"><p>Recomendación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Ubuntu</p></td>
+<td><p>24.04 LTS, arquitectura amd64 o arm64</p></td>
+</tr>
+<tr class="row-odd"><td><p>ROS</p></td>
+<td><p>Jazzy (<code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">/opt/ros/jazzy/setup.bash</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p>Python</p></td>
+<td><p>3.12 del sistema, paquetes ROS mediante APT</p></td>
+</tr>
+<tr class="row-odd"><td><p>Compilación</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">colcon</span></code>, <code class="docutils literal notranslate"><span class="pre">ament_python</span></code> / <code class="docutils literal notranslate"><span class="pre">ament_cmake</span></code>, <code class="docutils literal notranslate"><span class="pre">rosdep</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>MQTT</p></td>
+<td><p>Paho MQTT 2.x, <code class="docutils literal notranslate"><span class="pre">CallbackAPIVersion.VERSION2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>ESP32</p></td>
+<td><p>Firmware para ESP32 Arduino core 3.x; revisar dependencias</p></td>
+</tr>
+<tr class="row-even"><td><p>Sphinx</p></td>
+<td><p>RST, tema Read the Docs, tabs y botón de copiar</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="instalacion-tipica-de-componentes-roboticos">
+<h2>Instalación típica de componentes robóticos<a class="headerlink" href="#instalacion-tipica-de-componentes-roboticos" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-xacro<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ros-jazzy-joint-state-publisher-gui<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ros-jazzy-robot-state-publisher<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ros-jazzy-tf2-tools<span class="w"> </span>ros-jazzy-py-trees<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ros-jazzy-py-trees-ros<span class="w"> </span>python3-opencv<span class="w"> </span>python3-yaml
+</pre></div>
+</div>
+<p>Si falta un paquete APT en una arquitectura concreta, consúltalo en el
+<a class="reference external" href="https://index.ros.org/">índice oficial de paquetes</a> y adapta el
+método de instalación, sin mezclar distribuciones de ROS.</p>
+</section>
+<section id="limites-de-las-pruebas">
+<h2>Límites de las pruebas<a class="headerlink" href="#limites-de-las-pruebas" title="Link to this heading"></a></h2>
+<p>La validación estática de los fragmentos Python comprueba sintaxis y
+coherencia documental, pero <strong>no equivale</strong> a compilar el workspace ni a
+probar ROS, sensores o actuadores. Las demostraciones con AprilTags,
+modelos Xacro/URDF, ESP32 o cámaras requieren sus archivos y su hardware.</p>
+</section>
+<section id="lista-de-verificacion-en-ubuntu-24-04">
+<h2>Lista de verificación en Ubuntu 24.04<a class="headerlink" href="#lista-de-verificacion-en-ubuntu-24-04" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lsb_release<span class="w"> </span>-rs
+python3<span class="w"> </span>--version
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ROS_DISTRO</span><span class="s2">&quot;</span>
+ros2<span class="w"> </span>doctor<span class="w"> </span>--report
+ros2<span class="w"> </span>pkg<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">&#39;rclpy|tf2_ros|robot_state_publisher&#39;</span>
+ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_cpp<span class="w"> </span>talker
+</pre></div>
+</div>
+<p>En otra terminal: <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span> <span class="pre">demo_nodes_py</span> <span class="pre">listener</span></code>.</p>
+</section>
+<section id="buenas-practicas-de-seguridad">
+<h2>Buenas prácticas de seguridad<a class="headerlink" href="#buenas-practicas-de-seguridad" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Sustituye <code class="docutils literal notranslate"><span class="pre">TU_SSID</span></code> y <code class="docutils literal notranslate"><span class="pre">TU_CLAVE_WIFI</span></code> por credenciales propias;
+<strong>no publiques contraseñas reales</strong> dentro del código fuente.</p></li>
+<li><p>Evita <code class="docutils literal notranslate"><span class="pre">allow_anonymous</span> <span class="pre">true</span></code> en MQTT fuera de una red de pruebas
+aislada. En una LAN compartida configura autenticación y una lista de
+acceso por tópico; en redes no confiables, utiliza TLS.</p></li>
+<li><p>No expongas por Internet el puerto 1883 de Mosquitto ni los servicios
+de diagnóstico de ROS 2 sin controles de seguridad.</p></li>
+<li><p>Antes de mover motores reales, prueba las trayectorias en simulación,
+establece límites de velocidad y dispone de parada de emergencia.</p></li>
+</ul>
+</section>
+<section id="fuentes-oficiales">
+<h2>Fuentes oficiales<a class="headerlink" href="#fuentes-oficiales" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html">ROS 2 Jazzy: instalación</a>.</p></li>
+<li><p><a class="reference external" href="https://docs.ros.org/en/jazzy/Tutorials.html">Tutoriales ROS 2 Jazzy</a>.</p></li>
+<li><p><a class="reference external" href="https://eclipse.dev/paho/files/paho.mqtt.python/html/migrations.html">Paho MQTT: migración a API 2</a>.</p></li>
+<li><p><a class="reference external" href="https://peps.python.org/pep-0668/">PEP 668: entornos Python gestionados externamente</a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="instalacionROS2.html" class="btn btn-neutral float-left" title="Instalación de ROS 2 Jazzy en Ubuntu 24.04" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="xarm_instalacion.html" class="btn btn-neutral float-right" title="Instalación de xArm ROS 2 para Jazzy" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

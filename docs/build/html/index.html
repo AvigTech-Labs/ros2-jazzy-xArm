@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROS 2 JAZZY: FUNDAMENTOS Y xArm 6 &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=13309ef0"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/translations.js?v=f85f4cfb"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="¿Qué es ROS2?" href="documentos/tema_0/intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ROS 2 JAZZY: FUNDAMENTOS Y xArm 6</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ros-2-jazzy-fundamentos-y-xarm-6">
+<h1>ROS 2 JAZZY: FUNDAMENTOS Y xArm 6<a class="headerlink" href="#ros-2-jazzy-fundamentos-y-xarm-6" title="Link to this heading"></a></h1>
+<p>Bienvenido a la documentación educativa de AvigTech para <strong>Ubuntu 24.04 LTS</strong>
+y <strong>ROS 2 Jazzy</strong>, con prácticas aplicadas al manipulador <strong>UFACTORY xArm 6</strong>.
+Se conserva el material general anterior y se incorporan laboratorios que
+conectan teoría, comandos, programación Python y planificación.</p>
+<img alt="AvigTech" class="align-center" src="_images/logo.png" />
+</section>
+<section id="contenido-del-curso">
+<h1>Contenido del curso<a class="headerlink" href="#contenido-del-curso" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_0/intro.html">¿Qué es ROS2?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_0/intro.html#ecosistema-ros-2">Ecosistema ROS 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_0/intro.html#arquitectura-de-ros-2">Arquitectura de ROS 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_0/intro.html#plumbing-capabilities">Plumbing &amp; Capabilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/ubuntu_git.html">Ubuntu y GitHub</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/ubuntu_git.html#instalacion-de-ubuntu">Instalación de Ubuntu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/ubuntu_git.html#introduccion-a-ubuntu">Introducción a Ubuntu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/ubuntu_git.html#github">GitHub</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#verificar-version-y-configuracion-regional">1. Verificar versión y configuración regional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#incorporar-el-repositorio-de-ros-2">2. Incorporar el repositorio de ROS 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#instalar-ros-2-jazzy">3. Instalar ROS 2 Jazzy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#inicializar-dependencias-del-workspace">4. Inicializar dependencias del workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#configurar-la-terminal">5. Configurar la terminal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#verificar-con-un-publicador-y-un-suscriptor">6. Verificar con un publicador y un suscriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#preparar-un-espacio-de-trabajo">7. Preparar un espacio de trabajo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/instalacionROS2.html#dependencias-python-externas-y-entornos-virtuales">8. Dependencias Python externas y entornos virtuales</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html#objetivo">Objetivo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html#versiones-y-dependencias">Versiones y dependencias</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html#instalacion-tipica-de-componentes-roboticos">Instalación típica de componentes robóticos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html#limites-de-las-pruebas">Límites de las pruebas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html#lista-de-verificacion-en-ubuntu-24-04">Lista de verificación en Ubuntu 24.04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html#buenas-practicas-de-seguridad">Buenas prácticas de seguridad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/compatibilidad_jazzy.html#fuentes-oficiales">Fuentes oficiales</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#verificar-el-entorno">1. Verificar el entorno</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#preparar-las-herramientas">2. Preparar las herramientas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#clonar-la-rama-correcta">3. Clonar la rama correcta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#resolver-dependencias-y-compilar">4. Resolver dependencias y compilar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#resolver-incompatibilidades-de-gazebo-harmonic-en-jazzy">5. Resolver incompatibilidades de Gazebo Harmonic en Jazzy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#primera-ejecucion-solo-visualizacion">6. Primera ejecución: solo visualización</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#segunda-ejecucion-planificacion-con-moveit-2">7. Segunda ejecución: planificación con MoveIt 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#preguntas-de-comprobacion">Preguntas de comprobación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_1/xarm_instalacion.html#lectura-oficial">Lectura oficial</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html">Conceptos Básicos</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html#espacio-de-trabajo">Espacio de trabajo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html#paquetes">Paquetes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html#nodos">Nodos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html#temas">Temas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html#ejemplos-de-lanzamiento-y-control-de-turtlesim-en-ros-2">Ejemplos de Lanzamiento y Control de Turtlesim en ROS 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html#servicios">Servicios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html#acciones">Acciones</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/tutoriales.html">Tutoriales</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#creacion-de-un-espacio-de-trabajo">Creación de un espacio de trabajo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#creacion-paquetes">Creación Paquetes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#nodos-publicador-y-suscriptor">Nodos publicador y Suscriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#paquetes-con-mensajes-personalizados">Paquetes con mensajes personalizados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#april-tags">April-Tags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#servicios-personalizados">Servicios personalizados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#implementacion-de-una-accion-personalizada">Implementación de una Acción Personalizada</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#crear-el-servidor-y-cliente-de-la-accion">4. Crear el servidor y cliente de la acción</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#registrar-ejecutables-y-dependencias">5. Registrar ejecutables y dependencias</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#compilar-y-verificar">6. Compilar y verificar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#ejecutar">7. Ejecutar</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-1-iniciar-un-escenario-de-practica">Paso 1. Iniciar un escenario de práctica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-2-inspeccionar-el-mensaje">Paso 2. Inspeccionar el mensaje</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-3-crear-un-paquete-educativo-independiente">Paso 3. Crear un paquete educativo independiente</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-4-ejecutar-el-nodo-monitor">Paso 4. Ejecutar el nodo monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#comprender-el-fragmento-de-python">Comprender el fragmento de Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#reto-de-programacion">Reto de programación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#solucion-del-reto-de-radianes-a-grados">Solución del reto: de radianes a grados</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#objetivos">Objetivos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#servicio-propio-lectura-del-estado">1. Servicio propio: lectura del estado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#parametros-del-nodo">2. Parámetros del nodo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#descubrir-acciones-en-moveit-2">3. Descubrir acciones en MoveIt 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#interfaces-del-robot-real-solo-lectura-y-estudio">4. Interfaces del robot real: solo lectura y estudio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#reto">Reto</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html#localizar-la-funcion-suscriptora">1. Localizar la función suscriptora</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html#comprender-el-suscriptor-y-el-temporizador">2. Comprender el suscriptor y el temporizador</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html#identificar-el-parametro-del-nombre-del-topico">3. Identificar el parámetro del nombre del tópico</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html#mostrar-grados-sin-alterar-jointstate">4. Mostrar grados sin alterar JointState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html#comparar-las-frecuencias-de-publicacion">5. Comparar las frecuencias de publicación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html#verificacion-del-ejercicio">Verificación del ejercicio</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_3/dispositivos.html">Conexión con dispositivos</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_3/dispositivos.html#mqtt">MQTT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_3/dispositivos.html#arduino-ide-2-x-y-esp32-core-3-x">Arduino IDE 2.x y ESP32 core 3.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_3/dispositivos.html#acceso-a-puertos-usb">3. Acceso a puertos USB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_3/dispositivos.html#ejemplos-de-uso">Ejemplos de Uso.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_3/dispositivos.html#puente-mqtt-ros2">Puente MQTT - ROS2</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/drivers.html">Drivers para Steppers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/drivers.html#driver-a4988-nema-17">Driver A4988 - Nema 17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/drivers.html#driver-dm542t-y-nema23-pg47">Driver DM542T y NEMA23 PG47</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/modelo_digital.html">Modelo digital</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/modelo_digital.html#archivos-urdf">Archivos URDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/modelo_digital.html#visualizacion-de-archivos-urdf">Visualización de archivos URDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/modelo_digital.html#manejo-de-datos-en-rviz-con-urdf">Manejo de datos en RVIZ con URDF.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/modelo_digital.html#conexion-urdf-steppers">Conexión URDF - Steppers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/modelo_digital.html#ros2-y-el-control-de-stepper">ROS2 y el control de stepper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html">Gemelo Digital</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#archivos-xacro-en-ros-2">Archivos Xacro en ROS 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#instalacion-de-xacro">Instalación de XACRO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#diferencia-entre-urdf-y-xacro">Diferencia entre URDF y XACRO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#conversion-de-urdf-a-xacro">Conversión de URDF a XACRO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#probar-el-archivo-xacro">Probar el archivo XACRO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#xacro-en-archivos-launch">XACRO en archivos launch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#multi-robot-con-xacro">Multi-robot con XACRO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#launch-para-dos-robots-iguales">Launch para dos robots iguales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#explicacion-del-launch">Explicación del launch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#configuracion-en-rviz2">Configuración en RViz2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#dependencias-en-package-xml">Dependencias en package.xml</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#instalacion-de-archivos-en-setup-py">Instalación de archivos en setup.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#errores-comunes">Errores comunes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/gemelo_digital.html#aquitectura-esp32-y-gemelo-digital">Aquitectura ESP32 y Gemelo Digital</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_modelo.html#urdf-y-xacro-que-estudiar">URDF y Xacro: qué estudiar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_modelo.html#transformaciones-y-tf2">Transformaciones y TF2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_modelo.html#de-urdf-a-ros2-control">De URDF a ros2_control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_modelo.html#lecturas">Lecturas</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html#proposito">Propósito</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html#conceptos">Conceptos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html#primera-practica">Primera práctica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html#observar-que-ocurre-en-ros-2">Observar qué ocurre en ROS 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html#planificacion-mediante-api-siguiente-nivel">Planificación mediante API: siguiente nivel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html#ampliacion-opcional-gazebo-harmonic">Ampliación opcional: Gazebo Harmonic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/xarm_moveit.html#reto-de-evaluacion">Reto de evaluación</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#objetivo-del-documento">Objetivo del documento</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#contexto-general">Contexto general</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#concepto-de-behavior-tree">Concepto de Behavior Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#elementos-principales-de-un-behavior-tree">Elementos principales de un Behavior Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#diferencia-entre-fsm-y-behavior-tree">Diferencia entre FSM y Behavior Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#instalacion">Instalación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#diccionarios-python">Diccionarios Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#bt-para-el-control">BT para el control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#bt-y-ros2">BT y ROS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#comandos-para-el-control">Comandos para el control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#agregar-recuperacion-de-errores">Agregar recuperación de errores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#agregar-reintentos">Agregar reintentos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_4/behavior_trees.html#agregar-condicion-de-pieza">Agregar condición de pieza</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#desafio">Desafío</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#arquitectura-recomendada">Arquitectura recomendada</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#fase-1-preparacion">Fase 1. Preparación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#fase-2-registro-de-estados">Fase 2. Registro de estados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#fase-3-planificacion-de-la-tarea">Fase 3. Planificación de la tarea</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#fase-4-ampliaciones">Fase 4. Ampliaciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#entregables">Entregables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/xarm_integrador.html#criterios-de-aceptacion">Criterios de aceptación</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/proyecto_1.html">Ejercicio práctico 1</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#actividad">Actividad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#calibracion-de-la-camara">Calibración de la cámara</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#deteccion-y-transformacion-de-apriltags">Detección y Transformación de AprilTags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#publicacion-de-objetos-simulados">Publicación de objetos simulados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#modificacion-de-servicios">Modificación de servicios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#cinematica-inversa">Cinemática Inversa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#conexion-ros2-esp32">Conexión ROS2 - ESP32</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#modificacion-de-archivos-launch">Modificacion de archivos launch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_1.html#algoritmo-de-control-de-proceso">Algoritmo de control de proceso</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/proyecto_2.html">Proyecto 2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/proyecto_2.html#introduccion">Introducción</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_5/extra.html">Ejercicio práctico 2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#actividad">Actividad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#archivos-xacro">Archivos Xacro</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#scaras">Scaras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#maquinas-de-estado">Máquinas de estado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#publicacion-de-objetos-simulados">Publicación de objetos simulados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#modificacion-de-servicios">Modificación de servicios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#cinematica-inversa">Cinemática Inversa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#conexion-ros2-esp32">Conexión ROS2 - ESP32</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#modificacion-de-archivos-launch">Modificacion de archivos launch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_5/extra.html#algoritmo-de-control-de-proceso">Algoritmo de control de proceso</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="documentos/tema_0/intro.html" class="btn btn-neutral float-right" title="¿Qué es ROS2?" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

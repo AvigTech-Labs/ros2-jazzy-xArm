@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solución del reto de programación: monitor de articulaciones &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Conexión con dispositivos" href="../tema_3/dispositivos.html" />
+    <link rel="prev" title="Práctica xArm: servicios, acciones y parámetros" href="xarm_servicios.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Solución del reto de programación: monitor de articulaciones</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#localizar-la-funcion-suscriptora">1. Localizar la función suscriptora</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comprender-el-suscriptor-y-el-temporizador">2. Comprender el suscriptor y el temporizador</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#identificar-el-parametro-del-nombre-del-topico">3. Identificar el parámetro del nombre del tópico</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mostrar-grados-sin-alterar-jointstate">4. Mostrar grados sin alterar JointState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparar-las-frecuencias-de-publicacion">5. Comparar las frecuencias de publicación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verificacion-del-ejercicio">Verificación del ejercicio</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Solución del reto de programación: monitor de articulaciones</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="solucion-del-reto-de-programacion-monitor-de-articulaciones">
+<h1>Solución del reto de programación: monitor de articulaciones<a class="headerlink" href="#solucion-del-reto-de-programacion-monitor-de-articulaciones" title="Link to this heading"></a></h1>
+<p>Este solucionario corresponde a <a class="reference internal" href="xarm_comunicacion.html"><span class="doc">Práctica xArm: nodos, tópicos y mensajes</span></a> y al paquete
+<code class="docutils literal notranslate"><span class="pre">avigtech_xarm_intro</span></code> incluido en el material. Se utiliza exclusivamente
+un nodo de <strong>lectura de estados</strong>, sin enviar comandos de movimiento.</p>
+<section id="localizar-la-funcion-suscriptora">
+<h2>1. Localizar la función suscriptora<a class="headerlink" href="#localizar-la-funcion-suscriptora" title="Link to this heading"></a></h2>
+<p>En <code class="docutils literal notranslate"><span class="pre">avigtech_xarm_intro/monitor_articular.py</span></code> el callback es
+<code class="docutils literal notranslate"><span class="pre">recibir_estado(self,</span> <span class="pre">mensaje)</span></code>. Cada vez que llega un
+<code class="docutils literal notranslate"><span class="pre">sensor_msgs/msg/JointState</span></code> guarda una copia de los nombres y
+posiciones en <code class="docutils literal notranslate"><span class="pre">self.ultimo_estado</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">recibir_estado</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mensaje</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ultimo_estado</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">mensaje</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">mensaje</span><span class="o">.</span><span class="n">position</span><span class="p">),</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Este callback <strong>no mueve</strong> el robot ni modifica el mensaje recibido.</p>
+</section>
+<section id="comprender-el-suscriptor-y-el-temporizador">
+<h2>2. Comprender el suscriptor y el temporizador<a class="headerlink" href="#comprender-el-suscriptor-y-el-temporizador" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">self.create_subscription(JointState,</span> <span class="pre">...,</span> <span class="pre">self.recibir_estado,</span> <span class="pre">qos)</span></code>
+conecta el nodo a un tópico y entrega los mensajes al callback. El
+<code class="docutils literal notranslate"><span class="pre">timer</span></code> se ejecuta a intervalos independientes del ritmo de llegada:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_timer</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">frecuencia_hz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">publicar_resumen</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Por ejemplo, <code class="docutils literal notranslate"><span class="pre">frecuencia_hz</span> <span class="pre">=</span> <span class="pre">2.0</span></code> implica un periodo nominal de
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">0.5</span> <span class="pre">s</span></code>. El monitor solo publica cuando ya recibió un estado.
+El QoS del suscriptor es <code class="docutils literal notranslate"><span class="pre">qos_profile_sensor_data</span></code>, diseñado para
+manejar información reciente de sensores.</p>
+</section>
+<section id="identificar-el-parametro-del-nombre-del-topico">
+<h2>3. Identificar el parámetro del nombre del tópico<a class="headerlink" href="#identificar-el-parametro-del-nombre-del-topico" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">topic_articular</span></code> se declara dentro del constructor del nodo:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">declare_parameter</span><span class="p">(</span><span class="s1">&#39;topic_articular&#39;</span><span class="p">,</span> <span class="s1">&#39;/joint_states&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">topic_articular</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="s1">&#39;topic_articular&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+<p>En <code class="docutils literal notranslate"><span class="pre">launch/monitor_articular.launch.py</span></code> existe el argumento
+<code class="docutils literal notranslate"><span class="pre">topic_articular</span></code>. Por eso puede cambiarse sin editar Python:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>avigtech_xarm_intro<span class="w"> </span>monitor_articular.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>topic_articular:<span class="o">=</span>/joint_states
+</pre></div>
+</div>
+<p>Comprueba el parámetro que realmente utiliza el nodo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>param<span class="w"> </span>get<span class="w"> </span>/avigtech_xarm/monitor_articular<span class="w"> </span>topic_articular
+</pre></div>
+</div>
+</section>
+<section id="mostrar-grados-sin-alterar-jointstate">
+<h2>4. Mostrar grados sin alterar JointState<a class="headerlink" href="#mostrar-grados-sin-alterar-jointstate" title="Link to this heading"></a></h2>
+<p>El mensaje <code class="docutils literal notranslate"><span class="pre">JointState</span></code> expresa las <strong>juntas rotativas</strong> en radianes.
+La fórmula para convertir al presentar un resumen es:</p>
+<div class="math notranslate nohighlight">
+\[q_{grados} = q_{radianes} \frac{180}{\pi}\]</div>
+<p>El archivo <code class="docutils literal notranslate"><span class="pre">avigtech_xarm_intro/formato.py</span></code> incorpora esa conversión
+con <code class="docutils literal notranslate"><span class="pre">math.degrees()</span></code>. Esta es la función completa de la solución:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">degrees</span>
+
+<span class="n">JUNTAS_ROTATIVAS_XARM6</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s1">&#39;joint</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">formatear_articulaciones</span><span class="p">(</span><span class="n">nombres</span><span class="p">,</span> <span class="n">posiciones</span><span class="p">,</span> <span class="n">unidad</span><span class="o">=</span><span class="s1">&#39;rad&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">unidad</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;rad&#39;</span><span class="p">,</span> <span class="s1">&#39;deg&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unidad debe ser &#39;rad&#39; o &#39;deg&#39;&quot;</span><span class="p">)</span>
+
+    <span class="n">partes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">posicion</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nombres</span><span class="p">,</span> <span class="n">posiciones</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">nombre</span> <span class="ow">in</span> <span class="n">JUNTAS_ROTATIVAS_XARM6</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">unidad</span> <span class="o">==</span> <span class="s1">&#39;deg&#39;</span><span class="p">:</span>
+                <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">degrees</span><span class="p">(</span><span class="n">posicion</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> deg&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">posicion</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> rad&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">posicion</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> (revisar unidad URDF)&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">partes</span><span class="p">)</span> <span class="k">if</span> <span class="n">partes</span> <span class="k">else</span> <span class="s1">&#39;sin articulaciones con posicion publicada&#39;</span>
+</pre></div>
+</div>
+<p>La aplicación se puede lanzar directamente en grados:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-select<span class="w"> </span>avigtech_xarm_intro
+ros2<span class="w"> </span>launch<span class="w"> </span>avigtech_xarm_intro<span class="w"> </span>monitor_articular.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>topic_articular:<span class="o">=</span>/joint_states<span class="w"> </span>unidad_resumen:<span class="o">=</span>deg
+</pre></div>
+</div>
+<p>En otra terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>param<span class="w"> </span>get<span class="w"> </span>/avigtech_xarm/monitor_articular<span class="w"> </span>unidad_resumen
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/avigtech/xarm/resumen<span class="w"> </span>--once
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/joint_states<span class="w"> </span>--once
+</pre></div>
+</div>
+<p><strong>Ejemplo:</strong> <code class="docutils literal notranslate"><span class="pre">1.5708</span> <span class="pre">rad</span></code> equivale aproximadamente a <code class="docutils literal notranslate"><span class="pre">90.00</span> <span class="pre">deg</span></code>.
+No conviertas de forma indiscriminada las juntas de la pinza: las
+prismáticas se expresan en metros. Antes de convertir, verifica los
+nombres y los tipos de juntas en el URDF. En el paquete entregado la
+conversión se limita a <code class="docutils literal notranslate"><span class="pre">joint1</span></code> … <code class="docutils literal notranslate"><span class="pre">joint6</span></code>. Si tu modelo usa
+otros nombres, ajusta la lista tras comprobar el URDF.</p>
+</section>
+<section id="comparar-las-frecuencias-de-publicacion">
+<h2>5. Comparar las frecuencias de publicación<a class="headerlink" href="#comparar-las-frecuencias-de-publicacion" title="Link to this heading"></a></h2>
+<p>Abre terminales distintas mientras el escenario produce <code class="docutils literal notranslate"><span class="pre">JointState</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/joint_states
+</pre></div>
+</div>
+<p>Y para el mensaje de resumen:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/avigtech/xarm/resumen
+</pre></div>
+</div>
+<p><strong>Respuesta:</strong> transformar radianes en grados <strong>no altera la frecuencia
+ni los datos del publicador original</strong> de <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code>. El resumen
+sale por otro tópico, controlado por <code class="docutils literal notranslate"><span class="pre">frecuencia_hz</span></code> (por defecto
+aproximadamente 1 Hz), sujeto a la ejecución del temporizador y a que
+existan estados recibidos. La frecuencia real de <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code>
+depende de su propio publicador y puede variar independientemente.</p>
+<p>Para comprobarlo de forma más clara, cambia la frecuencia del resumen:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>avigtech_xarm_intro<span class="w"> </span>monitor_articular.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>topic_articular:<span class="o">=</span>/joint_states<span class="w"> </span>unidad_resumen:<span class="o">=</span>deg<span class="w"> </span>frecuencia_hz:<span class="o">=</span><span class="m">2</span>.0
+</pre></div>
+</div>
+<p>Esperarías alrededor de <strong>2 Hz en el resumen</strong>, manteniéndose la tasa
+original de <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code>. Las cifras reales se deben medir, no
+suponer. Detén antes el monitor anterior para evitar nodos duplicados.</p>
+</section>
+<section id="verificacion-del-ejercicio">
+<h2>Verificación del ejercicio<a class="headerlink" href="#verificacion-del-ejercicio" title="Link to this heading"></a></h2>
+<p>El paquete incluye pruebas unitarias de conversión, validación de unidades
+y tratamiento de juntas no identificadas como rotativas:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws/src/avigtech_xarm_intro
+python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>test/test_formato.py
+</pre></div>
+</div>
+<p>Esta prueba verifica las funciones de formato sin necesitar un robot físico.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="xarm_servicios.html" class="btn btn-neutral float-left" title="Práctica xArm: servicios, acciones y parámetros" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="../tema_3/dispositivos.html" class="btn btn-neutral float-right" title="Conexión con dispositivos" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Ejercicio práctico 1" href="proyecto_1.html" />
+    <link rel="prev" title="Behavior Trees en ROS 2 para el control de dos robots SCARA" href="../tema_4/behavior_trees.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#desafio">Desafío</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arquitectura-recomendada">Arquitectura recomendada</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fase-1-preparacion">Fase 1. Preparación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fase-2-registro-de-estados">Fase 2. Registro de estados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fase-3-planificacion-de-la-tarea">Fase 3. Planificación de la tarea</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fase-4-ampliaciones">Fase 4. Ampliaciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#entregables">Entregables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#criterios-de-aceptacion">Criterios de aceptación</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="proyecto-integrador-laboratorio-xarm-6-con-ros-2-jazzy">
+<h1>Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy<a class="headerlink" href="#proyecto-integrador-laboratorio-xarm-6-con-ros-2-jazzy" title="Link to this heading"></a></h1>
+<section id="desafio">
+<h2>Desafío<a class="headerlink" href="#desafio" title="Link to this heading"></a></h2>
+<p>Construir una pequeña aplicación que <strong>observe</strong> el estado del robot,
+lo represente y planifique una tarea de manipulación en un entorno
+simulado, reuniendo los conceptos estudiados.</p>
+<p><strong>Escenario:</strong> un objeto debe trasladarse desde una estación A a una
+estación B mediante una secuencia lógica de aproximación, agarre,
+traslado y liberación. En el curso inicial, se evalúa la planificación
+en RViz y se <strong>simulan los eventos de agarre</strong>; no se afirma que un
+objeto se mueva físicamente si no hay simulación del objeto, sensor,
+colisiones y pinza apropiados.</p>
+</section>
+<section id="arquitectura-recomendada">
+<h2>Arquitectura recomendada<a class="headerlink" href="#arquitectura-recomendada" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">xarm_description</span> <span class="o">/</span> <span class="n">robot_state_publisher</span><span class="p">]</span>
+                    <span class="o">|</span>
+               <span class="n">JointState</span>
+                    <span class="n">v</span>
+           <span class="p">[</span><span class="n">monitor_articular</span><span class="p">]</span>
+                <span class="o">|</span>       \
+       <span class="o">/</span><span class="n">avigtech</span><span class="o">/</span><span class="n">xarm</span><span class="o">/</span>  <span class="n">servicio</span> <span class="n">Trigger</span>
+           <span class="n">resumen</span>       <span class="p">(</span><span class="n">consulta</span><span class="p">)</span>
+                <span class="o">|</span>
+       <span class="p">[</span><span class="n">panel</span> <span class="n">o</span> <span class="n">registro</span><span class="p">]</span>
+
+<span class="p">[</span><span class="n">operador</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">planificador</span> <span class="n">MoveIt</span> <span class="mi">2</span><span class="p">]</span>
+                      <span class="o">|</span>
+               <span class="p">[</span><span class="n">controlador</span> <span class="n">fake</span><span class="p">]</span>
+                      <span class="o">|</span>
+                <span class="p">[</span><span class="n">RViz</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="fase-1-preparacion">
+<h2>Fase 1. Preparación<a class="headerlink" href="#fase-1-preparacion" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Instala y compila <code class="docutils literal notranslate"><span class="pre">xarm_ros2</span></code> (rama Jazzy).</p></li>
+<li><p>Incorpora <code class="docutils literal notranslate"><span class="pre">avigtech_xarm_intro</span></code> como paquete adicional.</p></li>
+<li><p>Ejecuta el lanzamiento fake del robot con MoveIt 2.</p></li>
+<li><p>Descubre el tópico <code class="docutils literal notranslate"><span class="pre">JointState</span></code> que está activo y configúralo en
+el monitor educativo.</p></li>
+</ol>
+</section>
+<section id="fase-2-registro-de-estados">
+<h2>Fase 2. Registro de estados<a class="headerlink" href="#fase-2-registro-de-estados" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Publica el resumen y consulta el servicio <code class="docutils literal notranslate"><span class="pre">Trigger</span></code>.</p></li>
+<li><p>Registra las posiciones antes y después de dos planificaciones.</p></li>
+<li><p>Agrega una marca de tiempo de captura en un registro CSV propio.</p></li>
+<li><p>Explica las unidades y el uso de nombres de articulaciones.</p></li>
+</ol>
+</section>
+<section id="fase-3-planificacion-de-la-tarea">
+<h2>Fase 3. Planificación de la tarea<a class="headerlink" href="#fase-3-planificacion-de-la-tarea" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Define dos puntos de trabajo alcanzables en una escena virtual.</p></li>
+<li><p>Identifica posiciones de aproximación y retiro.</p></li>
+<li><p>Planifica cada movimiento con los controles de RViz 2.</p></li>
+<li><p>Registra el resultado de planificación y los cambios de estado.</p></li>
+<li><p>Representa la secuencia de eventos de agarre/liberación, dejando
+claro que el proceso es lógico y no controla una pinza física.</p></li>
+</ol>
+</section>
+<section id="fase-4-ampliaciones">
+<h2>Fase 4. Ampliaciones<a class="headerlink" href="#fase-4-ampliaciones" title="Link to this heading"></a></h2>
+<p>Una vez dominada la base pueden incluirse:</p>
+<ul class="simple">
+<li><p>Cámara RealSense y AprilTags (ver <a class="reference internal" href="proyecto_1.html"><span class="doc">Ejercicio práctico 1</span></a>).</p></li>
+<li><p>Lectura de señales remotas desde ESP32 y MQTT
+(ver <a class="reference internal" href="../tema_3/dispositivos.html"><span class="doc">Conexión con dispositivos</span></a>).</p></li>
+<li><p>Control de secuencias con árboles de comportamiento
+(ver <a class="reference internal" href="../tema_4/behavior_trees.html"><span class="doc">Behavior Trees en ROS 2 para el control de dos robots SCARA</span></a>).</p></li>
+<li><p>Gazebo Harmonic, tras validar las dependencias y plugins concretos
+del repositorio xArm para Jazzy.</p></li>
+</ul>
+</section>
+<section id="entregables">
+<h2>Entregables<a class="headerlink" href="#entregables" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Diagrama de nodos, tópicos, parámetros, servicios y acciones.</p></li>
+<li><p>Código del paquete creado por el estudiante.</p></li>
+<li><p>Evidencias del modelo en RViz y de los planes de MoveIt.</p></li>
+<li><p>Descripción de los límites y riesgos antes de un ensayo real.</p></li>
+<li><p>Bitácora con nombres exactos de tópicos y tipos observados.</p></li>
+</ul>
+</section>
+<section id="criterios-de-aceptacion">
+<h2>Criterios de aceptación<a class="headerlink" href="#criterios-de-aceptacion" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>El paquete educativo se compila sin modificar el código del fabricante.</p></li>
+<li><p>Un mensaje <code class="docutils literal notranslate"><span class="pre">JointState</span></code> real o de demostración llega al monitor.</p></li>
+<li><p>El servicio de consulta devuelve el último estado observado.</p></li>
+<li><p>Se visualiza al menos una trayectoria planificada en RViz.</p></li>
+<li><p>Se distinguen explícitamente tres escenarios: visualización del
+modelo, controlador fake y robot físico.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>No se incluyen instrucciones automáticas de ejecución sobre el xArm
+real en esta evaluación inicial. Un laboratorio con actuadores
+necesita revisión profesional de límites, colisiones, E-stop,
+acceso a red y procedimiento de operación segura.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="../tema_4/behavior_trees.html" class="btn btn-neutral float-left" title="Behavior Trees en ROS 2 para el control de dos robots SCARA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="proyecto_1.html" class="btn btn-neutral float-right" title="Ejercicio práctico 1" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
