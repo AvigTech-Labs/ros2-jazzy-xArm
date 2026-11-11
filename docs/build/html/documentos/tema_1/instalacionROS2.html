@@ -198,13 +198,11 @@ continúa con <code class="docutils literal notranslate"><span class="pre">rosde
 <section id="verificar-con-un-publicador-y-un-suscriptor">
 <h2>6. Verificar con un publicador y un suscriptor<a class="headerlink" href="#verificar-con-un-publicador-y-un-suscriptor" title="Link to this heading"></a></h2>
 <p>En la primera terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
-ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_cpp<span class="w"> </span>talker
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_cpp<span class="w"> </span>talker
 </pre></div>
 </div>
 <p>En otra terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
-ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_py<span class="w"> </span>listener
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_py<span class="w"> </span>listener
 </pre></div>
 </div>
 <p>Deben aparecer mensajes publicados y recibidos. Finaliza con <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code>.</p>

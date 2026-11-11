@@ -5,14 +5,13 @@ Este tutorial complementa :doc:`instalacionROS2` y utiliza el repositorio
 oficial `xarm_ros2 <https://github.com/xArm-Developer/xarm_ros2/tree/jazzy>`__.
 Comienza con una ejecución **sin hardware**.
 
-1. Verificar el entorno
+0. Verificar el entorno
 -----------------------
 
 Abre una terminal nueva:
 
 .. code-block:: bash
 
-   source /opt/ros/jazzy/setup.bash
    echo "$ROS_DISTRO"    # Debe imprimir jazzy
    lsb_release -rs       # Debe imprimir 24.04
    python3 --version     # Python 3.12 en Ubuntu 24.04
@@ -21,6 +20,45 @@ Abre una terminal nueva:
 
    Se recomienda Ubuntu 24.04 instalado de manera nativa para el trabajo
    con RViz, MoveIt 2 y Gazebo Harmonic.
+
+1. Preparar un espacio de trabajo
+---------------------------------
+
+.. code-block:: bash
+
+   mkdir -p ~/ros2_ws/src
+   cd ~/ros2_ws
+   colcon build --symlink-install
+   source install/setup.bash
+
+**Activación automática del espacio de trabajo (solo una vez):**
+
+En lugar de escribir ``source ~/ros2_ws/install/setup.bash`` al abrir
+cada terminal, agrega esta instrucción a ``~/.bashrc`` **después** de
+haber generado ``install/setup.bash`` con ``colcon build``:
+
+.. code-block:: bash
+
+   echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
+   source ~/.bashrc
+
+.. important::
+
+   Agrega la línea una sola vez, para evitar duplicados. El archivo
+   ``~/.bashrc`` debe cargar primero ``/opt/ros/jazzy/setup.bash`` y
+   después ``~/ros2_ws/install/setup.bash``. Usa ``tail -n 10 ~/.bashrc``
+   para comprobar el orden. Cuando crees o actualices paquetes, vuelve a
+   ejecutar ``colcon build``; la activación del workspace será automática
+   en terminales Bash nuevas.
+
+Cuando agregues paquetes con dependencias nuevas, instálalas antes de
+compilar, desde la raíz del workspace:
+
+.. code-block:: bash
+
+   rosdep install --from-paths src --ignore-src --rosdistro jazzy -r -y
+   colcon build --symlink-install
+   source install/setup.bash
 
 2. Preparar las herramientas
 ----------------------------
@@ -32,9 +70,7 @@ Abre una terminal nueva:
        python3-rosdep ros-jazzy-moveit ros-jazzy-ros2-control \
        ros-jazzy-ros2-controllers
 
-   # Si rosdep se inicializó anteriormente, omite esta instrucción.
-   sudo rosdep init
-   rosdep update
+   rosdep update # Recomendado una vez por mes 
 
 El repositorio puede requerir dependencias adicionales. Se resolverán con
 ``rosdep`` antes de construir el workspace.
@@ -44,7 +80,6 @@ El repositorio puede requerir dependencias adicionales. Se resolverán con
 
 .. code-block:: bash
 
-   mkdir -p ~/ros2_ws/src
    cd ~/ros2_ws/src
    git clone -b jazzy --recursive \
        https://github.com/xArm-Developer/xarm_ros2.git
@@ -64,7 +99,6 @@ El repositorio puede requerir dependencias adicionales. Se resolverán con
 
 .. code-block:: bash
 
-   source /opt/ros/jazzy/setup.bash
    cd ~/ros2_ws
    rosdep install --from-paths src --ignore-src \
        --rosdistro jazzy -y
@@ -115,7 +149,6 @@ El aviso de ``on_init(const HardwareInfo&) is deprecated`` en
 
    sudo apt update
    sudo apt install -y ros-jazzy-gz-sim-vendor ros-jazzy-sdformat-vendor
-   source /opt/ros/jazzy/setup.bash
    ros2 pkg prefix gz_sim_vendor
    ros2 pkg prefix sdformat_vendor
 
@@ -262,13 +295,6 @@ Si Colcon reconoce el paquete pero ROS 2 todavía no lo encuentra, ejecuta
 ``colcon build --symlink-install --packages-up-to xarm_moveit_config``
 desde ``~/ros2_ws`` y vuelve a cargar ``install/setup.bash``.
 
-Preguntas de comprobación
--------------------------
-
-#. ¿Cuál es la diferencia entre el modelo URDF y el planificador MoveIt?
-#. ¿Qué paquetes descubriste mediante ``ros2 pkg list | grep xarm``?
-#. ¿Qué cambia al cerrar un lanzamiento y abrir el otro?
-#. ¿Para qué sirve ``source ~/ros2_ws/install/setup.bash``?
 
 Lectura oficial
 ---------------

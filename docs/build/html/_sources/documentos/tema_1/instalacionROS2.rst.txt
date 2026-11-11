@@ -102,14 +102,12 @@ En la primera terminal:
 
 .. code-block:: bash
 
-   source /opt/ros/jazzy/setup.bash
    ros2 run demo_nodes_cpp talker
 
 En otra terminal:
 
 .. code-block:: bash
 
-   source /opt/ros/jazzy/setup.bash
    ros2 run demo_nodes_py listener
 
 Deben aparecer mensajes publicados y recibidos. Finaliza con ``Ctrl+C``.
