@@ -64,8 +64,8 @@ compatible con python, y tendrá las dependencias de ``std_msgs``
    cd ~/ros2_ws
    colcon build --packages-select mi_pkg_python
 
-Nodos publicador y Suscriptor
------------------------------
+Nodos
+------
 
 Una vez compilado el paquete, se realiza la creación de los nodos
 publicador y suscriptor.
@@ -242,8 +242,8 @@ en una terminal diferente ejecutar el nodo suscriptor
 
    ros2 run mi_pkg_python suscriptor1
 
-Paquetes con mensajes personalizados
-------------------------------------
+Mensajes personalizados
+-------------------------
 
 Los mensajes personalizados permiten crear un paquete exclusivo para
 generar estructuras personales de mensajes en ROS2 usando
@@ -413,7 +413,7 @@ Se puede usar en un publicador o suscriptor como cualquier otro mensaje.
 
 
 April-Tags
-----------
+-----------
 
 Un **AprilTag** es un tipo de marcador visual 2D diseñado para permitir
 la detección robusta, precisa y rápida en entornos de visión por
@@ -731,7 +731,7 @@ Ejemplos
                main()
 
 Servicios personalizados
-------------------------
+-------------------------
 
 En el servicio personalizado se agrega la funcionalidad de una
 Heuristica al sistema de control del robot.
@@ -1002,8 +1002,8 @@ En dos terminales diferentes:
    ros2 run mi_pkg_python servidor
    ros2 run mi_pkg_python cliente
 
-Implementación de una Acción Personalizada
-------------------------------------------
+Acciones personalizadas
+-------------------------
 
 En esta **acción personalizada** llamada ``MoverA`` se simula el movimiento de un robot hacia una posición ``(x, y)`` objetivo, utilizando el sistema de 
 acciones de ROS 2.
@@ -1076,7 +1076,6 @@ Agregar:
 --------------
 
 4. Crear el servidor y cliente de la acción
-----------------------------------------------
 
 En ``~/ros2_ws/src/mi_pkg_python/mi_pkg_python/`` crea los archivos
 ``action_server.py`` y ``action_client.py``. El servidor publica feedback
@@ -1248,7 +1247,6 @@ que ya está gestionado por el ejecutor de ROS 2.
    de metas concurrentes, límites de velocidad y parada de emergencia.
 
 5. Registrar ejecutables y dependencias
----------------------------------------
 
 En el ``setup.py`` del paquete Python ``mi_pkg_python``, dentro de
 ``entry_points['console_scripts']`` registra:
@@ -1279,7 +1277,6 @@ No crees un segundo bloque para el mismo paquete:
    )
 
 6. Compilar y verificar
------------------------
 
 .. code-block:: bash
 
@@ -1288,7 +1285,7 @@ No crees un segundo bloque para el mismo paquete:
    source install/setup.bash
    ros2 interface show avig_msg/action/MoverA
 
-7. Ejecutar
+Ejecutar
 -----------
 
 En la primera terminal:
