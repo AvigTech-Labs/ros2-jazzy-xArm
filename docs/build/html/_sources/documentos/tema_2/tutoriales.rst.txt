@@ -479,6 +479,84 @@ repositorios:
 
 --------------
 
+
+Configuración de la Camara.
+
+1. Identificar las cámaras disponibles en Ubuntu
+
+.. code:: bash
+
+   ls /dev/video*
+
+2. Instalar herramientas para identificar la cámara
+
+Ubuntu dispone de una herramienta llamada v4l2-ctl, que permite consultar los dispositivos de vídeo.
+
+.. code:: bash
+
+   sudo apt update
+   sudo apt install -y v4l-utils
+
+revisión:
+
+.. code:: bash
+
+   v4l2-ctl --list-devices
+
+
+Para comprobar qué dispositivo admite realmente captura de vídeo:
+
+.. code:: bash
+
+   v4l2-ctl -d /dev/video0 --all
+
+
+En los reusltados debe existir una capacidad similar a Video Capture. Si el dispositivo solamente informa Metadata Capture, 
+no será el dispositivo adecuado para capturar imágenes con OpenCV.
+
+También puedes conocer las resoluciones y los formatos compatible
+
+.. code:: bash
+
+   v4l2-ctl -d /dev/video0 --list-formats-ext
+
+
+3. Detectar automáticamente el ID correcto mediante Python
+
+.. code:: bash
+
+   python3 - <<'PY'
+   import cv2
+   import glob
+
+   dispositivos = sorted(glob.glob('/dev/video*'))
+
+   print("Buscando cámaras disponibles...\n")
+
+   for dispositivo in dispositivos:
+      print(f"Probando: {dispositivo}")
+
+      cap = cv2.VideoCapture(dispositivo, cv2.CAP_V4L2)
+
+      if cap.isOpened():
+         ret, frame = cap.read()
+
+         if ret and frame is not None:
+               alto, ancho = frame.shape[:2]
+
+               print("  Cámara funcional")
+               print(f"  Resolución: {ancho}x{alto}")
+               print(f"  Dispositivo: {dispositivo}\n")
+         else:
+               print("  Abre, pero no entrega imágenes\n")
+      else:
+         print("  No se pudo abrir\n")
+
+      cap.release()
+
+   print("Verificación finalizada.")
+   PY
+
 Ejemplos 
 
 
