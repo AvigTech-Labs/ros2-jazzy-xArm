@@ -112,61 +112,13 @@ En otra terminal:
 
 Deben aparecer mensajes publicados y recibidos. Finaliza con ``Ctrl+C``.
 
-7. Preparar un espacio de trabajo
----------------------------------
 
-.. code-block:: bash
-
-   mkdir -p ~/ros2_ws/src
-   cd ~/ros2_ws
-   colcon build --symlink-install
-   source install/setup.bash
-
-**Activación automática del espacio de trabajo (solo una vez):**
-
-En lugar de escribir ``source ~/ros2_ws/install/setup.bash`` al abrir
-cada terminal, agrega esta instrucción a ``~/.bashrc`` **después** de
-haber generado ``install/setup.bash`` con ``colcon build``:
-
-.. code-block:: bash
-
-   echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
-   source ~/.bashrc
-
-.. important::
-
-   Agrega la línea una sola vez, para evitar duplicados. El archivo
-   ``~/.bashrc`` debe cargar primero ``/opt/ros/jazzy/setup.bash`` y
-   después ``~/ros2_ws/install/setup.bash``. Usa ``tail -n 10 ~/.bashrc``
-   para comprobar el orden. Cuando crees o actualices paquetes, vuelve a
-   ejecutar ``colcon build``; la activación del workspace será automática
-   en terminales Bash nuevas.
-
-Cuando agregues paquetes con dependencias nuevas, instálalas antes de
-compilar, desde la raíz del workspace:
-
-.. code-block:: bash
-
-   rosdep install --from-paths src --ignore-src --rosdistro jazzy -r -y
-   colcon build --symlink-install
-   source install/setup.bash
-
-8. Dependencias Python externas y entornos virtuales
+7. Dependencias Python externas y entornos virtuales
 ----------------------------------------------------
 
 Ubuntu 24.04 usa Python 3.12 y protege su intérprete del sistema según
 PEP 668. **No uses** ``sudo pip`` ni ``--break-system-packages`` para
 instalar dependencias de los ejemplos.
-
-Para mantener disponibles los módulos instalados por ROS mediante APT,
-usa un entorno virtual con acceso a paquetes del sistema:
-
-.. code-block:: bash
-
-   sudo apt install -y python3-venv python3-pip python3-opencv python3-yaml
-   python3 -m venv --system-site-packages ~/venvs/ros2-jazzy
-   source ~/venvs/ros2-jazzy/bin/activate
-   python -m pip install 'paho-mqtt>=2,<3' pupil-apriltags pydot
 
 .. warning::
 

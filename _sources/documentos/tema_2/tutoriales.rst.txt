@@ -464,11 +464,18 @@ repositorios:
 
 **Instalación:**
 
+
 .. code:: bash
 
-   sudo apt install -y python3-opencv
-   source ~/venvs/ros2-jazzy/bin/activate
-   python -m pip install pupil-apriltags
+   sudo apt install python3-pip -y
+   /usr/bin/python3 -c "import cv2, numpy; print('OpenCV:', cv2.__version__); print('NumPy:', numpy.__version__)"
+   /usr/bin/python3 -m pip install \
+    --user \
+    --break-system-packages \
+    --no-deps \
+    "pupil-apriltags==1.0.4.post11"
+   
+   /usr/bin/python3 -m pip show pupil-apriltags
 
 --------------
 
