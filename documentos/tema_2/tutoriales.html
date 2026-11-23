@@ -549,6 +549,71 @@ repositorios:</p>
 </pre></div>
 </div>
 <hr class="docutils" />
+<p>Configuración de la Camara.</p>
+<ol class="arabic simple">
+<li><p>Identificar las cámaras disponibles en Ubuntu</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>/dev/video*
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Instalar herramientas para identificar la cámara</p></li>
+</ol>
+<p>Ubuntu dispone de una herramienta llamada v4l2-ctl, que permite consultar los dispositivos de vídeo.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>v4l-utils
+</pre></div>
+</div>
+<p>revisión:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v4l2-ctl<span class="w"> </span>--list-devices
+</pre></div>
+</div>
+<p>Para comprobar qué dispositivo admite realmente captura de vídeo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v4l2-ctl<span class="w"> </span>-d<span class="w"> </span>/dev/video0<span class="w"> </span>--all
+</pre></div>
+</div>
+<p>En los reusltados debe existir una capacidad similar a Video Capture. Si el dispositivo solamente informa Metadata Capture,
+no será el dispositivo adecuado para capturar imágenes con OpenCV.</p>
+<p>También puedes conocer las resoluciones y los formatos compatible</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v4l2-ctl<span class="w"> </span>-d<span class="w"> </span>/dev/video0<span class="w"> </span>--list-formats-ext
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Detectar automáticamente el ID correcto mediante Python</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;'PY'</span>
+<span class="s">import cv2</span>
+<span class="s">import glob</span>
+
+<span class="s">dispositivos = sorted(glob.glob('/dev/video*'))</span>
+
+<span class="s">print("Buscando cámaras disponibles...\n")</span>
+
+<span class="s">for dispositivo in dispositivos:</span>
+<span class="s">   print(f"Probando: {dispositivo}")</span>
+
+<span class="s">   cap = cv2.VideoCapture(dispositivo, cv2.CAP_V4L2)</span>
+
+<span class="s">   if cap.isOpened():</span>
+<span class="s">      ret, frame = cap.read()</span>
+
+<span class="s">      if ret and frame is not None:</span>
+<span class="s">            alto, ancho = frame.shape[:2]</span>
+
+<span class="s">            print("  Cámara funcional")</span>
+<span class="s">            print(f"  Resolución: {ancho}x{alto}")</span>
+<span class="s">            print(f"  Dispositivo: {dispositivo}\n")</span>
+<span class="s">      else:</span>
+<span class="s">            print("  Abre, pero no entrega imágenes\n")</span>
+<span class="s">   else:</span>
+<span class="s">      print("  No se pudo abrir\n")</span>
+
+<span class="s">   cap.release()</span>
+
+<span class="s">print("Verificación finalizada.")</span>
+<span class="s">PY</span>
+</pre></div>
+</div>
 <p>Ejemplos</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-1-UHJvZ3JhbWEgMQ==" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-1-UHJvZ3JhbWEgMQ==" name="UHJvZ3JhbWEgMQ==" role="tab" tabindex="0">Programa 1</button><button aria-controls="panel-1-UHJvZ3JhbWEgMg==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-UHJvZ3JhbWEgMg==" name="UHJvZ3JhbWEgMg==" role="tab" tabindex="-1">Programa 2</button><button aria-controls="panel-1-UHJvZ3JhbWEgMw==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-UHJvZ3JhbWEgMw==" name="UHJvZ3JhbWEgMw==" role="tab" tabindex="-1">Programa 3</button></div><div aria-labelledby="tab-1-UHJvZ3JhbWEgMQ==" class="sphinx-tabs-panel group-tab" id="panel-1-UHJvZ3JhbWEgMQ==" name="UHJvZ3JhbWEgMQ==" role="tabpanel" tabindex="0"><p><em>Detección en Python puro (sin ROS)</em></p>
