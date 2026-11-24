@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Práctica xArm: nodos, tópicos y mensajes &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
 
@@ -16,8 +16,8 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=13309ef0"></script>
-      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../_static/translations.js?v=f85f4cfb"></script>
@@ -201,10 +201,10 @@ importaciones están en <code class="docutils literal notranslate"><span class="
     <span class="n">qos_profile_sensor_data</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="bp">self</span><span class="o">.</span><span class="n">publicador</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_publisher</span><span class="p">(</span>
-    <span class="n">String</span><span class="p">,</span> <span class="s1">'/avigtech/xarm/resumen'</span><span class="p">,</span> <span class="mi">10</span>
+    <span class="n">String</span><span class="p">,</span> <span class="s1">&#39;/avigtech/xarm/resumen&#39;</span><span class="p">,</span> <span class="mi">10</span>
 <span class="p">)</span>
 <span class="bp">self</span><span class="o">.</span><span class="n">servicio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span>
-    <span class="n">Trigger</span><span class="p">,</span> <span class="s1">'/avigtech/xarm/obtener_estado'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">consultar_estado</span>
+    <span class="n">Trigger</span><span class="p">,</span> <span class="s1">&#39;/avigtech/xarm/obtener_estado&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">consultar_estado</span>
 <span class="p">)</span>
 </pre></div>
 </div>

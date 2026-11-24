@@ -1,0 +1,1352 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=13309ef0"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" />
+    <link rel="next" title="Solución del reto de programación: monitor de articulaciones" href="xarm_reto_resuelto.html" />
+    <link rel="prev" title="Tutoriales" href="tutoriales.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ROS2 Jazzy - xArm 6
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introducción y puesta en marcha</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_0/intro.html">¿Qué es ROS2?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/ubuntu_git.html">Ubuntu y GitHub</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/compatibilidad_jazzy.html">Compatibilidad, dependencias y validación en Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_1/xarm_instalacion.html">Instalación de xArm ROS 2 para Jazzy</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Fundamentos ROS 2 aplicados al xArm 6</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="conceptos_basicos.html">Conceptos Básicos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutoriales.html">Tutoriales</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#que-hace-cada-lanzamiento-de-xarm">1. ¿Qué hace cada lanzamiento de xArm?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fundamentos-nodos-topicos-mensajes-y-servicios">2. Fundamentos: nodos, tópicos, mensajes y servicios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analisis-de-los-resultados-reales-del-xarm-6">3. Análisis de los resultados reales del xArm 6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arquitectura-de-planificacion-y-ejecucion-simuladas">4. Arquitectura de planificación y ejecución simuladas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#como-funciona-el-servicio-xarm-planner">5. ¿Cómo funciona el servicio <code class="docutils literal notranslate"><span class="pre">xarm_planner</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#programar-nuestro-propio-cliente-ros-2-con-python">6. Programar nuestro propio cliente ROS 2 con Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enviar-una-posicion-y-orientacion-pose-cartesiana">7. Enviar una posición y orientación (pose cartesiana)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ptp-frente-a-movimiento-cartesiano-rectilineo">8. PTP frente a movimiento cartesiano rectilíneo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#crear-b-a-partir-de-la-pose-actual-a-con-tf2">9. Crear B a partir de la pose actual A con TF2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resultados-y-preguntas-de-comprobacion">10. Resultados y preguntas de comprobación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#referencias-tecnicas">11. Referencias técnicas</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_3/dispositivos.html">Conexión con dispositivos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/drivers.html">Drivers para Steppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/modelo_digital.html">Modelo digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/gemelo_digital.html">Gemelo Digital</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_modelo.html">Práctica xArm: URDF, Xacro, TF2 y control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/xarm_moveit.html">Práctica xArm: planificación con MoveIt 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_4/behavior_trees.html">Behavior Trees en ROS 2 para el control de dos robots SCARA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Proyectos aplicados</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/xarm_integrador.html">Proyecto integrador: laboratorio xArm 6 con ROS 2 Jazzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_1.html">Ejercicio práctico 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/proyecto_2.html">Proyecto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tema_5/extra.html">Ejercicio práctico 2</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS2 Jazzy - xArm 6</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="practica-xarm-6-ros-2-moveit-2-y-planificacion-sin-robot-fisico">
+<h1>Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico<a class="headerlink" href="#practica-xarm-6-ros-2-moveit-2-y-planificacion-sin-robot-fisico" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Esta práctica se basa en <strong>ROS 2 Jazzy, Ubuntu 24.04 y el xArm 6</strong>.
+Se utilizan exclusivamente los lanzamientos con hardware <code class="docutils literal notranslate"><span class="pre">fake</span></code>.
+No es necesario el manipulador físico, el driver <code class="docutils literal notranslate"><span class="pre">xarm_api</span></code> ni Gazebo.
+La planificación no simula fuerzas, pares ni dinámica de contacto.</p>
+</div>
+<p><strong>Objetivos de aprendizaje</strong></p>
+<ul class="simple">
+<li><p>Diferenciar los lanzamientos de visualización, MoveIt 2, planificador y driver.</p></li>
+<li><p>Identificar nodos, tópicos, mensajes, servicios y controladores <strong>observados</strong>.</p></li>
+<li><p>Explicar la arquitectura cliente/servidor de <code class="docutils literal notranslate"><span class="pre">xarm_planner</span></code>.</p></li>
+<li><p>Planificar y ejecutar de forma controlada una trayectoria articular A → B.</p></li>
+<li><p>Programar un cliente <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> que sustituya <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">service</span> <span class="pre">call</span></code>.</p></li>
+<li><p>Comparar planificación articular/por pose con planificación cartesiana lineal.</p></li>
+</ul>
+<p><strong>Prerrequisitos:</strong> tener compilado <code class="docutils literal notranslate"><span class="pre">xarm_ros2</span></code> (rama <code class="docutils literal notranslate"><span class="pre">jazzy</span></code>), disponer de
+<code class="docutils literal notranslate"><span class="pre">~/ros2_ws</span></code> y haber configurado la carga del entorno. Si no se configuró el
+<code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>, en una nueva terminal se requiere <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/ros2_ws/install/setup.bash</span></code>.</p>
+<section id="que-hace-cada-lanzamiento-de-xarm">
+<h2>1. ¿Qué hace cada lanzamiento de xArm?<a class="headerlink" href="#que-hace-cada-lanzamiento-de-xarm" title="Link to this heading"></a></h2>
+<p>El fabricante ofrece diferentes puntos de entrada. <strong>No se deben ejecutar al
+mismo tiempo</strong> dos lanzamientos fake completos que compartan nombres de nodos,
+controladores o interfaces, porque pueden competir por recursos.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Lanzamientos relevantes</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 29.0%" />
+<col style="width: 35.0%" />
+<col style="width: 36.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Lanzamiento</p></th>
+<th class="head"><p>Componentes / propósito</p></th>
+<th class="head"><p>Uso didáctico</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">xarm_description</span> <span class="pre">xarm6_rviz_display.launch.py</span></code></p></td>
+<td><p>Modelo URDF y visualización en RViz 2; no equivale a MoveIt</p></td>
+<td><p>Introducción al robot, eslabones, articulaciones y TF2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">xarm_moveit_config</span> <span class="pre">xarm6_moveit_fake.launch.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">move_group</span></code>, RViz 2, controladores ROS 2 y hardware fake</p></td>
+<td><p>Descubrir nodos, mensajes, servicios, acciones y controladores</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">xarm_planner</span> <span class="pre">xarm6_planner_fake.launch.py</span></code></p></td>
+<td><p>Incluye la configuración MoveIt fake y añade <code class="docutils literal notranslate"><span class="pre">xarm_planner_node</span></code></p></td>
+<td><p>Planificación articular y cartesiana mediante servicios</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">xarm_api</span> <span class="pre">xarm6_driver.launch.py</span> <span class="pre">robot_ip:=...</span></code></p></td>
+<td><p>Inicia el driver/SDK e intenta conectarse al controlador físico</p></td>
+<td><p><strong>Fuera de alcance</strong> de esta práctica sin robot físico</p></td>
+</tr>
+</tbody>
+</table>
+<p>Los servicios del SDK como <code class="docutils literal notranslate"><span class="pre">/xarm/motion_enable</span></code>, <code class="docutils literal notranslate"><span class="pre">/xarm/set_mode</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/xarm/set_position</span></code> y <code class="docutils literal notranslate"><span class="pre">/xarm/set_servo_angle</span></code> no forman parte de la
+interfaz predeterminada del planificador fake; su ausencia es esperada.</p>
+<p><strong>Primera terminal: exploración de MoveIt 2</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_moveit_config<span class="w"> </span>xarm6_moveit_fake.launch.py
+</pre></div>
+</div>
+<p><strong>Para los ejercicios de planificación por servicio:</strong> detén el lanzamiento
+anterior (<code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code>), comprueba que sus procesos han finalizado y ejecuta:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>xarm_planner<span class="w"> </span>xarm6_planner_fake.launch.py
+</pre></div>
+</div>
+<p>La rama <code class="docutils literal notranslate"><span class="pre">jazzy</span></code> de UFACTORY define este segundo lanzamiento como una
+configuración que incluye el launch interno de MoveIt fake y habilita el
+planificador de servicios.</p>
+</section>
+<section id="fundamentos-nodos-topicos-mensajes-y-servicios">
+<h2>2. Fundamentos: nodos, tópicos, mensajes y servicios<a class="headerlink" href="#fundamentos-nodos-topicos-mensajes-y-servicios" title="Link to this heading"></a></h2>
+<p><strong>Nodo:</strong> proceso o componente ROS 2 que realiza tareas concretas. Un mismo
+sistema puede contener un nodo de planificación, uno de control, otro de
+publicación de estados y otro de visualización.</p>
+<p><strong>Tópico:</strong> canal de comunicación publicador/suscriptor. Permite un flujo de
+datos asíncrono. <strong>Mensaje:</strong> estructura tipada que viaja por el tópico.
+Por ejemplo, <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code> publica mensajes <code class="docutils literal notranslate"><span class="pre">sensor_msgs/msg/JointState</span></code>
+con nombres y estados articulares. Las posiciones de las juntas rotativas se
+expresan en <strong>radianes</strong>.</p>
+<p><strong>Servicio:</strong> comunicación solicitud/respuesta. Un cliente envía una petición
+con un tipo conocido, y un servidor la procesa y devuelve una respuesta.
+La respuesta <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code> de una planificación confirma que se obtuvo un
+plan; <strong>no confirma la ejecución</strong> del movimiento.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Cliente ROS 2   -- Request --&gt;   Servidor de servicio
+    (rclpy)                       (xarm_planner_node)
+        ^                              |
+        +----------- Response ---------+
+</pre></div>
+</div>
+<p><strong>Comandos iniciales de exploración (segunda terminal):</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>node<span class="w"> </span>list
+ros2<span class="w"> </span>node<span class="w"> </span>info<span class="w"> </span>/move_group
+ros2<span class="w"> </span>topic<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>topic<span class="w"> </span>info<span class="w"> </span>/joint_states<span class="w"> </span>-v
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>sensor_msgs/msg/JointState
+ros2<span class="w"> </span>service<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>action<span class="w"> </span>list<span class="w"> </span>-t
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>La salida de <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">service</span> <span class="pre">list</span></code> depende del instante de arranque, los
+namespaces y el lanzamiento seleccionado. Si no se ve algún servicio,
+espera la inicialización y vuelve a consultar.</p>
+</div>
+</section>
+<section id="analisis-de-los-resultados-reales-del-xarm-6">
+<h2>3. Análisis de los resultados reales del xArm 6<a class="headerlink" href="#analisis-de-los-resultados-reales-del-xarm-6" title="Link to this heading"></a></h2>
+<p>Esta tabla utiliza las <strong>salidas registradas en el equipo de prácticas</strong>,
+no una lista hipotética de servicios. La última prueba confirmó la
+planificación de un objetivo de seis articulaciones, mientras que la ejecución
+A → B todavía debe comprobarse en esa instalación.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">¿Qué hemos comprobado realmente?</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 22.0%" />
+<col style="width: 32.0%" />
+<col style="width: 46.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Componente</p></th>
+<th class="head"><p>Resultado observado</p></th>
+<th class="head"><p>Comando de comprobación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">move_group</span></code></p></td>
+<td><p>Nodo activo con servicios y acciones de MoveIt 2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">node</span> <span class="pre">info</span> <span class="pre">/move_group</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>MoveIt 2 y OMPL</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">move_group</span></code> usa la pipeline <code class="docutils literal notranslate"><span class="pre">ompl</span></code>; una planificación fue exitosa</p></td>
+<td><p>Ver logs del lanzamiento y llamar a <code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ros2_control</span></code></p></td>
+<td><p>Controladores cargados y activos</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">control</span> <span class="pre">list_controllers</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Hardware fake</p></td>
+<td><p>Aparece <code class="docutils literal notranslate"><span class="pre">uf_robot_hardware_ufrobotfakesystemhardware</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">control</span> <span class="pre">list_hardware_components</span></code> y <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">node</span> <span class="pre">list</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/joint_states</span></code></p></td>
+<td><p>Publica seis posiciones para <code class="docutils literal notranslate"><span class="pre">joint1</span></code> … <code class="docutils literal notranslate"><span class="pre">joint6</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">topic</span> <span class="pre">echo</span> <span class="pre">/joint_states</span> <span class="pre">--once</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/move_action</span></code></p></td>
+<td><p>Servidor de la acción <code class="docutils literal notranslate"><span class="pre">MoveGroup</span></code> presente</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">action</span> <span class="pre">info</span> <span class="pre">/move_action</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/execute_trajectory</span></code></p></td>
+<td><p>Servidor de acción disponible</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">action</span> <span class="pre">info</span> <span class="pre">/execute_trajectory</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Control de trayectorias</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xarm6_traj_controller</span></code> activo</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">control</span> <span class="pre">list_controllers</span></code> y <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">action</span> <span class="pre">list</span> <span class="pre">-t</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code></p></td>
+<td><p><strong>Verificado:</strong> respuesta <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">service</span> <span class="pre">call</span> <span class="pre">/xarm_joint_plan</span> <span class="pre">...</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Ejecución de A → B</p></td>
+<td><p><strong>Pendiente de confirmar</strong> en el registro aportado</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/xarm_exec_plan</span></code> + <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Comprobaciones complementarias:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>node<span class="w"> </span>info<span class="w"> </span>/move_group
+ros2<span class="w"> </span>service<span class="w"> </span>list<span class="w"> </span>-t<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">'compute_fk|compute_ik|compute_cartesian_path|plan_kinematic_path'</span>
+ros2<span class="w"> </span>action<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>control<span class="w"> </span>list_controllers
+ros2<span class="w"> </span>control<span class="w"> </span>list_hardware_components
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/joint_states<span class="w"> </span>--once
+ros2<span class="w"> </span>topic<span class="w"> </span>info<span class="w"> </span>/xarm6_traj_controller/controller_state
+</pre></div>
+</div>
+<p>En el registro real, <code class="docutils literal notranslate"><span class="pre">/move_group</span></code> anunció, entre otros, estos servicios:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/compute_fk</span></code> (<code class="docutils literal notranslate"><span class="pre">moveit_msgs/srv/GetPositionFK</span></code>): cinemática directa.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/compute_ik</span></code> (<code class="docutils literal notranslate"><span class="pre">moveit_msgs/srv/GetPositionIK</span></code>): cinemática inversa.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/compute_cartesian_path</span></code> (<code class="docutils literal notranslate"><span class="pre">moveit_msgs/srv/GetCartesianPath</span></code>): ruta cartesiana.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/plan_kinematic_path</span></code> (<code class="docutils literal notranslate"><span class="pre">moveit_msgs/srv/GetMotionPlan</span></code>): petición de planificación.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/check_state_validity</span></code> (<code class="docutils literal notranslate"><span class="pre">moveit_msgs/srv/GetStateValidity</span></code>): comprobar un estado.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/apply_planning_scene</span></code> (<code class="docutils literal notranslate"><span class="pre">moveit_msgs/srv/ApplyPlanningScene</span></code>): actualizar escena.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/clear_octomap</span></code> (<code class="docutils literal notranslate"><span class="pre">std_srvs/srv/Empty</span></code>): limpiar mapa de ocupación.</p></li>
+</ul>
+<p>No todos estos servicios se utilizarán todavía; algunos corresponden a las
+lecciones futuras de cinemática y percepción.</p>
+<p><strong>Interpretación del mensaje de estados</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/joint_states<span class="w"> </span>--once
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/xarm6_traj_controller/controller_state
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/joint_states
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">JointState</span></code> contiene <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">position</span></code>, <code class="docutils literal notranslate"><span class="pre">velocity</span></code> y <code class="docutils literal notranslate"><span class="pre">effort</span></code>.
+En las pruebas, los seis valores de <code class="docutils literal notranslate"><span class="pre">effort</span></code> aparecieron como <code class="docutils literal notranslate"><span class="pre">.nan</span></code>:
+esto <strong>no representa un esfuerzo medido</strong>, sino datos no disponibles en el
+hardware fake. Los valores de <code class="docutils literal notranslate"><span class="pre">position</span></code> deben asociarse siempre con la
+lista <code class="docutils literal notranslate"><span class="pre">name</span></code>; no hay que suponer que el orden es fijo si cambia el modelo.</p>
+<p><strong>Controladores activos observados:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>joint_state_broadcaster  joint_state_broadcaster/JointStateBroadcaster          active
+xarm6_traj_controller    joint_trajectory_controller/JointTrajectoryController active
+</pre></div>
+</div>
+<p><strong>Avisos del entorno VirtualBox:</strong> <code class="docutils literal notranslate"><span class="pre">Overrun</span> <span class="pre">detected</span></code> indica que el ciclo
+de control (150 Hz en la sesión registrada, equivalente a 6,67 ms) incumplió
+su período. <code class="docutils literal notranslate"><span class="pre">/recognize_objects</span> <span class="pre">not</span> <span class="pre">available</span></code> puede aparecer sin un módulo
+de reconocimiento; no impide planificar. Los avisos de nodos duplicados y
+pérdida de mensajes requieren comprobar que no queden otros lanzamientos
+activos y observar si se repiten continuamente.</p>
+</section>
+<section id="arquitectura-de-planificacion-y-ejecucion-simuladas">
+<h2>4. Arquitectura de planificación y ejecución simuladas<a class="headerlink" href="#arquitectura-de-planificacion-y-ejecucion-simuladas" title="Link to this heading"></a></h2>
+<p>El flujo que debemos comprender es el siguiente:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Cliente ROS 2 de AvigTech
+   |     solicitud PlanJoint / PlanSingleStraight
+   v
+/xarm_joint_plan o /xarm_straight_plan
+   |
+   v
+xarm_planner_node (servidor C++ UFACTORY)
+   |
+   v
+move_group / MoveIt 2 (planificacion)
+   |
+   | plan valido almacenado en el planificador
+   v
+/xarm_exec_plan (servicio de ejecucion)
+   |
+   v
+MoveIt Execution / xarm6_traj_controller
+   |
+   v
+UFRobotFakeSystemHardware
+   |
+   v
+joint_state_broadcaster -&gt; /joint_states -&gt; RViz 2
+</pre></div>
+</div>
+<p>La separación entre <strong>planificar</strong> y <strong>ejecutar</strong> es deliberada. La
+trayectoria encontrada por MoveIt no altera por sí sola las posiciones del
+robot. El hardware fake actualiza posiciones al procesar los comandos de
+trayectoria; RViz muestra ese estado, no un robot conectado.</p>
+</section>
+<section id="como-funciona-el-servicio-xarm-planner">
+<h2>5. ¿Cómo funciona el servicio <code class="docutils literal notranslate"><span class="pre">xarm_planner</span></code>?<a class="headerlink" href="#como-funciona-el-servicio-xarm-planner" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">xarm_planner_node</span></code> implementa los servidores. En la rama Jazzy se pueden
+consultar las siguientes interfaces de UFACTORY:</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Servicios didácticos del planificador</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 31.0%" />
+<col style="width: 30.0%" />
+<col style="width: 39.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Nombre</p></th>
+<th class="head"><p>Tipo</p></th>
+<th class="head"><p>Objetivo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xarm_msgs/srv/PlanJoint</span></code></p></td>
+<td><p>Planificar un objetivo en radianes (seis juntas)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/xarm_pose_plan</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xarm_msgs/srv/PlanPose</span></code></p></td>
+<td><p>Planificar hasta una pose del efector (sin exigir recta)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/xarm_straight_plan</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xarm_msgs/srv/PlanSingleStraight</span></code></p></td>
+<td><p>Calcular una ruta cartesiana hacia una pose</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/xarm_exec_plan</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xarm_msgs/srv/PlanExec</span></code></p></td>
+<td><p>Ejecutar la última trayectoria planificada</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Descubrimiento y definición de los mensajes de servicio:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>list<span class="w"> </span>-t<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">'xarm_(joint|pose|straight|exec)_plan'</span>
+ros2<span class="w"> </span>service<span class="w"> </span><span class="nb">type</span><span class="w"> </span>/xarm_joint_plan
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>xarm_msgs/srv/PlanJoint
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>xarm_msgs/srv/PlanExec
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>xarm_msgs/srv/PlanPose
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>xarm_msgs/srv/PlanSingleStraight
+</pre></div>
+</div>
+<p>Por ejemplo, <code class="docutils literal notranslate"><span class="pre">PlanJoint</span></code> intercambia:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>float64[] target
+---
+bool success
+</pre></div>
+</div>
+<p>El <strong>cliente</strong> puede ser el comando <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">service</span> <span class="pre">call</span></code> o nuestro propio
+nodo Python. El <strong>servidor</strong> seguirá siendo <code class="docutils literal notranslate"><span class="pre">xarm_planner_node</span></code>,
+que llama al planificador de MoveIt; no hay que reescribir el SDK.</p>
+<p><strong>¿Qué significan los seis valores de ``target``?</strong></p>
+<p>En <code class="docutils literal notranslate"><span class="pre">xarm_msgs/srv/PlanJoint</span></code>, <code class="docutils literal notranslate"><span class="pre">target</span></code> es un <strong>arreglo de posiciones
+articulares objetivo</strong>, no una posición cartesiana. En el modelo xArm 6 hay
+seis articulaciones rotativas; sus posiciones se expresan en <strong>radianes</strong> y
+se indican en el mismo orden que las juntas <code class="docutils literal notranslate"><span class="pre">joint1</span></code> a <code class="docutils literal notranslate"><span class="pre">joint6</span></code>.</p>
+<p>Por ejemplo, para la siguiente solicitud:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/xarm_joint_plan<span class="w"> </span>xarm_msgs/srv/PlanJoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{target: [0.25, -0.3, 0.0, 0.0, 0.0, 0.0]}"</span>
+</pre></div>
+</div>
+<p>se está solicitando esta configuración articular:</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Interpretación del arreglo <code class="docutils literal notranslate"><span class="pre">target</span></code></span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 21.0%" />
+<col style="width: 21.0%" />
+<col style="width: 34.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Elemento</p></th>
+<th class="head"><p>Articulación</p></th>
+<th class="head"><p>Valor (rad)</p></th>
+<th class="head"><p>Valor aproximado (grados)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">target[0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">joint1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.25</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">+14.32°</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">target[1]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">joint2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-0.30</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-17.19°</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">target[2]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">joint3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0°</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">target[3]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">joint4</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0°</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">target[4]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">joint5</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0°</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">target[5]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">joint6</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0°</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Los ángulos en grados son una representación para facilitar la lectura.
+La petición ROS 2 <strong>debe conservar los radianes</strong>. La conversión es:</p>
+<div class="math notranslate nohighlight">
+\[\theta_{\mathrm{grados}} = \theta_{\mathrm{radianes}} \frac{180}{\pi}\]</div>
+<p><strong>Cómo interpretar los signos y el cero:</strong></p>
+<ul class="simple">
+<li><p>Los seis números especifican <strong>ángulos absolutos</strong> respecto al cero de
+cada articulación definido por el modelo cinemático; no son incrementos
+respecto a la posición actual ni velocidades.</p></li>
+<li><p>Un ángulo positivo o negativo indica el sentido de giro <strong>según el eje
+local de esa articulación</strong> y la convención de signos del modelo. No
+significa que todas las juntas giren en el mismo sentido espacial.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code> solicita llevar la articulación a su referencia angular cero.
+<strong>No significa «no mover esa articulación»</strong>. Si actualmente no está en
+cero, también deberá desplazarse.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target</span></code> no representa <code class="docutils literal notranslate"><span class="pre">[X,</span> <span class="pre">Y,</span> <span class="pre">Z,</span> <span class="pre">roll,</span> <span class="pre">pitch,</span> <span class="pre">yaw]</span></code> ni la pose del
+efector final. El posicionamiento del efector se obtiene mediante la
+cinemática directa de las seis juntas.</p></li>
+<li><p>La planificación se realiza desde el <strong>estado articular actual</strong> hasta
+esos ángulos, siempre que el objetivo y la trayectoria satisfagan los
+límites, las colisiones y las demás restricciones configuradas.
+Una trayectoria articular no obliga al efector a recorrer una línea recta.</p></li>
+</ul>
+<p>Por ejemplo, si <code class="docutils literal notranslate"><span class="pre">joint1</span></code> está en <code class="docutils literal notranslate"><span class="pre">1.0</span></code> rad y se envía
+<code class="docutils literal notranslate"><span class="pre">target[0]</span> <span class="pre">=</span> <span class="pre">0.25</span></code>, se solicita acabar en <strong>0.25 rad</strong>, no sumar
+0.25 rad a la posición existente.</p>
+<p><strong>Comprobación con el estado publicado:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/joint_states<span class="w"> </span>--once
+</pre></div>
+</div>
+<p>En el mensaje <code class="docutils literal notranslate"><span class="pre">sensor_msgs/msg/JointState</span></code>, compara la lista <code class="docutils literal notranslate"><span class="pre">name</span></code>
+con la lista <code class="docutils literal notranslate"><span class="pre">position</span></code>: cada posición corresponde a la articulación
+cuyo nombre ocupa <strong>el mismo índice</strong>. Verifica los nombres antes de
+comparar, ya que el orden debe leerse del mensaje y no asumirse.
+Después de ejecutar correctamente la trayectoria, los valores deberían
+aproximarse al objetivo solicitado, dentro de la tolerancia del controlador.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En el ejercicio A se pide <code class="docutils literal notranslate"><span class="pre">joint1</span> <span class="pre">=</span> <span class="pre">0.0</span></code> rad; en el ejercicio B se
+pide <code class="docutils literal notranslate"><span class="pre">joint1</span> <span class="pre">=</span> <span class="pre">0.25</span></code> rad. Las otras cinco posiciones objetivo son
+iguales. Si A se ejecutó completamente antes que B, el cambio objetivo
+de <code class="docutils literal notranslate"><span class="pre">joint1</span></code> es <strong>+0.25 rad (aprox. +14.32°)</strong>. El resultado de
+<code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code> confirma planificación, <strong>no movimiento</strong>: el
+movimiento simulado se solicita aparte con <code class="docutils literal notranslate"><span class="pre">/xarm_exec_plan</span></code>.</p>
+</div>
+<p><strong>Ejercicio A: planificar y ejecutar un objetivo articular.</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/xarm_joint_plan<span class="w"> </span>xarm_msgs/srv/PlanJoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{target: [0.0, -0.3, 0.0, 0.0, 0.0, 0.0]}"</span>
+</pre></div>
+</div>
+<p>La respuesta observada fue <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code>. Eso significa que se generó
+una trayectoria. En el modo fake y <strong>solo cuando el plan fue exitoso</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/xarm_exec_plan<span class="w"> </span>xarm_msgs/srv/PlanExec<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{wait: true}"</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">wait:</span> <span class="pre">true</span></code> hace que el servidor espere a que termine la ejecución antes
+de devolver la respuesta. Verifica <code class="docutils literal notranslate"><span class="pre">success</span></code> y el nuevo <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code>.</p>
+<p><strong>Ejercicio B: segunda posición articular</strong> (objetivo ilustrativo,
+requiere planificador y validación de límites/colisiones):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/xarm_joint_plan<span class="w"> </span>xarm_msgs/srv/PlanJoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{target: [0.25, -0.3, 0.0, 0.0, 0.0, 0.0]}"</span>
+</pre></div>
+</div>
+<p>Si devuelve <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code>, ejecuta únicamente en fake:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/xarm_exec_plan<span class="w"> </span>xarm_msgs/srv/PlanExec<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{wait: true}"</span>
+</pre></div>
+</div>
+<p>Comprueba la diferencia entre los estados A y B:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/joint_states<span class="w"> </span>--field<span class="w"> </span>position
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/xarm6_traj_controller/controller_state
+</pre></div>
+</div>
+<p>La diferencia teórica esperada en <code class="docutils literal notranslate"><span class="pre">joint1</span></code> es 0,25 rad (aprox. 14,32°),
+si ambos movimientos se ejecutan completamente. No se debe confundir un
+<code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code> de planificación con un movimiento ya realizado.</p>
+</section>
+<section id="programar-nuestro-propio-cliente-ros-2-con-python">
+<h2>6. Programar nuestro propio cliente ROS 2 con Python<a class="headerlink" href="#programar-nuestro-propio-cliente-ros-2-con-python" title="Link to this heading"></a></h2>
+<p><strong>Utilizaremos el paquete principal ``mi_pkg_python``</strong>, creado previamente
+en <a class="reference internal" href="tutoriales.html"><span class="doc">Tutoriales</span></a>. <strong>No se crea ningún paquete adicional</strong> ni se cambia
+el servidor C++ de UFACTORY. El cliente Python usa <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> para enviar
+las mismas solicitudes que <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">service</span> <span class="pre">call</span></code>. Se mantienen los nodos
+publicador, suscriptor y demás ejercicios que ya estén en el paquete.</p>
+<p><strong>Paso 1. Incorporar los archivos al paquete que ya existe</strong></p>
+<p>En el ZIP del curso se incluyen los archivos Python sueltos en
+<code class="docutils literal notranslate"><span class="pre">ejemplos_ros2/archivos_para_mi_pkg_python/</span></code>; no son otro paquete.
+En la raíz del proyecto descargado, copia los archivos siguiendo estas rutas
+(o escribe los códigos completos que aparecen a continuación):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejecutar desde la raíz del proyecto de documentación descargado</span>
+cp<span class="w"> </span>ejemplos_ros2/archivos_para_mi_pkg_python/cliente_plan_*.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>~/ros2_ws/src/mi_pkg_python/mi_pkg_python/
+</pre></div>
+</div>
+<p>La estructura <strong>existente</strong> quedará así, sin borrar sus archivos anteriores:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/ros2_ws/src/mi_pkg_python/
+├── package.xml
+├── setup.py
+├── setup.cfg
+├── resource/mi_pkg_python
+├── mi_pkg_python/
+│   ├── __init__.py
+│   ├── publicador.py             # De las clases anteriores
+│   ├── suscriptor.py             # De las clases anteriores
+│   ├── formato.py                # Monitor de práctica anterior
+│   ├── monitor_articular.py      # Monitor de práctica anterior
+│   ├── cliente_plan_articular.py # Nuevo cliente
+│   ├── cliente_plan_pose.py      # Nuevo cliente
+│   └── cliente_plan_lineal.py    # Nuevo cliente
+├── launch/
+│   └── monitor_articular.launch.py
+└── test/
+</pre></div>
+</div>
+<p><strong>Paso 2. Añadir dependencias en ``package.xml``</strong></p>
+<p>Abre el archivo existente:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nano<span class="w"> </span>~/ros2_ws/src/mi_pkg_python/package.xml
+</pre></div>
+</div>
+<p><strong>Conserva sus dependencias actuales</strong> (por ejemplo <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> y
+<code class="docutils literal notranslate"><span class="pre">std_msgs</span></code>) y añade estas líneas dentro de <code class="docutils literal notranslate"><span class="pre">&lt;package&gt;</span></code>; no dupliques
+las que ya estén presentes:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;exec_depend&gt;</span>xarm_msgs<span class="nt">&lt;/exec_depend&gt;</span>
+<span class="nt">&lt;exec_depend&gt;</span>geometry_msgs<span class="nt">&lt;/exec_depend&gt;</span>
+<span class="nt">&lt;exec_depend&gt;</span>tf2_ros<span class="nt">&lt;/exec_depend&gt;</span>
+
+<span class="cm">&lt;!-- Requeridas también por la práctica anterior de monitorización --&gt;</span>
+<span class="nt">&lt;exec_depend&gt;</span>sensor_msgs<span class="nt">&lt;/exec_depend&gt;</span>
+<span class="nt">&lt;exec_depend&gt;</span>std_srvs<span class="nt">&lt;/exec_depend&gt;</span>
+<span class="nt">&lt;exec_depend&gt;</span>launch<span class="nt">&lt;/exec_depend&gt;</span>
+<span class="nt">&lt;exec_depend&gt;</span>launch_ros<span class="nt">&lt;/exec_depend&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">xarm_msgs</span></code> proporciona <code class="docutils literal notranslate"><span class="pre">PlanJoint</span></code>, <code class="docutils literal notranslate"><span class="pre">PlanPose</span></code>, <code class="docutils literal notranslate"><span class="pre">PlanExec</span></code> y
+<code class="docutils literal notranslate"><span class="pre">PlanSingleStraight</span></code>; <code class="docutils literal notranslate"><span class="pre">geometry_msgs</span></code> proporciona <code class="docutils literal notranslate"><span class="pre">Pose</span></code> y
+<code class="docutils literal notranslate"><span class="pre">tf2_ros</span></code> permite conocer la pose actual mediante transformaciones TF2.
+No agregues aquí <code class="docutils literal notranslate"><span class="pre">xarm_api</span></code> como dependencia del controlador físico: las
+prácticas trabajan con el servidor <code class="docutils literal notranslate"><span class="pre">xarm_planner</span></code> en modo fake. El paquete
+<code class="docutils literal notranslate"><span class="pre">xarm_msgs</span></code> debe estar en el mismo workspace o instalado correctamente,
+como parte de la compilación de <code class="docutils literal notranslate"><span class="pre">xarm_ros2</span></code>.</p>
+<p><strong>Paso 3. Registrar los clientes en ``setup.py``</strong></p>
+<p>Abre:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nano<span class="w"> </span>~/ros2_ws/src/mi_pkg_python/setup.py
+</pre></div>
+</div>
+<p>Busca la lista <code class="docutils literal notranslate"><span class="pre">'console_scripts'</span></code> dentro de <code class="docutils literal notranslate"><span class="pre">entry_points</span></code>. <strong>Añade las tres
+entradas sin borrar las anteriores</strong>. Por ejemplo, si ya
+registraste <code class="docutils literal notranslate"><span class="pre">publicador1</span></code> y <code class="docutils literal notranslate"><span class="pre">suscriptor1</span></code>, el bloque debe quedar:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">entry_points</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">'console_scripts'</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">'publicador1 = mi_pkg_python.publicador:main'</span><span class="p">,</span>
+        <span class="s1">'suscriptor1 = mi_pkg_python.suscriptor:main'</span><span class="p">,</span>
+        <span class="s1">'monitor_articular = mi_pkg_python.monitor_articular:main'</span><span class="p">,</span>
+        <span class="s1">'cliente_plan_articular = mi_pkg_python.cliente_plan_articular:main'</span><span class="p">,</span>
+        <span class="s1">'cliente_plan_pose = mi_pkg_python.cliente_plan_pose:main'</span><span class="p">,</span>
+        <span class="s1">'cliente_plan_lineal = mi_pkg_python.cliente_plan_lineal:main'</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>Este es <strong>solo el apartado ``entry_points``</strong>, no un reemplazo de todo
+<code class="docutils literal notranslate"><span class="pre">setup.py</span></code>. Conserva cualquier otro ejecutable previamente registrado.
+Cada entrada sigue el patrón
+<code class="docutils literal notranslate"><span class="pre">nombre_ejecutable</span> <span class="pre">=</span> <span class="pre">nombre_paquete.nombre_archivo:funcion_principal</span></code>.</p>
+<p>Si ya has integrado el monitor articular del curso, <strong>conserva su entrada</strong>
+<code class="docutils literal notranslate"><span class="pre">monitor_articular</span></code>. Para poder lanzarlo por <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">launch</span></code> también
+verifica que <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> instale los archivos <code class="docutils literal notranslate"><span class="pre">.launch.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Agrega esta importación al inicio de setup.py, si no existe:</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">glob</span><span class="w"> </span><span class="kn">import</span> <span class="n">glob</span>
+
+<span class="c1"># Y añade esta tupla a la lista data_files existente:</span>
+<span class="p">(</span><span class="s1">'share/'</span> <span class="o">+</span> <span class="n">package_name</span> <span class="o">+</span> <span class="s1">'/launch'</span><span class="p">,</span> <span class="n">glob</span><span class="p">(</span><span class="s1">'launch/*.launch.py'</span><span class="p">)),</span>
+</pre></div>
+</div>
+<p>No crees un nuevo objeto <code class="docutils literal notranslate"><span class="pre">setup()</span></code>: modifica el que ya tiene
+<code class="docutils literal notranslate"><span class="pre">mi_pkg_python</span></code>, manteniendo <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">packages</span></code>, <code class="docutils literal notranslate"><span class="pre">data_files</span></code>,
+<code class="docutils literal notranslate"><span class="pre">resource</span></code> y las demás entradas del proyecto original.</p>
+<p><strong>Paso 4. Resolver dependencias y compilar</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws
+rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>--ignore-src<span class="w"> </span>--rosdistro<span class="w"> </span>jazzy<span class="w"> </span>-y
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-select<span class="w"> </span>mi_pkg_python
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+<p><strong>Comprobar los ejecutables instalados:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>pkg<span class="w"> </span>executables<span class="w"> </span>mi_pkg_python
+</pre></div>
+</div>
+<p>Se espera que aparezcan <code class="docutils literal notranslate"><span class="pre">cliente_plan_articular</span></code>, <code class="docutils literal notranslate"><span class="pre">cliente_plan_pose</span></code>
+y <code class="docutils literal notranslate"><span class="pre">cliente_plan_lineal</span></code> junto con los nodos existentes del curso.
+Mantén corriendo <code class="docutils literal notranslate"><span class="pre">xarm6_planner_fake.launch.py</span></code> en otra terminal para
+que los servicios del fabricante estén disponibles. Los programas de
+<code class="docutils literal notranslate"><span class="pre">mi_pkg_python</span></code> <strong>son clientes</strong>; el servidor original sigue estando
+en <code class="docutils literal notranslate"><span class="pre">xarm_planner_node</span></code>.</p>
+<p><strong>Código: ``cliente_plan_articular.py``</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""Cliente ROS 2 de planificacion articular y ejecucion opcional de xArm."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarm_msgs.srv</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlanExec</span><span class="p">,</span> <span class="n">PlanJoint</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientePlanArticular</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'avigtech_cliente_plan_articular'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planificador</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_client</span><span class="p">(</span><span class="n">PlanJoint</span><span class="p">,</span> <span class="s1">'/xarm_joint_plan'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ejecutor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_client</span><span class="p">(</span><span class="n">PlanExec</span><span class="p">,</span> <span class="s1">'/xarm_exec_plan'</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">llamar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cliente</span><span class="p">,</span> <span class="n">solicitud</span><span class="p">,</span> <span class="n">nombre</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cliente</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="n">timeout_sec</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">'No disponible: </span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">futuro</span> <span class="o">=</span> <span class="n">cliente</span><span class="o">.</span><span class="n">call_async</span><span class="p">(</span><span class="n">solicitud</span><span class="p">)</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futuro</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">futuro</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Tiempo de espera agotado: </span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">futuro</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Error en </span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">futuro</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">futuro</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">planificar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objetivo</span><span class="p">):</span>
+        <span class="n">solicitud</span> <span class="o">=</span> <span class="n">PlanJoint</span><span class="o">.</span><span class="n">Request</span><span class="p">()</span>
+        <span class="n">solicitud</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">objetivo</span>
+        <span class="n">respuesta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">llamar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">planificador</span><span class="p">,</span> <span class="n">solicitud</span><span class="p">,</span> <span class="s1">'/xarm_joint_plan'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">respuesta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">success</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ejecutar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">solicitud</span> <span class="o">=</span> <span class="n">PlanExec</span><span class="o">.</span><span class="n">Request</span><span class="p">()</span>
+        <span class="n">solicitud</span><span class="o">.</span><span class="n">wait</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">respuesta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">llamar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ejecutor</span><span class="p">,</span> <span class="n">solicitud</span><span class="p">,</span> <span class="s1">'/xarm_exec_plan'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">respuesta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">success</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">'Cliente xArm articular (solo fake)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'--target'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="p">(</span><span class="s1">'J1'</span><span class="p">,</span> <span class="s1">'J2'</span><span class="p">,</span> <span class="s1">'J3'</span><span class="p">,</span> <span class="s1">'J4'</span><span class="p">,</span> <span class="s1">'J5'</span><span class="p">,</span> <span class="s1">'J6'</span><span class="p">),</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'Seis posiciones articulares en radianes'</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'--execute'</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'Ejecutar un plan exitoso, solo tras confirmar el entorno fake'</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">opciones</span><span class="p">,</span> <span class="n">ros_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">valor</span><span class="p">)</span> <span class="k">for</span> <span class="n">valor</span> <span class="ow">in</span> <span class="n">opciones</span><span class="o">.</span><span class="n">target</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Las seis posiciones deben ser valores finitos'</span><span class="p">)</span>
+
+    <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">ros_args</span><span class="p">)</span>
+    <span class="n">nodo</span> <span class="o">=</span> <span class="n">ClientePlanArticular</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Objetivo articular (rad): </span><span class="si">{</span><span class="n">opciones</span><span class="o">.</span><span class="n">target</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nodo</span><span class="o">.</span><span class="n">planificar</span><span class="p">(</span><span class="n">opciones</span><span class="o">.</span><span class="n">target</span><span class="p">):</span>
+            <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Planificacion rechazada; no se ejecuta'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Planificacion correcta'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">opciones</span><span class="o">.</span><span class="n">execute</span><span class="p">:</span>
+            <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Solo planificado. Para ejecutar usa --execute.'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">nodo</span><span class="o">.</span><span class="n">ejecutar</span><span class="p">():</span>
+            <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Ejecucion informada como exitosa'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'La ejecucion fallo'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p><strong>Explicación paso a paso del cliente</strong></p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">create_client(PlanJoint,</span> <span class="pre">'/xarm_joint_plan')</span></code> construye un cliente con
+el tipo de servicio correcto. No crea un servidor nuevo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PlanJoint.Request()</span></code> crea la solicitud y <code class="docutils literal notranslate"><span class="pre">target</span></code> contiene las seis
+posiciones articulares <strong>en radianes</strong>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">call_async()</span></code> envía una petición asíncrona; se usa
+<code class="docutils literal notranslate"><span class="pre">spin_until_future_complete()</span></code> para esperar la respuesta en el ejercicio.</p></li>
+<li><p>El atributo <code class="docutils literal notranslate"><span class="pre">response.success</span></code> indica si la planificación finalizó bien.</p></li>
+<li><p>Si se solicita <code class="docutils literal notranslate"><span class="pre">--execute</span></code>, el código usa <strong>otro cliente</strong> del tipo
+<code class="docutils literal notranslate"><span class="pre">PlanExec</span></code> y envía <code class="docutils literal notranslate"><span class="pre">wait=True</span></code>.</p></li>
+<li><p>Ante fallos, tiempos de espera o planificación rechazada, <strong>no ejecuta</strong>.</p></li>
+</ol>
+<p><strong>Planificar solamente:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>cliente_plan_articular<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span>-0.3<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0
+</pre></div>
+</div>
+<p><strong>Planificar y ejecutar</strong>, solo con el lanzamiento <code class="docutils literal notranslate"><span class="pre">planner_fake</span></code> activo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>cliente_plan_articular<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span>-0.3<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span>--execute
+</pre></div>
+</div>
+<p><strong>Segundo punto (B):</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>cliente_plan_articular<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target<span class="w"> </span><span class="m">0</span>.25<span class="w"> </span>-0.3<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span>--execute
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>Este cliente <strong>no comprueba automáticamente</strong> que el hardware sea fake.
+Confirma <code class="docutils literal notranslate"><span class="pre">UFRobotFakeSystemHardware</span></code> con
+<code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">control</span> <span class="pre">list_hardware_components</span></code> antes de usar <code class="docutils literal notranslate"><span class="pre">--execute</span></code>.
+Un proceso de planificación y otro cliente que ejecuten simultáneamente
+pueden sobrescribir el último plan del servidor; realiza la práctica
+secuencialmente.</p>
+</div>
+</section>
+<section id="enviar-una-posicion-y-orientacion-pose-cartesiana">
+<h2>7. Enviar una posición y orientación (pose cartesiana)<a class="headerlink" href="#enviar-una-posicion-y-orientacion-pose-cartesiana" title="Link to this heading"></a></h2>
+<p>Hasta ahora se programaron objetivos para las seis articulaciones mediante
+<code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code>. Para solicitar directamente dónde debe llegar el
+<strong>efector final</strong> utilizamos <code class="docutils literal notranslate"><span class="pre">/xarm_pose_plan</span></code>. MoveIt calcula las
+configuraciones articulares necesarias, sin que el cliente tenga que
+resolver manualmente la cinemática inversa.</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Información del objetivo <code class="docutils literal notranslate"><span class="pre">geometry_msgs/Pose</span></code></span><a class="headerlink" href="#id5" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 30.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Campo</p></th>
+<th class="head"><p>Unidad</p></th>
+<th class="head"><p>Interpretación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">position.x</span></code> / <code class="docutils literal notranslate"><span class="pre">position.y</span></code> / <code class="docutils literal notranslate"><span class="pre">position.z</span></code></p></td>
+<td><p>Metros</p></td>
+<td><p>Posición cartesiana absoluta del efector</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">orientation.x</span></code> / <code class="docutils literal notranslate"><span class="pre">orientation.y</span></code> / <code class="docutils literal notranslate"><span class="pre">orientation.z</span></code> / <code class="docutils literal notranslate"><span class="pre">orientation.w</span></code></p></td>
+<td><p>Cuaternión unitario (sin unidades)</p></td>
+<td><p>Orientación del efector en el marco de planificación</p></td>
+</tr>
+</tbody>
+</table>
+<p>El objetivo se expresa en el marco de planificación de MoveIt. En el
+registro de este laboratorio ese marco fue <code class="docutils literal notranslate"><span class="pre">world</span></code>, y el efector final
+fue <code class="docutils literal notranslate"><span class="pre">link_eef</span></code>. Verifica los nombres si modificas el modelo.</p>
+<p><strong>Diferencia fundamental:</strong> el mensaje <code class="docutils literal notranslate"><span class="pre">Pose</span></code> contiene <strong>7 valores</strong>,
+pero no son los seis ángulos del robot. El cuaternión representa
+orientación, no posición articular. En particular,
+<code class="docutils literal notranslate"><span class="pre">orientation:</span> <span class="pre">{x:</span> <span class="pre">0,</span> <span class="pre">y:</span> <span class="pre">0,</span> <span class="pre">z:</span> <span class="pre">0,</span> <span class="pre">w:</span> <span class="pre">1}</span></code> es la rotación identidad con
+respecto al marco de planificación; no significa «herramienta vertical».</p>
+<p><strong>Comprobar el servicio:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Lanzar SOLO la versión planner_fake</span>
+ros2<span class="w"> </span>launch<span class="w"> </span>xarm_planner<span class="w"> </span>xarm6_planner_fake.launch.py
+</pre></div>
+</div>
+<p>En una terminal nueva:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span><span class="nb">type</span><span class="w"> </span>/xarm_pose_plan
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>xarm_msgs/srv/PlanPose
+ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>world<span class="w"> </span>link_eef
+</pre></div>
+</div>
+<p>La definición exacta del servicio es:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>geometry_msgs/Pose target
+---
+bool success
+</pre></div>
+</div>
+<p><strong>Ejemplo: solicitar una pose objetivo absoluta</strong> (valores ilustrativos,
+no se garantiza que sean alcanzables ni libres de colisiones):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/xarm_pose_plan<span class="w"> </span>xarm_msgs/srv/PlanPose<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{target: {position: {x: 0.30, y: 0.0, z: 0.25}, \</span>
+<span class="s2">             orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}"</span>
+</pre></div>
+</div>
+<p>Si el servidor responde <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code>, <strong>ha encontrado un plan</strong>,
+pero el robot aún no se ha movido. Para ejecutar el plan en modo fake,
+tras comprobar que el controlador corresponde al hardware simulado:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>control<span class="w"> </span>list_hardware_components
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/xarm_exec_plan<span class="w"> </span>xarm_msgs/srv/PlanExec<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{wait: true}"</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>No reutilices esta práctica de ejecución en un xArm físico sin una
+revisión específica de seguridad. Además, el planificador conserva el
+<strong>último plan generado</strong>: evita que dos clientes planifiquen a la vez
+entre la solicitud y la ejecución.</p>
+</div>
+<p><strong>¿Y si quiero introducir Roll, Pitch y Yaw en grados?</strong></p>
+<p>El servicio recibe un cuaternión <code class="docutils literal notranslate"><span class="pre">(qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw)</span></code>, no RPY.
+Por ejemplo, la rotación de 90° alrededor de Z puede representarse por
+<code class="docutils literal notranslate"><span class="pre">{x:</span> <span class="pre">0,</span> <span class="pre">y:</span> <span class="pre">0,</span> <span class="pre">z:</span> <span class="pre">0.70710678,</span> <span class="pre">w:</span> <span class="pre">0.70710678}</span></code>. Este valor describe la
+orientación respecto al marco de planificación y no garantiza que la
+postura sea alcanzable.</p>
+<p>El cliente de AvigTech que sigue permite utilizar RPY en grados y
+convierte internamente a un cuaternión empleando la convención
+<strong>yaw-pitch-roll (ZYX)</strong>. Como alternativa permite proporcionar las cuatro
+componentes directamente con <code class="docutils literal notranslate"><span class="pre">--quaternion</span></code>.</p>
+<p><strong>Código: ``cliente_plan_pose.py``</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""Cliente educativo: alcanzar pose XYZ + orientacion en el xArm 6 fake.</span>
+
+<span class="sd">Envia PlanPose al servidor de UFACTORY. La ejecucion es opcional.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometry_msgs.msg</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pose</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarm_msgs.srv</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlanExec</span><span class="p">,</span> <span class="n">PlanPose</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rpy_a_cuaternion</span><span class="p">(</span><span class="n">roll</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">yaw</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Convierte Euler ZYX (roll X, pitch Y, yaw Z), grados -&gt; (x,y,z,w)."""</span>
+    <span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">roll</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">yaw</span><span class="p">))</span>
+    <span class="n">cr</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="n">cp</span><span class="p">,</span> <span class="n">sp</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">cy</span><span class="p">,</span> <span class="n">sy</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">sr</span> <span class="o">*</span> <span class="n">cp</span> <span class="o">*</span> <span class="n">cy</span> <span class="o">-</span> <span class="n">cr</span> <span class="o">*</span> <span class="n">sp</span> <span class="o">*</span> <span class="n">sy</span><span class="p">,</span>
+        <span class="n">cr</span> <span class="o">*</span> <span class="n">sp</span> <span class="o">*</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">sr</span> <span class="o">*</span> <span class="n">cp</span> <span class="o">*</span> <span class="n">sy</span><span class="p">,</span>
+        <span class="n">cr</span> <span class="o">*</span> <span class="n">cp</span> <span class="o">*</span> <span class="n">sy</span> <span class="o">-</span> <span class="n">sr</span> <span class="o">*</span> <span class="n">sp</span> <span class="o">*</span> <span class="n">cy</span><span class="p">,</span>
+        <span class="n">cr</span> <span class="o">*</span> <span class="n">cp</span> <span class="o">*</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">sr</span> <span class="o">*</span> <span class="n">sp</span> <span class="o">*</span> <span class="n">sy</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientePlanPose</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'avigtech_cliente_plan_pose'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cliente_pose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_client</span><span class="p">(</span><span class="n">PlanPose</span><span class="p">,</span> <span class="s1">'/xarm_pose_plan'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cliente_exec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_client</span><span class="p">(</span><span class="n">PlanExec</span><span class="p">,</span> <span class="s1">'/xarm_exec_plan'</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">solicitar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cliente</span><span class="p">,</span> <span class="n">solicitud</span><span class="p">,</span> <span class="n">nombre</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cliente</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="n">timeout_sec</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">'No disponible: </span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">futuro</span> <span class="o">=</span> <span class="n">cliente</span><span class="o">.</span><span class="n">call_async</span><span class="p">(</span><span class="n">solicitud</span><span class="p">)</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futuro</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">futuro</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Tiempo de espera agotado: </span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">futuro</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Error en </span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">futuro</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">futuro</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">planificar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="n">solicitud</span> <span class="o">=</span> <span class="n">PlanPose</span><span class="o">.</span><span class="n">Request</span><span class="p">()</span>
+        <span class="n">solicitud</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">pose</span>
+        <span class="n">respuesta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solicitar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cliente_pose</span><span class="p">,</span> <span class="n">solicitud</span><span class="p">,</span> <span class="s1">'/xarm_pose_plan'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">respuesta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">success</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ejecutar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">solicitud</span> <span class="o">=</span> <span class="n">PlanExec</span><span class="o">.</span><span class="n">Request</span><span class="p">()</span>
+        <span class="n">solicitud</span><span class="o">.</span><span class="n">wait</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">respuesta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solicitar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cliente_exec</span><span class="p">,</span> <span class="n">solicitud</span><span class="p">,</span> <span class="s1">'/xarm_exec_plan'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">respuesta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">success</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">'Objetivo XYZ + orientacion para xArm simulado'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--x'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'X absoluta (m)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--y'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Y absoluta (m)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--z'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Z absoluta (m)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--roll'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Rotacion X (grados)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--pitch'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Rotacion Y (grados)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--yaw'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Rotacion Z (grados)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--quaternion'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="p">(</span><span class="s1">'QX'</span><span class="p">,</span><span class="s1">'QY'</span><span class="p">,</span><span class="s1">'QZ'</span><span class="p">,</span><span class="s1">'QW'</span><span class="p">),</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">'Cuaternion en lugar de roll/pitch/yaw'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--execute'</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Ejecutar SOLO tras confirmar fake'</span><span class="p">)</span>
+    <span class="n">opciones</span><span class="p">,</span> <span class="n">ros_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">valores</span> <span class="o">=</span> <span class="p">[</span><span class="n">opciones</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+               <span class="n">opciones</span><span class="o">.</span><span class="n">roll</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">pitch</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">yaw</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">valores</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Todos los valores deben ser finitos'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opciones</span><span class="o">.</span><span class="n">quaternion</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="o">!=</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">opciones</span><span class="o">.</span><span class="n">roll</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">pitch</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">yaw</span><span class="p">)):</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Usa --quaternion o los angulos RPY, no ambos'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">opciones</span><span class="o">.</span><span class="n">quaternion</span><span class="p">):</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Cuaternion no valido'</span><span class="p">)</span>
+        <span class="n">norma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">v</span><span class="o">*</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">opciones</span><span class="o">.</span><span class="n">quaternion</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">norma</span> <span class="o">&lt;</span> <span class="mf">1e-9</span><span class="p">:</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'El cuaternion no puede ser nulo'</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">norma</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">opciones</span><span class="o">.</span><span class="n">quaternion</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">rpy_a_cuaternion</span><span class="p">(</span><span class="n">opciones</span><span class="o">.</span><span class="n">roll</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">pitch</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">yaw</span><span class="p">)</span>
+
+    <span class="n">objetivo</span> <span class="o">=</span> <span class="n">Pose</span><span class="p">()</span>
+    <span class="n">objetivo</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">opciones</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">objetivo</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">opciones</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">objetivo</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">opciones</span><span class="o">.</span><span class="n">z</span>
+    <span class="n">objetivo</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">objetivo</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">objetivo</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">objetivo</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">ros_args</span><span class="p">)</span>
+    <span class="n">nodo</span> <span class="o">=</span> <span class="n">ClientePlanPose</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'Meta (world): XYZ=(</span><span class="si">{</span><span class="n">opciones</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">opciones</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">opciones</span><span class="o">.</span><span class="n">z</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">) m, '</span>
+            <span class="sa">f</span><span class="s1">'q=(</span><span class="si">{</span><span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">)'</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nodo</span><span class="o">.</span><span class="n">planificar</span><span class="p">(</span><span class="n">objetivo</span><span class="p">):</span>
+            <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'La planificacion por pose no fue exitosa'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Planificacion por pose exitosa'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">opciones</span><span class="o">.</span><span class="n">execute</span><span class="p">:</span>
+            <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">'Ejecutando: verifica previamente que es hardware fake'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">nodo</span><span class="o">.</span><span class="n">ejecutar</span><span class="p">():</span>
+                <span class="k">return</span> <span class="mi">1</span>
+            <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Ejecucion reportada como exitosa'</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'No se ejecuto: anade --execute SOLO en fake'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p><strong>Compilación:</strong> al agregar <code class="docutils literal notranslate"><span class="pre">cliente_plan_pose.py</span></code> al mismo paquete,
+recompila <code class="docutils literal notranslate"><span class="pre">mi_pkg_python</span></code>; el registro en <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> y la dependencia
+a <code class="docutils literal notranslate"><span class="pre">geometry_msgs</span></code> ya quedaron explicados en el paso 3 de la sección 6.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/ros2_ws
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-select<span class="w"> </span>mi_pkg_python
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+<p><strong>Ejemplo con posición XYZ y orientación RPY en grados:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>cliente_plan_pose<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--x<span class="w"> </span><span class="m">0</span>.30<span class="w"> </span>--y<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span>--z<span class="w"> </span><span class="m">0</span>.25<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--roll<span class="w"> </span><span class="m">0</span><span class="w"> </span>--pitch<span class="w"> </span><span class="m">0</span><span class="w"> </span>--yaw<span class="w"> </span><span class="m">0</span>
+</pre></div>
+</div>
+<p><strong>Ejemplo expresando el cuaternión explícitamente:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>cliente_plan_pose<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--x<span class="w"> </span><span class="m">0</span>.30<span class="w"> </span>--y<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span>--z<span class="w"> </span><span class="m">0</span>.25<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--quaternion<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span>.70710678<span class="w"> </span><span class="m">0</span>.70710678
+</pre></div>
+</div>
+<p>Para ejecutar después de planificar, <strong>únicamente con</strong>
+<code class="docutils literal notranslate"><span class="pre">xarm6_planner_fake.launch.py</span></code> y verificación previa del hardware,
+puedes añadir <code class="docutils literal notranslate"><span class="pre">--execute</span></code>. La planificación por pose es de tipo PTP:
+<strong>no garantiza una recta entre A y B</strong>.</p>
+<p><strong>Comparación con el movimiento rectilíneo:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/xarm_pose_plan</span></code> establece el objetivo cartesiano y utiliza
+<code class="docutils literal notranslate"><span class="pre">setPoseTarget()</span></code> junto con <code class="docutils literal notranslate"><span class="pre">plan()</span></code>. MoveIt encuentra una ruta
+que cumple las restricciones; la punta puede describir una curva.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/xarm_straight_plan</span></code> usa <code class="docutils literal notranslate"><span class="pre">computeCartesianPath()</span></code> para interpolar
+el camino entre la pose actual A y el objetivo B. El código de UFACTORY
+utiliza pasos de 0,005 m y permite una fracción incompleta desde 0,9.
+Por eso el cliente lineal del siguiente apartado <strong>no ejecuta</strong>
+automáticamente el resultado.</p></li>
+</ul>
+<p>El siguiente apartado estudia esa diferencia con detalle.</p>
+</section>
+<section id="ptp-frente-a-movimiento-cartesiano-rectilineo">
+<h2>8. PTP frente a movimiento cartesiano rectilíneo<a class="headerlink" href="#ptp-frente-a-movimiento-cartesiano-rectilineo" title="Link to this heading"></a></h2>
+<p>Hasta aquí hemos solicitado una <strong>configuración articular</strong> de destino.
+El planificador de UFACTORY emplea <code class="docutils literal notranslate"><span class="pre">MoveGroupInterface</span></code>:</p>
+<ul class="simple">
+<li><p>Para <code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code> llama a <code class="docutils literal notranslate"><span class="pre">setJointValueTarget()</span></code> y luego
+a <code class="docutils literal notranslate"><span class="pre">plan()</span></code>.</p></li>
+<li><p>Para <code class="docutils literal notranslate"><span class="pre">/xarm_pose_plan</span></code> llama a <code class="docutils literal notranslate"><span class="pre">setPoseTarget()</span></code> y luego a
+<code class="docutils literal notranslate"><span class="pre">plan()</span></code>. Aunque la meta sea cartesiana, <strong>no exige</strong> una línea recta
+para el efector final.</p></li>
+<li><p>En ambos casos, el pipeline del registro utiliza OMPL. Se busca un
+camino de configuraciones articulares que satisfaga restricciones y evite
+colisiones. La geometría del recorrido del efector <strong>puede ser curva</strong>.</p></li>
+</ul>
+<p><strong>¿Qué significa una trayectoria rectilínea A → B?</strong></p>
+<p>Tomamos <code class="docutils literal notranslate"><span class="pre">A</span></code> como la posición cartesiana actual del efector y <code class="docutils literal notranslate"><span class="pre">B</span></code> como
+la meta, ambos en el mismo marco (<code class="docutils literal notranslate"><span class="pre">world</span></code> en el registro del equipo):</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{p}(s) = \mathbf{p}_A + s(\mathbf{p}_B-\mathbf{p}_A),
+\qquad 0 \leq s \leq 1\]</div>
+<p>Con la orientación del efector fija en este primer ejercicio. El
+planificador cartesiano interpola posiciones sucesivas de esa recta, obtiene
+soluciones articulares mediante cinemática inversa y valida límites y
+colisiones de los puntos intermedios.</p>
+<p>El código oficial de la rama Jazzy implementa el servicio
+<code class="docutils literal notranslate"><span class="pre">/xarm_straight_plan</span></code> mediante <code class="docutils literal notranslate"><span class="pre">computeCartesianPath()</span></code>. En el archivo
+<code class="docutils literal notranslate"><span class="pre">xarm_planner.cpp</span></code> se define <code class="docutils literal notranslate"><span class="pre">eef_step</span> <span class="pre">=</span> <span class="pre">0.005</span></code> (5 mm) y se acepta como
+exitosa una fracción calculada <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">0.9</span></code>. La respuesta pública solo incluye
+<code class="docutils literal notranslate"><span class="pre">success</span></code>; <strong>no permite conocer desde el cliente si se completó el 100 %</strong>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p><strong>No ejecutes automáticamente</strong> un plan cartesiano basándote solo en
+<code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code> de <code class="docutils literal notranslate"><span class="pre">/xarm_straight_plan</span></code>: puede haberse calculado
+una ruta parcial. Para una aplicación que exija llegar a B, se debe
+recuperar <code class="docutils literal notranslate"><span class="pre">fraction</span></code>, exigir por ejemplo <code class="docutils literal notranslate"><span class="pre">fraction</span> <span class="pre">&gt;=</span> <span class="pre">0.999</span></code>, validar
+colisiones y verificar la pose final. Una ampliación posible utiliza
+<code class="docutils literal notranslate"><span class="pre">/compute_cartesian_path</span></code> directamente o modifica el servidor C++.</p>
+</div>
+</section>
+<section id="crear-b-a-partir-de-la-pose-actual-a-con-tf2">
+<h2>9. Crear B a partir de la pose actual A con TF2<a class="headerlink" href="#crear-b-a-partir-de-la-pose-actual-a-con-tf2" title="Link to this heading"></a></h2>
+<p>En tu sesión el planificador informó:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Planning frame: world
+End effector link: link_eef
+</pre></div>
+</div>
+<p>La siguiente práctica consulta con TF2 la transformación
+<code class="docutils literal notranslate"><span class="pre">world</span> <span class="pre">-&gt;</span> <span class="pre">link_eef</span></code>. Obtiene A, desplaza <strong>20 mm en X</strong> manteniendo Y, Z y
+orientación, y envía B a <code class="docutils literal notranslate"><span class="pre">/xarm_straight_plan</span></code>. Si se usa una configuración
+con prefijos o marcos diferentes, hay que ajustar esos nombres.</p>
+<p><strong>Inspección de los marcos de referencia:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>world<span class="w"> </span>link_eef
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>xarm_msgs/srv/PlanSingleStraight
+ros2<span class="w"> </span>service<span class="w"> </span><span class="nb">type</span><span class="w"> </span>/xarm_straight_plan
+</pre></div>
+</div>
+<p><strong>Código: ``cliente_plan_lineal.py``</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""Calcula una meta B desde TF2 y solicita una trayectoria cartesiana.</span>
+
+<span class="sd">No ejecuta el plan: el servidor de UFACTORY puede aceptar fracciones &gt;= 0.9.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometry_msgs.msg</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pose</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tf2_ros</span><span class="w"> </span><span class="kn">import</span> <span class="n">Buffer</span><span class="p">,</span> <span class="n">TransformListener</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarm_msgs.srv</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlanSingleStraight</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientePlanLineal</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'avigtech_cliente_plan_lineal'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">Buffer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escucha</span> <span class="o">=</span> <span class="n">TransformListener</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planificador</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_client</span><span class="p">(</span>
+            <span class="n">PlanSingleStraight</span><span class="p">,</span> <span class="s1">'/xarm_straight_plan'</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">pose_actual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origen</span><span class="o">=</span><span class="s1">'world'</span><span class="p">,</span> <span class="n">efector</span><span class="o">=</span><span class="s1">'link_eef'</span><span class="p">):</span>
+        <span class="n">fin</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="mf">10.0</span>
+        <span class="k">while</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">()</span> <span class="ow">and</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">fin</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">can_transform</span><span class="p">(</span><span class="n">origen</span><span class="p">,</span> <span class="n">efector</span><span class="p">,</span> <span class="n">Time</span><span class="p">()):</span>
+                <span class="n">transformacion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span>
+                    <span class="n">origen</span><span class="p">,</span> <span class="n">efector</span><span class="p">,</span> <span class="n">Time</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">actual</span> <span class="o">=</span> <span class="n">Pose</span><span class="p">()</span>
+                <span class="n">actual</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">transformacion</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">translation</span><span class="o">.</span><span class="n">x</span>
+                <span class="n">actual</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">transformacion</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">translation</span><span class="o">.</span><span class="n">y</span>
+                <span class="n">actual</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">transformacion</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">translation</span><span class="o">.</span><span class="n">z</span>
+                <span class="n">actual</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">transformacion</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">rotation</span>
+                <span class="k">return</span> <span class="n">actual</span>
+            <span class="n">rclpy</span><span class="o">.</span><span class="n">spin_once</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">'TF no disponible: </span><span class="si">{</span><span class="n">origen</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">efector</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">planificar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objetivo</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">planificador</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="n">timeout_sec</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'No disponible /xarm_straight_plan'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">solicitud</span> <span class="o">=</span> <span class="n">PlanSingleStraight</span><span class="o">.</span><span class="n">Request</span><span class="p">()</span>
+        <span class="n">solicitud</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">objetivo</span>
+        <span class="n">futuro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">planificador</span><span class="o">.</span><span class="n">call_async</span><span class="p">(</span><span class="n">solicitud</span><span class="p">)</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futuro</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">futuro</span><span class="o">.</span><span class="n">done</span><span class="p">()</span> <span class="ow">or</span> <span class="n">futuro</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Error o timeout en la planificacion lineal'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">futuro</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">success</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">'Planificacion lineal xArm (solo fake)'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--dx'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Delta X en metros'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--dy'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Delta Y en metros'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--dz'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Delta Z en metros'</span><span class="p">)</span>
+    <span class="n">opciones</span><span class="p">,</span> <span class="n">ros_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">opciones</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="n">opciones</span><span class="o">.</span><span class="n">dz</span><span class="p">)):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Los desplazamientos deben ser finitos'</span><span class="p">)</span>
+
+    <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">ros_args</span><span class="p">)</span>
+    <span class="n">nodo</span> <span class="o">=</span> <span class="n">ClientePlanLineal</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">nodo</span><span class="o">.</span><span class="n">pose_actual</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">Pose</span><span class="p">()</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">opciones</span><span class="o">.</span><span class="n">dx</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">opciones</span><span class="o">.</span><span class="n">dy</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">opciones</span><span class="o">.</span><span class="n">dz</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">orientation</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'A = (</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">) m'</span>
+        <span class="p">)</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'B = (</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">) m'</span>
+        <span class="p">)</span>
+        <span class="n">exito</span> <span class="o">=</span> <span class="n">nodo</span><span class="o">.</span><span class="n">planificar</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Resultado de planificacion: </span><span class="si">{</span><span class="n">exito</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">'NO se ejecuta: success=True puede significar &gt;=90</span><span class="si">% d</span><span class="s1">el recorrido. '</span>
+            <span class="s1">'Inspecciona la fraccion real antes de ejecutar.'</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">exito</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">nodo</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+        <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p><strong>Ejecutar la planificación sin mover todavía el robot:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>cliente_plan_lineal<span class="w"> </span>--dx<span class="w"> </span><span class="m">0</span>.02
+</pre></div>
+</div>
+<p>El programa informa las coordenadas cartesianas A y B <strong>en metros</strong> y devuelve
+el booleano de planificación. No llama a <code class="docutils literal notranslate"><span class="pre">/xarm_exec_plan</span></code> porque el
+servidor oficial no expone la fracción alcanzada; necesitamos inspeccionarla
+antes de garantizar el destino.</p>
+<p><strong>¿Cómo haríamos una recta completa A → B en una aplicación posterior?</strong></p>
+<ol class="arabic simple">
+<li><p>Leer la pose actual A desde el estado vigente de TF2/MoveIt.</p></li>
+<li><p>Definir B en el <strong>mismo marco de referencia</strong>; por ejemplo, A + 0,02 m
+en el eje X de <code class="docutils literal notranslate"><span class="pre">world</span></code>.</p></li>
+<li><p>Calcular puntos intermedios de la recta con orientación constante.</p></li>
+<li><p>Invocar <code class="docutils literal notranslate"><span class="pre">computeCartesianPath()</span></code> / <code class="docutils literal notranslate"><span class="pre">GetCartesianPath</span></code> con control de
+colisiones y un tamaño de paso apropiado (5 mm en el código del fabricante).</p></li>
+<li><p>Exigir una fracción prácticamente completa (por ejemplo <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">0.999</span></code>)
+y rechazar movimientos con saltos articulares o restricciones incumplidas.</p></li>
+<li><p>Parametrizar tiempos y velocidades, revisar la trayectoria y <strong>solo
+después</strong> solicitar su ejecución fake.</p></li>
+<li><p>Comparar la pose realmente alcanzada con B, con una tolerancia definida.</p></li>
+</ol>
+<p><strong>Importante:</strong> una ruta cartesiana recta es una restricción sobre la
+trayectoria <strong>geométrica</strong> del efector; no implica velocidad cartesiana
+constante. El retemporizado y la ejecución son problemas relacionados, pero
+separados.</p>
+</section>
+<section id="resultados-y-preguntas-de-comprobacion">
+<h2>10. Resultados y preguntas de comprobación<a class="headerlink" href="#resultados-y-preguntas-de-comprobacion" title="Link to this heading"></a></h2>
+<table class="docutils align-default" id="id6">
+<caption><span class="caption-text">Registro del laboratorio</span><a class="headerlink" href="#id6" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 33.0%" />
+<col style="width: 37.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Evidencia</p></th>
+<th class="head"><p>Comando o lectura</p></th>
+<th class="head"><p>Resultado esperado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Controladores</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">control</span> <span class="pre">list_controllers</span></code></p></td>
+<td><p>Dos controladores activos</p></td>
+</tr>
+<tr class="row-odd"><td><p>Estado inicial A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/joint_states</span></code></p></td>
+<td><p>Seis posiciones numéricas</p></td>
+</tr>
+<tr class="row-even"><td><p>Planificación articular A/B</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code> si hay plan válido</p></td>
+</tr>
+<tr class="row-odd"><td><p>Ejecución A/B</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/xarm_exec_plan</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code> y cambio en <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Pose inicial cartesiana</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tf2_echo</span> <span class="pre">world</span> <span class="pre">link_eef</span></code></p></td>
+<td><p>Traslación y cuaternión</p></td>
+</tr>
+<tr class="row-odd"><td><p>Planificación por posición/orientación</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/xarm_pose_plan</span></code></p></td>
+<td><p>Booleano de planificación, no ejecución</p></td>
+</tr>
+<tr class="row-even"><td><p>Planificación rectilínea</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/xarm_straight_plan</span></code></p></td>
+<td><p>Booleano; <strong>no</strong> certifica 100 %</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Preguntas y respuestas</strong></p>
+<ol class="arabic simple">
+<li><p>¿Qué diferencias existen entre <code class="docutils literal notranslate"><span class="pre">PlanJoint</span></code> y <code class="docutils literal notranslate"><span class="pre">PlanPose</span></code>? <strong>El primero
+expresa seis ángulos (rad); el segundo una posición XYZ (m) y un
+cuaternión (qx, qy, qz, qw)</strong>.</p></li>
+<li><p>¿Por qué una respuesta <code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">true</span></code> de <code class="docutils literal notranslate"><span class="pre">/xarm_joint_plan</span></code> no
+significa que el robot se haya movido? <strong>Porque solo valida el plan</strong>.</p></li>
+<li><p>¿Cuál es el servidor y cuál es el cliente? <strong>Servidor:</strong>
+<code class="docutils literal notranslate"><span class="pre">xarm_planner_node</span></code>. <strong>Clientes:</strong> <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">service</span> <span class="pre">call</span></code> o nuestro nodo
+Python de AvigTech.</p></li>
+<li><p>¿Qué publica <code class="docutils literal notranslate"><span class="pre">/joint_states</span></code>? <strong>Los nombres, posiciones, velocidades y
+esfuerzos (si están disponibles)</strong> de las juntas.</p></li>
+<li><p>¿Por qué <code class="docutils literal notranslate"><span class="pre">xarm_pose_plan</span></code> no implica una recta A → B? <strong>Porque llama a
+``plan()`` para una meta cartesiana, sin imponer el camino geométrico</strong>.</p></li>
+<li><p>¿Qué herramienta se utiliza para una trayectoria recta? <strong>El servicio
+``/xarm_straight_plan`` basado en ``computeCartesianPath()``</strong>.</p></li>
+<li><p>¿Por qué se debe revisar <code class="docutils literal notranslate"><span class="pre">fraction</span></code>? <strong>Porque el servidor de UFACTORY
+acepta fracciones desde 0,9 y un plan parcial no garantiza alcanzar B</strong>.</p></li>
+</ol>
+</section>
+<section id="referencias-tecnicas">
+<h2>11. Referencias técnicas<a class="headerlink" href="#referencias-tecnicas" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/tree/jazzy">Repositorio xarm_ros2 (rama Jazzy)</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/blob/jazzy/xarm_planner/src/xarm_planner_node.cpp">xarm_planner_node.cpp (servidores y callbacks)</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/blob/jazzy/xarm_planner/src/xarm_planner.cpp">xarm_planner.cpp (planificación, fracción y ejecución)</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/blob/jazzy/xarm_msgs/srv/PlanPose.srv">PlanPose.srv</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/xArm-Developer/xarm_ros2/blob/jazzy/xarm_msgs/srv/PlanSingleStraight.srv">PlanSingleStraight.srv</a>.</p></li>
+<li><p><a class="reference external" href="https://moveit.picknik.ai/main/api/html/classmoveit_1_1planning__interface_1_1MoveGroupInterface.html">MoveGroupInterface::computeCartesianPath()</a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Las lecciones futuras abordarán en profundidad <strong>acciones ROS 2,
+cinemática y programación de planificación personalizada</strong>. Esta unidad
+se limita a identificar sus interfaces y demostrar el uso de servicios
+y estados articulares en un entorno sin hardware físico.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="tutoriales.html" class="btn btn-neutral float-left" title="Tutoriales" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="xarm_reto_resuelto.html" class="btn btn-neutral float-right" title="Solución del reto de programación: monitor de articulaciones" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, AvigTech.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
