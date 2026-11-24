@@ -59,8 +59,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/tutoriales.html">Tutoriales</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
@@ -187,23 +186,18 @@ conectan teoría, comandos, programación Python y planificación.</p>
 <li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/tutoriales.html#ejecutar">Ejecutar</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-1-iniciar-un-escenario-de-practica">Paso 1. Iniciar un escenario de práctica</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-2-inspeccionar-el-mensaje">Paso 2. Inspeccionar el mensaje</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-3-crear-un-paquete-educativo-independiente">Paso 3. Crear un paquete educativo independiente</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#paso-4-ejecutar-el-nodo-monitor">Paso 4. Ejecutar el nodo monitor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#comprender-el-fragmento-de-python">Comprender el fragmento de Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#reto-de-programacion">Reto de programación</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_comunicacion.html#solucion-del-reto-de-radianes-a-grados">Solución del reto: de radianes a grados</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#objetivos">Objetivos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#servicio-propio-lectura-del-estado">1. Servicio propio: lectura del estado</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#parametros-del-nodo">2. Parámetros del nodo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#descubrir-acciones-en-moveit-2">3. Descubrir acciones en MoveIt 2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#interfaces-del-robot-real-solo-lectura-y-estudio">4. Interfaces del robot real: solo lectura y estudio</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_servicios.html#reto">Reto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#que-hace-cada-lanzamiento-de-xarm">1. ¿Qué hace cada lanzamiento de xArm?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#fundamentos-nodos-topicos-mensajes-y-servicios">2. Fundamentos: nodos, tópicos, mensajes y servicios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#analisis-de-los-resultados-reales-del-xarm-6">3. Análisis de los resultados reales del xArm 6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#arquitectura-de-planificacion-y-ejecucion-simuladas">4. Arquitectura de planificación y ejecución simuladas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#como-funciona-el-servicio-xarm-planner">5. ¿Cómo funciona el servicio <code class="docutils literal notranslate"><span class="pre">xarm_planner</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#programar-nuestro-propio-cliente-ros-2-con-python">6. Programar nuestro propio cliente ROS 2 con Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#enviar-una-posicion-y-orientacion-pose-cartesiana">7. Enviar una posición y orientación (pose cartesiana)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#ptp-frente-a-movimiento-cartesiano-rectilineo">8. PTP frente a movimiento cartesiano rectilíneo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#crear-b-a-partir-de-la-pose-actual-a-con-tf2">9. Crear B a partir de la pose actual A con TF2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#resultados-y-preguntas-de-comprobacion">10. Resultados y preguntas de comprobación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentos/tema_2/xarm_practicas.html#referencias-tecnicas">11. Referencias técnicas</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="documentos/tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a><ul>
