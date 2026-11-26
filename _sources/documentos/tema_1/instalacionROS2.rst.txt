@@ -1,14 +1,14 @@
 Instalación de ROS 2 Jazzy en Ubuntu 24.04
 ==========================================
 
-Esta guía utiliza **Ubuntu 24.04 LTS (Noble Numbat)** y **ROS 2 Jazzy Jalisco**.
+Este repositorio utiliza **Ubuntu 24.04 LTS Noble Numbat** y **ROS 2 Jazzy Jalisco**.
 Ambos forman la plataforma objetivo de la capacitación. Jazzy es una distribución
 LTS con soporte previsto hasta mayo de 2029.
 
 .. important::
 
    Los comandos siguientes están destinados a Ubuntu **24.04** de 64 bits
-   (``amd64`` o ``arm64``). No combines entornos Humble y Jazzy en una
+   (``amd64`` o ``arm64``). No se recomienda combinar entornos Humble y Jazzy en una
    misma terminal. En una instalación ya existente, revisa primero las
    fuentes APT para evitar repositorios ROS duplicados.
 
@@ -126,5 +126,3 @@ instalar dependencias de los ejemplos.
    entorno virtual, activa el entorno **antes** de ``colcon build``.
    No instales otra distribución de ``rclpy`` desde PyPI ni mezcles
    intérpretes Python con ROS Jazzy.
-
-Para el entorno del curso, consulta :doc:`compatibilidad_jazzy`.

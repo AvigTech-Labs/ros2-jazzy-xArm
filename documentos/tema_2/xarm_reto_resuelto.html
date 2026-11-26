@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Solución del reto de programación: monitor de articulaciones &mdash; documentación de ROS2 Jazzy - xArm 6 - Jazzy (Ubuntu 24.04)</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=23a32747" />
 
@@ -16,17 +16,17 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=13309ef0"></script>
-      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../_static/translations.js?v=f85f4cfb"></script>
-      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Índice" href="../../genindex.html" />
     <link rel="search" title="Búsqueda" href="../../search.html" />
     <link rel="next" title="Conexión con dispositivos" href="../tema_3/dispositivos.html" />
-    <link rel="prev" title="Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico" href="xarm_practicas.html" /> 
+    <link rel="prev" title="Práctica xArm: servicios, acciones y parámetros" href="xarm_servicios.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -60,7 +60,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="conceptos_basicos.html">Conceptos Básicos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutoriales.html">Tutoriales</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xarm_practicas.html">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_comunicacion.html">Práctica xArm: nodos, tópicos y mensajes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarm_servicios.html">Práctica xArm: servicios, acciones y parámetros</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Solución del reto de programación: monitor de articulaciones</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#localizar-la-funcion-suscriptora">1. Localizar la función suscriptora</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#comprender-el-suscriptor-y-el-temporizador">2. Comprender el suscriptor y el temporizador</a></li>
@@ -114,7 +115,7 @@
              
   <section id="solucion-del-reto-de-programacion-monitor-de-articulaciones">
 <h1>Solución del reto de programación: monitor de articulaciones<a class="headerlink" href="#solucion-del-reto-de-programacion-monitor-de-articulaciones" title="Link to this heading"></a></h1>
-<p>Este solucionario corresponde a <span class="xref std std-doc">xarm_comunicacion</span> y al paquete
+<p>Este solucionario corresponde a <a class="reference internal" href="xarm_comunicacion.html"><span class="doc">Práctica xArm: nodos, tópicos y mensajes</span></a> y al paquete
 <code class="docutils literal notranslate"><span class="pre">avigtech_xarm_intro</span></code> incluido en el material. Se utiliza exclusivamente
 un nodo de <strong>lectura de estados</strong>, sin enviar comandos de movimiento.</p>
 <section id="localizar-la-funcion-suscriptora">
@@ -148,8 +149,8 @@ manejar información reciente de sensores.</p>
 <section id="identificar-el-parametro-del-nombre-del-topico">
 <h2>3. Identificar el parámetro del nombre del tópico<a class="headerlink" href="#identificar-el-parametro-del-nombre-del-topico" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">topic_articular</span></code> se declara dentro del constructor del nodo:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">declare_parameter</span><span class="p">(</span><span class="s1">'topic_articular'</span><span class="p">,</span> <span class="s1">'/joint_states'</span><span class="p">)</span>
-<span class="bp">self</span><span class="o">.</span><span class="n">topic_articular</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="s1">'topic_articular'</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">declare_parameter</span><span class="p">(</span><span class="s1">&#39;topic_articular&#39;</span><span class="p">,</span> <span class="s1">&#39;/joint_states&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">topic_articular</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="s1">&#39;topic_articular&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
 </pre></div>
 </div>
 <p>En <code class="docutils literal notranslate"><span class="pre">launch/monitor_articular.launch.py</span></code> existe el argumento
@@ -173,23 +174,23 @@ La fórmula para convertir al presentar un resumen es:</p>
 con <code class="docutils literal notranslate"><span class="pre">math.degrees()</span></code>. Esta es la función completa de la solución:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">degrees</span>
 
-<span class="n">JUNTAS_ROTATIVAS_XARM6</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s1">'joint</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)}</span>
+<span class="n">JUNTAS_ROTATIVAS_XARM6</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s1">&#39;joint</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)}</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">formatear_articulaciones</span><span class="p">(</span><span class="n">nombres</span><span class="p">,</span> <span class="n">posiciones</span><span class="p">,</span> <span class="n">unidad</span><span class="o">=</span><span class="s1">'rad'</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">unidad</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'rad'</span><span class="p">,</span> <span class="s1">'deg'</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"unidad debe ser 'rad' o 'deg'"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">formatear_articulaciones</span><span class="p">(</span><span class="n">nombres</span><span class="p">,</span> <span class="n">posiciones</span><span class="p">,</span> <span class="n">unidad</span><span class="o">=</span><span class="s1">&#39;rad&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">unidad</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;rad&#39;</span><span class="p">,</span> <span class="s1">&#39;deg&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unidad debe ser &#39;rad&#39; o &#39;deg&#39;&quot;</span><span class="p">)</span>
 
     <span class="n">partes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">posicion</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nombres</span><span class="p">,</span> <span class="n">posiciones</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">nombre</span> <span class="ow">in</span> <span class="n">JUNTAS_ROTATIVAS_XARM6</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">unidad</span> <span class="o">==</span> <span class="s1">'deg'</span><span class="p">:</span>
-                <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">degrees</span><span class="p">(</span><span class="n">posicion</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> deg'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unidad</span> <span class="o">==</span> <span class="s1">&#39;deg&#39;</span><span class="p">:</span>
+                <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">degrees</span><span class="p">(</span><span class="n">posicion</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> deg&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">posicion</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> rad'</span><span class="p">)</span>
+                <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">posicion</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> rad&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">posicion</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> (revisar unidad URDF)'</span><span class="p">)</span>
+            <span class="n">partes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">posicion</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> (revisar unidad URDF)&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">partes</span><span class="p">)</span> <span class="k">if</span> <span class="n">partes</span> <span class="k">else</span> <span class="s1">'sin articulaciones con posicion publicada'</span>
+    <span class="k">return</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">partes</span><span class="p">)</span> <span class="k">if</span> <span class="n">partes</span> <span class="k">else</span> <span class="s1">&#39;sin articulaciones con posicion publicada&#39;</span>
 </pre></div>
 </div>
 <p>La aplicación se puede lanzar directamente en grados:</p>
@@ -253,7 +254,7 @@ python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
-        <a href="xarm_practicas.html" class="btn btn-neutral float-left" title="Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="xarm_servicios.html" class="btn btn-neutral float-left" title="Práctica xArm: servicios, acciones y parámetros" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
         <a href="../tema_3/dispositivos.html" class="btn btn-neutral float-right" title="Conexión con dispositivos" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

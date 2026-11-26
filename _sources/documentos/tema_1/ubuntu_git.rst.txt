@@ -4,9 +4,7 @@ Ubuntu y GitHub
 Instalación de Ubuntu
 ---------------------
 
-| Para el funcionamiento de ROS2 es necesario instalar Ubuntu.
-| En este curso trabajaremos con **Ubuntu 24.04** y **ROS Jazzy**.
-
+ROS2 puede funcionario en sistemas operativos como Windows o Ubuntu, en este repositorio trabajaremos con **Ubuntu 24.04** y **ROS Jazzy**.
 
 **Recursos de descarga**
 
@@ -16,7 +14,7 @@ Instalación de Ubuntu
 
 **Instalación recomendada**
 
-Para las prácticas del manipulador se recomienda instalar Ubuntu 24.04 LTS
+Para prácticas con equipos físicos se recomienda instalar Ubuntu 24.04 LTS
 nativamente, de modo que RViz 2, los periféricos y la aceleración gráfica
 puedan utilizar los recursos del equipo. Sigue las instrucciones oficiales
 de Ubuntu y verifica que la versión instalada sea 24.04 antes de continuar.
@@ -48,8 +46,8 @@ escritorios personales.
 
 Usos comunes de Ubuntu:
 
-- Desarrollo de software (Python, C++, ROS 2, Web)
-- Educación y simulación (Gazebo, R)
+- Desarrollo de software
+- Educación y simulación
 - Administración de sistemas y redes (SSH, Docker, servidores web)
 - Automatización de tareas con Bash scripting
 - Entornos gráficos personalizados y ligeros
@@ -129,7 +127,7 @@ De manera decimal tenemos:
 .. figure:: ./img/1-ubuntu2.jpg
    :alt: img2
 
-los comandos que permiten modificar los permisos de directorios son:
+uno de los comandos que permiten modificar los permisos de directorios son:
 
 - chmod: Cambia los permisos de archivos y directorios.
 
@@ -200,6 +198,7 @@ Ejemplo:
    ping google.com # verifica si hay conexión con Google.
 
 ::
+
    ss -tulnp # Muestra sockets TCP/UDP en escucha.
 
 - UFW (Uncomplicated Firewall): Firewall básico en Ubuntu.
@@ -216,12 +215,9 @@ Ejemplo:
 
    sudo ufw allow 22 #Permitir conexiones SSH (puerto 22).
 
-::
 
-   # ROS 2 usa DDS, no el puerto 11311 de ROS 1.
-   # Revisa la política de red y los puertos DDS de tu RMW antes de abrir el firewall.
-
---------------
+ROS 2 usa DDS, no el puerto 11311 de ROS 1.
+Es necesario revisar la política de red y los puertos DDS de tu RMW antes de abrir el firewall.
 
 
 GitHub

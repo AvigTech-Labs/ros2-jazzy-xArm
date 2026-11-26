@@ -59,20 +59,39 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Conceptos Básicos</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#espacio-de-trabajo">Espacio de trabajo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#paquetes">Paquetes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#nodos">Nodos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#temas">Temas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ejemplos-de-lanzamiento-y-control-de-turtlesim-en-ros-2">Ejemplos de Lanzamiento y Control de Turtlesim en ROS 2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#paquetes">Paquetes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#organizacion-de-los-archivos-del-paquete">Organización de los archivos del paquete</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nodos">Nodos</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#significado-de-los-elementos-de-python">Significado de los elementos de Python</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#publicadores-y-suscriptores-comunicacion-por-topicos">Publicadores y suscriptores: comunicación por tópicos</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estructura-del-publicador">Estructura del publicador</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estructura-del-suscriptor">Estructura del suscriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#remapeo-de-temas">Remapeo de temas</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#servicios">Servicios</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#acciones">Acciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#servicios">Servicios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#servidor-de-servicio">Servidor de servicio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cliente-de-servicio-asincrono">Cliente de servicio asíncrono</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comprobacion-del-servicio">Comprobación del servicio</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#acciones">Acciones</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#partes-obligatorias-del-servidor-de-accion">Partes obligatorias del servidor de acción</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#partes-obligatorias-del-cliente-de-accion">Partes obligatorias del cliente de acción</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diferencia-entre-estado-y-resultado">Diferencia entre estado y resultado</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spin-executors-y-grupos-de-callbacks">Spin, executors y grupos de callbacks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#parametros-configurar-nodos-sin-editar-el-programa">Parámetros: configurar nodos sin editar el programa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#launch-ejecutar-y-parametrizar-varios-nodos">Launch: ejecutar y parametrizar varios nodos</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutoriales.html">Tutoriales</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xarm_practicas.html">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
 <ul>
@@ -117,10 +136,6 @@
              
   <section id="conceptos-basicos">
 <h1>Conceptos Básicos<a class="headerlink" href="#conceptos-basicos" title="Link to this heading"></a></h1>
-<div class="admonition note">
-<p class="admonition-title">Nota</p>
-<p>Después de los conceptos, utiliza <span class="xref std std-doc">nodos y tópicos con xArm 6</span> para observar los mismos mecanismos en un manipulador.</p>
-</div>
 <section id="espacio-de-trabajo">
 <h2>Espacio de trabajo<a class="headerlink" href="#espacio-de-trabajo" title="Link to this heading"></a></h2>
 <p>¿Qué es un espacio de trabajo en ROS 2?</p>
@@ -133,7 +148,6 @@ dentro del workspace.</p>
 compilar y organizar workspaces en ROS 2</strong>.</p>
 <p>Proviene de “COmplex LOgic CONstructor” y fue diseñado para reemplazar
 herramientas anteriores como <code class="docutils literal notranslate"><span class="pre">catkin_make</span></code> o <code class="docutils literal notranslate"><span class="pre">ament_tools</span></code>.</p>
-<hr class="docutils" />
 <p><strong>Características de colcon</strong></p>
 <ul class="simple">
 <li><p>Compila múltiples paquetes de forma <strong>paralela</strong>.</p></li>
@@ -142,12 +156,10 @@ compilación.</p></li>
 <li><p>Separa los archivos construidos en carpetas específicas.</p></li>
 <li><p>Es <strong>extensible</strong> mediante plugins.</p></li>
 </ul>
-<hr class="docutils" />
 <p>Instalación de colcon y extensiones recomendadas</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-colcon-common-extensions
 </pre></div>
 </div>
-<hr class="docutils" />
 <p><strong>Comandos principales de colcon</strong></p>
 <table class="docutils align-default">
 <thead>
@@ -185,7 +197,6 @@ vez</p></td>
 </tr>
 </tbody>
 </table>
-<hr class="docutils" />
 <p><strong>Directorios creados por colcon al compilar</strong></p>
 <p>Al ejecutar <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span></code>, se generan 3 carpetas principales:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ros2_ws/
@@ -218,7 +229,6 @@ depuración.</p></td>
 </tr>
 </tbody>
 </table>
-<hr class="docutils" />
 <p><strong>Limpieza de la build</strong></p>
 <p>Si es necesario limpiar el workspace por completo:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>colcon<span class="w"> </span>build<span class="w"> </span>--packages-select<span class="w"> </span>my_package<span class="w"> </span>--cmake-clean-cache
@@ -229,7 +239,6 @@ depuración.</p></td>
 </pre></div>
 </div>
 </section>
-<hr class="docutils" />
 <section id="paquetes">
 <h2>Paquetes<a class="headerlink" href="#paquetes" title="Link to this heading"></a></h2>
 <p><strong>¿Qué son los paquetes?</strong></p>
@@ -264,7 +273,6 @@ o C++.</p>
 </tr>
 </tbody>
 </table>
-<hr class="docutils" />
 <p><strong>Crear un paquete Python desde cero</strong></p>
 <p>Para crear un paquete usamos el comando <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">pkg</span> <span class="pre">create</span></code> y añadiños
 las siguientes argumentos :</p>
@@ -304,13 +312,142 @@ ignora usualmente</p></td>
 <span class="w">  </span>--description<span class="w"> </span><span class="s2">"Paquete de ejemplo en Python para suscripción ROS 2"</span>
 </pre></div>
 </div>
+<section id="organizacion-de-los-archivos-del-paquete">
+<h3>Organización de los archivos del paquete<a class="headerlink" href="#organizacion-de-los-archivos-del-paquete" title="Link to this heading"></a></h3>
+<p>El siguiente árbol es <strong>ilustrativo</strong>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/ros2_ws/src/
+├── avig_msg/                         # Interfaces personalizadas existentes
+│   └── action/
+│       └── MoverA.action
+└── mi_pkg_python/
+    ├── package.xml                  # Dependencias del paquete ROS 2
+    ├── setup.py                     # Registro de módulos ejecutables
+    ├── setup.cfg                    # Directorio de scripts instalados
+    ├── resource/
+    │   └── mi_pkg_python            # Marcador ament
+    ├── launch/
+    │   └── ejemplo_nodos.launch.py  # Lanzamiento opcional
+    └── mi_pkg_python/
+        ├── __init__.py
+        ├── estructura_nodo.py
+        ├── estructura_publicador.py
+</pre></div>
+</div>
+<p><strong>Funciones de los archivos:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">package.xml</span></code>: identifica el paquete y declara las dependencias de ROS 2.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup.py</span></code>: instala los módulos y asigna nombres de ejecutables para <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>: indica dónde instalar los ejecutables de Python.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mi_pkg_python/__init__.py</span></code>: identifica el directorio como paquete Python.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">launch/*.launch.py</span></code>: permite iniciar y configurar uno o varios nodos.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">avig_msg</span></code>: contiene las definiciones de interfaces propias; se mantiene
+independiente del paquete Python según la estructura actual del curso.</p></li>
+</ul>
 </section>
-<hr class="docutils" />
+</section>
 <section id="nodos">
 <h2>Nodos<a class="headerlink" href="#nodos" title="Link to this heading"></a></h2>
 <p>Un <strong>nodo</strong> es una entidad computacional que ejecuta una función
 específica, como mover un robot móvil simulado, leer sensores, o calcular
 trayectorias.</p>
+<p>Un nodo escrito con <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> sigue normalmente seis pasos:</p>
+<ol class="arabic simple">
+<li><p><strong>Importar bibliotecas</strong> de Python y ROS 2.</p></li>
+<li><p><strong>Definir una clase</strong> que herede de <code class="docutils literal notranslate"><span class="pre">Node</span></code>.</p></li>
+<li><p><strong>Llamar al constructor</strong> de <code class="docutils literal notranslate"><span class="pre">Node</span></code> mediante <code class="docutils literal notranslate"><span class="pre">super().__init__()</span></code>.</p></li>
+<li><p><strong>Crear las interfaces</strong> que necesite (si las hay).</p></li>
+<li><p><strong>Definir los callbacks</strong> que ejecutarán la lógica.</p></li>
+<li><p><strong>Crear ``main()``</strong> para inicializar, procesar y finalizar ROS 2.</p></li>
+</ol>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">mi_pkg_python/estructura_nodo.py</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Bibliotecas necesarias para crear un nodo ROS 2.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+
+<span class="c1"># 2. La clase del programa hereda de Node.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodoBasico</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+
+   <span class="c1"># 3. El constructor configura el nodo una sola vez.</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'nodo_basico'</span><span class="p">)</span>  <span class="c1"># Nombre visible con ros2 node list.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Nodo iniciado correctamente.'</span><span class="p">)</span>
+      <span class="c1"># 4. Aquí se crearían publicadores, suscripciones, etc.</span>
+      <span class="c1"># 5. Aquí se declararían los parámetros y estados necesarios.</span>
+
+
+<span class="c1"># 6. Punto de entrada del proceso.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>               <span class="c1"># Inicializar el contexto ROS 2.</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">NodoBasico</span><span class="p">()</span>                 <span class="c1"># Construir el nodo.</span>
+
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>                <span class="c1"># Atender callbacks hasta detenerlo.</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>            <span class="c1"># Liberar las interfaces del nodo.</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>           <span class="c1"># Finalizar el contexto ROS 2.</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<section id="significado-de-los-elementos-de-python">
+<h3>Significado de los elementos de Python<a class="headerlink" href="#significado-de-los-elementos-de-python" title="Link to this heading"></a></h3>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Lectura del código</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 32.0%" />
+<col style="width: 68.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Elemento</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">class</span> <span class="pre">MiNodo(Node):</span></code></p></td>
+<td><p>Define una clase que hereda las funciones de un nodo ROS 2.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">__init__(self):</span></code></p></td>
+<td><p>Constructor que se ejecuta al instanciar el objeto.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">super().__init__('nombre')</span></code></p></td>
+<td><p>Inicializa la parte <code class="docutils literal notranslate"><span class="pre">Node</span></code> heredada y registra el nombre del nodo.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">self</span></code></p></td>
+<td><p>Referencia a la instancia; permite acceder a sus variables y métodos.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">self.create_publisher(...)</span></code></p></td>
+<td><p>Llama a un método de <code class="docutils literal notranslate"><span class="pre">Node</span></code> que crea una entidad publicadora.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">self.callback</span></code></p></td>
+<td><p>Referencia al método que será invocado cuando ocurra un evento.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rclpy.init()</span></code></p></td>
+<td><p>Inicializa los recursos necesarios del cliente ROS 2.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rclpy.spin()</span></code></p></td>
+<td><p>Procesa eventos, mensajes, timers y respuestas por medio del executor.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">node.destroy_node()</span></code></p></td>
+<td><p>Libera el nodo y sus entidades.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">'__main__':</span></code></p></td>
+<td><p>Ejecuta <code class="docutils literal notranslate"><span class="pre">main()</span></code> si se inicia el archivo directamente.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p><code class="docutils literal notranslate"><span class="pre">rclpy.spin(node)</span></code> se utiliza cuando el nodo debe permanecer atendiendo
+eventos. Si un programa de propósito puntual solo realiza una operación,
+puede utilizar otro patrón de ejecución, pero siempre debe gestionar
+correctamente la inicialización y el cierre.</p>
+</div>
 <p>Ejemplo:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">turtlesim_node</span></code>: renderiza la tortuga y ejecuta sus acciones.</p></li>
@@ -322,12 +459,112 @@ trayectorias.</p>
 </pre></div>
 </div>
 </section>
-<hr class="docutils" />
-<section id="temas">
-<h2>Temas<a class="headerlink" href="#temas" title="Link to this heading"></a></h2>
-<p>Un <strong>tema</strong> es un canal por el cual los nodos publican o reciben datos.
-Es <strong>unidireccional y asincrónico</strong>.</p>
-<p>Ejemplo:</p>
+</section>
+<section id="publicadores-y-suscriptores-comunicacion-por-topicos">
+<h2>Publicadores y suscriptores: comunicación por tópicos<a class="headerlink" href="#publicadores-y-suscriptores-comunicacion-por-topicos" title="Link to this heading"></a></h2>
+<p>En una comunicación por tópicos, el publicador envía mensajes y uno o varios
+suscriptores pueden recibirlos. <strong>El nombre del tópico, el tipo de mensaje y
+la compatibilidad de QoS</strong> deben coincidir para que exista intercambio.</p>
+<figure class="align-default" id="id3">
+<img alt="Seleccion" src="../../_images/temas.gif" />
+<figcaption>
+<p><span class="caption-text">Tomado de: ROS 2 Jazzy - Documentación Oficial</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="estructura-del-publicador">
+<h3>Estructura del publicador<a class="headerlink" href="#estructura-del-publicador" title="Link to this heading"></a></h3>
+<p>Un publicador necesita <strong>crear un objeto publicador</strong>, <strong>construir un mensaje</strong>
+y <strong>publicarlo</strong>. Si el envío es periódico, suele utilizarse un temporizador.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">mi_pkg_python/estructura_publicador.py</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">std_msgs.msg</span><span class="w"> </span><span class="kn">import</span> <span class="n">String</span>  <span class="c1"># Tipo que contiene un campo data.</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PublicadorClase</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'publicador_clase'</span><span class="p">)</span>
+
+      <span class="c1"># Tipo, nombre del tópico y profundidad de la cola (QoS).</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">publisher_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_publisher</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="s1">'topic'</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+      <span class="c1"># El callback se ejecutará cada 0.5 segundos.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_timer</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_callback</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">contador</span> <span class="o">=</span> <span class="mi">0</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">timer_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="n">mensaje</span> <span class="o">=</span> <span class="n">String</span><span class="p">()</span>                    <span class="c1"># Crear el mensaje.</span>
+      <span class="n">mensaje</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'Mensaje </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">contador</span><span class="si">}</span><span class="s1">'</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">publisher_</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">mensaje</span><span class="p">)</span>      <span class="c1"># Enviar al tópico.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">mensaje</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">contador</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">PublicadorClase</span><span class="p">()</span>
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">create_publisher()</span></code> no publica por sí mismo: solo crea la interfaz. La
+publicación se realiza con <code class="docutils literal notranslate"><span class="pre">publish(mensaje)</span></code>. En este caso, el temporizador
+es el mecanismo que desencadena cada envío.</p>
+</section>
+<section id="estructura-del-suscriptor">
+<h3>Estructura del suscriptor<a class="headerlink" href="#estructura-del-suscriptor" title="Link to this heading"></a></h3>
+<p>El suscriptor necesita crear una suscripción y registrar un <strong>callback</strong> que
+reciba un mensaje del tipo configurado.</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">mi_pkg_python/estructura_suscriptor.py</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">std_msgs.msg</span><span class="w"> </span><span class="kn">import</span> <span class="n">String</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SuscriptorClase</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'suscriptor_clase'</span><span class="p">)</span>
+
+      <span class="c1"># Guardar la suscripción en un atributo de la instancia.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">subscription</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_subscription</span><span class="p">(</span>
+         <span class="n">String</span><span class="p">,</span> <span class="s1">'topic'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">listener_callback</span><span class="p">,</span> <span class="mi">10</span>
+      <span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">listener_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+      <span class="c1"># Se ejecuta por cada mensaje recibido de 'topic'.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Recibido: </span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">SuscriptorClase</span><span class="p">()</span>
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Ejemplos de ROS2:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/turtle1/cmd_vel</span></code>: donde se publican los comandos de velocidad lineal y angular.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">/turtle1/pose</span></code>: donde se publica la posición actual de la tortuga.</p></li>
@@ -336,37 +573,26 @@ Es <strong>unidireccional y asincrónico</strong>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>list
 </pre></div>
 </div>
-<hr class="docutils" />
-<figure class="align-default" id="id1">
-<img alt="Seleccion" src="../../_images/temas.gif" />
-<figcaption>
-<p><span class="caption-text">Tomado de: ROS 2 Jazzy - Documentación Oficial</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
-</figcaption>
-</figure>
-</section>
-<section id="ejemplos-de-lanzamiento-y-control-de-turtlesim-en-ros-2">
-<h2>Ejemplos de Lanzamiento y Control de Turtlesim en ROS 2<a class="headerlink" href="#ejemplos-de-lanzamiento-y-control-de-turtlesim-en-ros-2" title="Link to this heading"></a></h2>
 <p>En este ejemplo se muestra cómo lanzar el nodo de <code class="docutils literal notranslate"><span class="pre">turtlesim</span></code> y
 controlar su movimiento mediante el teclado. También se explica cómo
 utilizar otro nodo de teleoperación genérico (<code class="docutils literal notranslate"><span class="pre">teleop_twist_keyboard</span></code>)
 haciendo uso de <strong>remapeo de temas</strong> en ROS 2.</p>
-<p><strong>Paso 1: Instalación de paquetes necesarios</strong></p>
+<p><strong>1: Instalación de paquetes necesarios</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-jazzy-turtlesim<span class="w"> </span>ros-jazzy-teleop-twist-keyboard
 </pre></div>
 </div>
-<p><strong>Paso 2: Lanzar la ventana del simulador</strong></p>
+<p><strong>2: Lanzar la ventana del simulador</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>turtlesim<span class="w"> </span>turtlesim_node
 </pre></div>
 </div>
 <p>Este comando lanza el nodo que genera la ventana de simulación con la
 tortuga inicial (<code class="docutils literal notranslate"><span class="pre">/turtle1</span></code>).</p>
-<p><strong>Paso 3: Controlar la tortuga con el teclado (teleop integrado)</strong></p>
+<p><strong>3: Controlar la tortuga con el teclado (teleop integrado)</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>turtlesim<span class="w"> </span>turtle_teleop_key
 </pre></div>
 </div>
-<hr class="docutils" />
-<p><strong>Paso 4: Control con un nodo genérico de teleoperación</strong></p>
+<p><strong>4: Control con un nodo genérico de teleoperación</strong></p>
 <p>En este ejemplo se usa el nodo <code class="docutils literal notranslate"><span class="pre">teleop_twist_keyboard</span></code> del paquete
 <code class="docutils literal notranslate"><span class="pre">teleop_twist_keyboard</span></code>. Este nodo: Lee las teclas del teclado y
 publica mensajes del tipo <code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/Twist</span></code></p>
@@ -381,8 +607,8 @@ publica mensajes del tipo <code class="docutils literal notranslate"><span class
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">turtle1</span><span class="o">/</span><span class="n">cmd_vel</span>
 </pre></div>
 </div>
-<hr class="docutils" />
 <p><strong>¿Cómo solucionar esto?</strong></p>
+</section>
 <section id="remapeo-de-temas">
 <h3>Remapeo de temas<a class="headerlink" href="#remapeo-de-temas" title="Link to this heading"></a></h3>
 <p>ROS 2 permite redirigir (“remapear”) los nombres de los temas <strong>sin
@@ -420,7 +646,6 @@ simuladores.</p></li>
 <li><p><strong>Tipo de servicio</strong>: define la estructura de los datos solicitados y
 respondidos.</p></li>
 </ul>
-<hr class="docutils" />
 <p><strong>Estructura de un Servicio</strong></p>
 <p>Los servicios están definidos por archivos <code class="docutils literal notranslate"><span class="pre">.srv</span></code>, que contienen dos
 partes separadas por <code class="docutils literal notranslate"><span class="pre">---</span></code>:</p>
@@ -437,18 +662,130 @@ partes separadas por <code class="docutils literal notranslate"><span class="pre
 <li><p>El <strong>cliente</strong> enviará dos enteros <code class="docutils literal notranslate"><span class="pre">a</span></code> y <code class="docutils literal notranslate"><span class="pre">b</span></code></p></li>
 <li><p>El <strong>servidor</strong> responderá con un entero <code class="docutils literal notranslate"><span class="pre">sum</span></code></p></li>
 </ul>
-<hr class="docutils" />
 <p><strong>Comunicación Cliente-Servidor</strong></p>
 <p>La interacción funciona así: <img alt="Seleccion" src="../../_images/servicios.gif" /> <em>Tomado de: ROS 2 Jazzy - Documentación Oficial</em></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="n">Cliente</span> <span class="p">]</span> <span class="o">--</span> <span class="n">Request</span> <span class="o">--&gt;</span> <span class="p">[</span> <span class="n">Servidor</span> <span class="p">]</span>
-<span class="p">[</span> <span class="n">Cliente</span> <span class="p">]</span> <span class="o">&lt;--</span> <span class="n">Response</span> <span class="o">--</span> <span class="p">[</span> <span class="n">Servidor</span> <span class="p">]</span>
+<section id="servidor-de-servicio">
+<h3>Servidor de servicio<a class="headerlink" href="#servidor-de-servicio" title="Link to this heading"></a></h3>
+<p>Un servidor necesita declarar el tipo <code class="docutils literal notranslate"><span class="pre">.srv</span></code>, registrar el <strong>nombre del
+servicio</strong> y proporcionar un callback que reciba <code class="docutils literal notranslate"><span class="pre">request</span></code> y <code class="docutils literal notranslate"><span class="pre">response</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">mi_pkg_python/estructura_servidor_srv.py</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">example_interfaces.srv</span><span class="w"> </span><span class="kn">import</span> <span class="n">AddTwoInts</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ServidorSuma</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'servidor_suma'</span><span class="p">)</span>
+
+      <span class="c1"># Tipo de servicio, nombre y callback que responde solicitudes.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">srv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_service</span><span class="p">(</span>
+         <span class="n">AddTwoInts</span><span class="p">,</span> <span class="s1">'sumar_dos_enteros'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sumar_callback</span>
+      <span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Servicio /sumar_dos_enteros disponible.'</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">sumar_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+      <span class="c1"># request contiene los campos definidos ANTES de ---.</span>
+      <span class="c1"># response contiene los campos definidos DESPUÉS de ---.</span>
+      <span class="n">response</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="n">b</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">a</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">b</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">sum</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">response</span>  <span class="c1"># Siempre devolver la respuesta tipada.</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">ServidorSuma</span><span class="p">()</span>
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-<ul class="simple">
-<li><p>El cliente espera la respuesta antes de continuar.</p></li>
-<li><p>Se usa para tareas <strong>puntuales</strong>, <strong>deterministas</strong> y de <strong>control</strong>.</p></li>
-</ul>
-<hr class="docutils" />
+</div>
+</section>
+<section id="cliente-de-servicio-asincrono">
+<h3>Cliente de servicio asíncrono<a class="headerlink" href="#cliente-de-servicio-asincrono" title="Link to this heading"></a></h3>
+<p>El cliente debe crear una entidad <code class="docutils literal notranslate"><span class="pre">Client</span></code>, construir un objeto <code class="docutils literal notranslate"><span class="pre">Request</span></code>
+y llamar a <code class="docutils literal notranslate"><span class="pre">call_async()</span></code>. La operación devuelve un <strong>Future</strong>, que es un
+objeto que permite obtener la respuesta cuando haya terminado.</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">mi_pkg_python/estructura_cliente_srv.py</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">example_interfaces.srv</span><span class="w"> </span><span class="kn">import</span> <span class="n">AddTwoInts</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClienteSuma</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'cliente_suma'</span><span class="p">)</span>
+
+      <span class="c1"># El nombre y el tipo deben coincidir con los del servidor.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cli</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_client</span><span class="p">(</span><span class="n">AddTwoInts</span><span class="p">,</span> <span class="s1">'sumar_dos_enteros'</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">enviar_solicitud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+      <span class="c1"># Esperar de forma acotada hasta que exista un servidor.</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="n">timeout_sec</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Servicio no disponible.'</span><span class="p">)</span>
+         <span class="k">return</span> <span class="kc">None</span>
+
+      <span class="n">solicitud</span> <span class="o">=</span> <span class="n">AddTwoInts</span><span class="o">.</span><span class="n">Request</span><span class="p">()</span>
+      <span class="n">solicitud</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+      <span class="n">solicitud</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+      <span class="c1"># call_async() devuelve inmediatamente un Future.</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">call_async</span><span class="p">(</span><span class="n">solicitud</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">ClienteSuma</span><span class="p">()</span>
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">futuro</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">enviar_solicitud</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">futuro</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+         <span class="c1"># Es válido aquí: estamos en main(), SIN otro spin activo.</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">futuro</span><span class="p">)</span>
+         <span class="k">if</span> <span class="n">futuro</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">futuro</span><span class="o">.</span><span class="n">exception</span><span class="p">()))</span>
+         <span class="k">else</span><span class="p">:</span>
+            <span class="n">resultado</span> <span class="o">=</span> <span class="n">futuro</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Suma recibida: </span><span class="si">{</span><span class="n">resultado</span><span class="o">.</span><span class="n">sum</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="comprobacion-del-servicio">
+<h3>Comprobación del servicio<a class="headerlink" href="#comprobacion-del-servicio" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Terminal 1: servidor</span>
+ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>estructura_servidor_srv
+
+<span class="c1"># Terminal 2: cliente</span>
+ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>estructura_cliente_srv
+
+<span class="c1"># Alternativa: invocar el servicio desde la terminal.</span>
+ros2<span class="w"> </span>service<span class="w"> </span>list<span class="w"> </span>-t
+ros2<span class="w"> </span>service<span class="w"> </span><span class="nb">type</span><span class="w"> </span>/sumar_dos_enteros
+ros2<span class="w"> </span>interface<span class="w"> </span>show<span class="w"> </span>example_interfaces/srv/AddTwoInts
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/sumar_dos_enteros<span class="w"> </span>example_interfaces/srv/AddTwoInts<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"{a: 5, b: 7}"</span>
+</pre></div>
+</div>
 <p><strong>¿Cuándo usar un Servicio?</strong></p>
 <table class="docutils align-default">
 <thead>
@@ -474,7 +811,6 @@ partes separadas por <code class="docutils literal notranslate"><span class="pre
 </tr>
 </tbody>
 </table>
-<hr class="docutils" />
 <p><strong>Ventajas del uso de servicios</strong></p>
 <ul class="simple">
 <li><p>Comunicación clara de solicitud y respuesta.</p></li>
@@ -483,7 +819,6 @@ partes separadas por <code class="docutils literal notranslate"><span class="pre
 servicio.</p></li>
 <li><p>Facilita control de errores: se sabe si hubo respuesta o no.</p></li>
 </ul>
-<hr class="docutils" />
 <p><strong>Consideraciones técnicas</strong></p>
 <ul class="simple">
 <li><p>La espera por la respuesta puede bloquear el nodo (sin <code class="docutils literal notranslate"><span class="pre">async</span></code>).</p></li>
@@ -491,7 +826,6 @@ servicio.</p></li>
 <li><p>Si necesitas emitir múltiples respuestas a una sola solicitud → usa
 <strong>acciones</strong>.</p></li>
 </ul>
-<hr class="docutils" />
 <p><strong>Ejemplos de servicios comunes en ROS 2</strong></p>
 <table class="docutils align-default">
 <thead>
@@ -541,6 +875,7 @@ de un nodo</p></td>
 </pre></div>
 </div>
 </section>
+</section>
 <section id="acciones">
 <h2>Acciones<a class="headerlink" href="#acciones" title="Link to this heading"></a></h2>
 <p><strong>¿Qué es una Acción en ROS 2?</strong></p>
@@ -554,61 +889,6 @@ servidor.</p></li>
 <li><p>Tener la posibilidad de <strong>cancelar la ejecución</strong> en cualquier
 momento.</p></li>
 </ul>
-<hr class="docutils" />
-<p><strong>¿Por qué usar acciones y no servicios o tópicos?</strong></p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Característica</p></th>
-<th class="head"><p>Tópico</p></th>
-<th class="head"><p>Servicio</p></th>
-<th class="head"><p>Acción</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Comunicación</p></td>
-<td><p>Unidireccional</p></td>
-<td><p>Bidireccional</p></td>
-<td><p>Bidireccional</p></td>
-</tr>
-<tr class="row-odd"><td><p>Tiempo de ejecución</p></td>
-<td><p>Continuo</p></td>
-<td><p>Corto</p></td>
-<td><p>Largo</p></td>
-</tr>
-<tr class="row-even"><td><p>Respuesta directa</p></td>
-<td><p>❌</p></td>
-<td><p>✅</p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-odd"><td><p>Retroalimentación</p></td>
-<td><p>❌</p></td>
-<td><p>❌</p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-even"><td><p>Cancelación posible</p></td>
-<td><p>❌</p></td>
-<td><p>❌</p></td>
-<td><p>✅</p></td>
-</tr>
-</tbody>
-</table>
-<p>En <strong>Conclusión:</strong> Las acciones combinan lo mejor de los servicios y
-tópicos, permitiendo tareas de larga duración con control dinámico.</p>
-<hr class="docutils" />
-<p><strong>Estructura de un archivo ``.action``</strong></p>
-<p>Un archivo <code class="docutils literal notranslate"><span class="pre">.action</span></code> define tres partes:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Objetivo (Goal)</span>
-<span class="n">int32</span> <span class="n">x</span>
-<span class="n">int32</span> <span class="n">y</span>
-<span class="o">---</span>
-<span class="c1"># Resultado (Result)</span>
-<span class="nb">bool</span> <span class="n">success</span>
-<span class="o">---</span>
-<span class="c1"># Retroalimentación (Feedback)</span>
-<span class="n">float32</span> <span class="n">percentage_complete</span>
-</pre></div>
-</div>
-<hr class="docutils" />
 <p><strong>Componentes Clave</strong></p>
 <ul class="simple">
 <li><p><strong>Cliente de acción:</strong> Nodo que solicita ejecutar una acción.</p></li>
@@ -618,7 +898,6 @@ resultados o feedback.</p></li>
 <li><p><strong>Result:</strong> Salida final cuando se completa la acción.</p></li>
 <li><p><strong>Feedback:</strong> Información de progreso enviada mientras se ejecuta.</p></li>
 </ul>
-<hr class="docutils" />
 <p><strong>Flujo de Ejecución</strong></p>
 <ol class="arabic simple">
 <li><p>El cliente envía un <strong>objetivo (goal)</strong>.</p></li>
@@ -628,12 +907,335 @@ resultados o feedback.</p></li>
 <li><p>Cuando termina, se envía un <strong>resultado</strong>.</p></li>
 <li><p>El cliente puede <strong>cancelar</strong> la acción si es necesario.´</p></li>
 </ol>
-<figure class="align-default" id="id2">
+<figure class="align-default" id="id8">
 <img alt="gif" src="../../_images/acciones.gif" />
 <figcaption>
-<p><span class="caption-text">Tomado de: ROS 2 Jazzy - Documentación Oficial</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+<p><span class="caption-text">Tomado de: ROS 2 Jazzy - Documentación Oficial</span><a class="headerlink" href="#id8" title="Link to this image"></a></p>
 </figcaption>
 </figure>
+<p><strong>Estructura de un action</strong></p>
+<p>En este repositorio se utiliza de ejemplo un action personalizado <code class="docutils literal notranslate"><span class="pre">MoverA</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Objetivo</span>
+<span class="n">float32</span> <span class="n">x_actual</span>
+<span class="n">float32</span> <span class="n">y_actual</span>
+<span class="n">float32</span> <span class="n">x_meta</span>
+<span class="n">float32</span> <span class="n">y_meta</span>
+<span class="o">---</span>
+<span class="c1"># Resultado</span>
+<span class="nb">bool</span> <span class="n">success</span>
+<span class="o">---</span>
+<span class="c1"># Feedback</span>
+<span class="n">float32</span> <span class="n">distancia_restante</span>
+</pre></div>
+</div>
+<section id="partes-obligatorias-del-servidor-de-accion">
+<h3>Partes obligatorias del servidor de acción<a class="headerlink" href="#partes-obligatorias-del-servidor-de-accion" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>``ActionServer``</strong>: entidad que registra el nombre y tipo de la acción.</p></li>
+<li><p><strong>``goal_callback()``</strong>: acepta o rechaza metas.</p></li>
+<li><p><strong>``execute_callback()``</strong>: ejecuta la tarea, publica feedback y devuelve
+un <code class="docutils literal notranslate"><span class="pre">MoverA.Result</span></code>.</p></li>
+<li><p><strong>``cancel_callback()``</strong>: acepta o rechaza solicitudes de cancelación.</p></li>
+<li><p><strong>``goal_handle``</strong>: representa una meta concreta y permite consultar su
+cancelación y establecer estados terminales.</p></li>
+<li><p><strong>Executor</strong>: procesa las solicitudes y las tareas concurrentes.</p></li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Esqueleto didáctico del servidor con cancelación (MoverA)</span><a class="headerlink" href="#id9" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionServer</span><span class="p">,</span> <span class="n">GoalResponse</span><span class="p">,</span> <span class="n">CancelResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.callback_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReentrantCallbackGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.executors</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiThreadedExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">avig_msg.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoverA</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ServidorMoverA</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'movera_server'</span><span class="p">)</span>
+
+      <span class="c1"># Permite atender una cancelación mientras hay una meta ejecutándose.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">grupo</span> <span class="o">=</span> <span class="n">ReentrantCallbackGroup</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">servidor</span> <span class="o">=</span> <span class="n">ActionServer</span><span class="p">(</span>
+         <span class="bp">self</span><span class="p">,</span> <span class="n">MoverA</span><span class="p">,</span> <span class="s1">'mover_a'</span><span class="p">,</span>
+         <span class="n">execute_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execute_callback</span><span class="p">,</span>
+         <span class="n">goal_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">goal_callback</span><span class="p">,</span>
+         <span class="n">cancel_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_callback</span><span class="p">,</span>
+         <span class="n">callback_group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grupo</span>
+      <span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">goal_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_request</span><span class="p">):</span>
+      <span class="c1"># En un robot físico validaríamos límites y conflictos.</span>
+      <span class="k">return</span> <span class="n">GoalResponse</span><span class="o">.</span><span class="n">ACCEPT</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">cancel_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_handle</span><span class="p">):</span>
+      <span class="c1"># Aceptar cancelar NO marca aún el estado final CANCELED.</span>
+      <span class="k">return</span> <span class="n">CancelResponse</span><span class="o">.</span><span class="n">ACCEPT</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">execute_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_handle</span><span class="p">):</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">x_actual</span><span class="p">)</span>
+      <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">y_actual</span><span class="p">)</span>
+      <span class="n">meta_x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">x_meta</span><span class="p">)</span>
+      <span class="n">meta_y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">y_meta</span><span class="p">)</span>
+      <span class="n">feedback</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Feedback</span><span class="p">()</span>
+      <span class="n">resultado</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Result</span><span class="p">()</span>
+
+      <span class="k">while</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="c1"># Verificar cancelación durante la tarea, no solo al comenzar.</span>
+         <span class="k">if</span> <span class="n">goal_handle</span><span class="o">.</span><span class="n">is_cancel_requested</span><span class="p">:</span>
+            <span class="n">goal_handle</span><span class="o">.</span><span class="n">canceled</span><span class="p">()</span>
+            <span class="n">resultado</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="n">resultado</span>
+
+         <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">meta_x</span> <span class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="n">meta_y</span> <span class="o">-</span> <span class="n">y</span>
+         <span class="n">distancia</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+
+         <span class="k">if</span> <span class="n">distancia</span> <span class="o">&lt;=</span> <span class="mf">0.1</span><span class="p">:</span>       <span class="c1"># Tolerancia de llegada.</span>
+            <span class="n">goal_handle</span><span class="o">.</span><span class="n">succeed</span><span class="p">()</span>
+            <span class="n">resultado</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">resultado</span>
+
+         <span class="c1"># Simulación: avanzar 0.1 unidades hacia la meta.</span>
+         <span class="n">paso</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">distancia</span><span class="p">)</span>
+         <span class="n">x</span> <span class="o">+=</span> <span class="n">paso</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">/</span> <span class="n">distancia</span>
+         <span class="n">y</span> <span class="o">+=</span> <span class="n">paso</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">distancia</span>
+
+         <span class="n">feedback</span><span class="o">.</span><span class="n">distancia_restante</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+               <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">meta_x</span> <span class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="n">meta_y</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+         <span class="p">)</span>
+         <span class="n">goal_handle</span><span class="o">.</span><span class="n">publish_feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>            <span class="c1"># Solo para el ejercicio educativo.</span>
+
+      <span class="k">if</span> <span class="n">goal_handle</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+         <span class="n">goal_handle</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+      <span class="n">resultado</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+      <span class="k">return</span> <span class="n">resultado</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">ServidorMoverA</span><span class="p">()</span>
+   <span class="n">executor</span> <span class="o">=</span> <span class="n">MultiThreadedExecutor</span><span class="p">(</span><span class="n">num_threads</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+   <span class="n">executor</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">executor</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>                <span class="c1"># ÚNICO spin del servidor.</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>El programa usa un bucle con <code class="docutils literal notranslate"><span class="pre">time.sleep()</span></code> únicamente para representar
+un recorrido 2D <strong>ficticio</strong>. No es un algoritmo de control de motores en
+tiempo real. <code class="docutils literal notranslate"><span class="pre">ReentrantCallbackGroup</span></code> permite solapamiento de callbacks;
+en una aplicación que controle un único robot físico sería necesario
+gestionar explícitamente metas simultáneas y condiciones de seguridad.</p>
+</div>
+</section>
+<section id="partes-obligatorias-del-cliente-de-accion">
+<h3>Partes obligatorias del cliente de acción<a class="headerlink" href="#partes-obligatorias-del-cliente-de-accion" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>``ActionClient``</strong>: registra tipo y nombre de acción.</p></li>
+<li><p><strong>``MoverA.Goal()``</strong>: construye la meta con valores válidos.</p></li>
+<li><p><strong>``send_goal_async()``</strong>: inicia el envío de la meta.</p></li>
+<li><p><strong>``goal_response_callback()``</strong>: comprueba si fue aceptada.</p></li>
+<li><p><strong>``feedback_callback()``</strong>: recibe el progreso; puede activar una
+condición de cancelación.</p></li>
+<li><p><strong>``cancel_goal_async()``</strong>: solicita cancelar una meta aceptada.</p></li>
+<li><p><strong>``get_result_async()``</strong>: obtiene el estado y el resultado final.</p></li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">Esqueleto didáctico del cliente con cancelación (MoverA)</span><a class="headerlink" href="#id10" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">action_msgs.msg</span><span class="w"> </span><span class="kn">import</span> <span class="n">GoalStatus</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">avig_msg.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoverA</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClienteMoverA</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'movera_client'</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cliente</span> <span class="o">=</span> <span class="n">ActionClient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MoverA</span><span class="p">,</span> <span class="s1">'mover_a'</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="kc">None</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cancelacion_solicitada</span> <span class="o">=</span> <span class="kc">False</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">terminado</span> <span class="o">=</span> <span class="kc">False</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">enviar_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cliente</span><span class="o">.</span><span class="n">wait_for_server</span><span class="p">(</span><span class="n">timeout_sec</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'No hay servidor de acción disponible.'</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">terminado</span> <span class="o">=</span> <span class="kc">True</span>
+         <span class="k">return</span>
+
+      <span class="n">objetivo</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Goal</span><span class="p">()</span>
+      <span class="n">objetivo</span><span class="o">.</span><span class="n">x_actual</span><span class="p">,</span> <span class="n">objetivo</span><span class="o">.</span><span class="n">y_actual</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span>
+      <span class="n">objetivo</span><span class="o">.</span><span class="n">x_meta</span><span class="p">,</span> <span class="n">objetivo</span><span class="o">.</span><span class="n">y_meta</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span>
+      <span class="n">futuro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cliente</span><span class="o">.</span><span class="n">send_goal_async</span><span class="p">(</span>
+         <span class="n">objetivo</span><span class="p">,</span> <span class="n">feedback_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">recibir_feedback</span>
+      <span class="p">)</span>
+      <span class="n">futuro</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">respuesta_meta</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">respuesta_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futuro</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">futuro</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">accepted</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">'Meta rechazada.'</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">terminado</span> <span class="o">=</span> <span class="kc">True</span>
+         <span class="k">return</span>
+      <span class="n">futuro_resultado</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get_result_async</span><span class="p">()</span>
+      <span class="n">futuro_resultado</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recibir_resultado</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">recibir_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mensaje</span><span class="p">):</span>
+      <span class="n">distancia</span> <span class="o">=</span> <span class="n">mensaje</span><span class="o">.</span><span class="n">feedback</span><span class="o">.</span><span class="n">distancia_restante</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Faltan </span><span class="si">{</span><span class="n">distancia</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> unidades.'</span><span class="p">)</span>
+
+      <span class="c1"># Evitar pedir varias veces la misma cancelación.</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">distancia</span> <span class="o">&lt;</span> <span class="mf">0.8</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cancelacion_solicitada</span><span class="p">):</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">cancelacion_solicitada</span> <span class="o">=</span> <span class="kc">True</span>
+         <span class="n">futuro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">cancel_goal_async</span><span class="p">()</span>
+         <span class="n">futuro</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">respuesta_cancelacion</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">respuesta_cancelacion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futuro</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">futuro</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">goals_canceling</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Cancelación aceptada; espero resultado.'</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">'Cancelación no aceptada.'</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">recibir_resultado</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futuro</span><span class="p">):</span>
+      <span class="n">respuesta</span> <span class="o">=</span> <span class="n">futuro</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">STATUS_CANCELED</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Acción cancelada.'</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">STATUS_SUCCEEDED</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Objetivo completado.'</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">'Meta abortada u otro estado final.'</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">terminado</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">ClienteMoverA</span><span class="p">()</span>
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">enviar_meta</span><span class="p">()</span>
+      <span class="c1"># spin_once está en main(), no dentro de un callback ya en spin.</span>
+      <span class="k">while</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">terminado</span><span class="p">:</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">spin_once</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="diferencia-entre-estado-y-resultado">
+<h3>Diferencia entre estado y resultado<a class="headerlink" href="#diferencia-entre-estado-y-resultado" title="Link to this heading"></a></h3>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">Estados relevantes de una meta</span><a class="headerlink" href="#id11" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 76.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Estado</p></th>
+<th class="head"><p>Interpretación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ACCEPTED</span></code></p></td>
+<td><p>El servidor aceptó la meta; puede estar esperando ejecución.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EXECUTING</span></code></p></td>
+<td><p>La tarea está en ejecución.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CANCELING</span></code></p></td>
+<td><p>Se aceptó la solicitud de cancelación y aún se está procesando.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CANCELED</span></code></p></td>
+<td><p>El servidor marcó la meta como cancelada.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUCCEEDED</span></code></p></td>
+<td><p>El servidor marcó la meta como completada correctamente.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ABORTED</span></code></p></td>
+<td><p>El servidor abortó la meta debido a una falla u otra condición.</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">resultado.success</span></code> es una variable <strong>definida por nuestra interfaz</strong>.
+El estado <code class="docutils literal notranslate"><span class="pre">GoalStatus</span></code> pertenece al protocolo de acciones de ROS 2.
+<strong>Aceptar cancelar no significa que la meta ya haya terminado</strong>: el cliente
+debe esperar el resultado y comprobar <code class="docutils literal notranslate"><span class="pre">STATUS_CANCELED</span></code>.</p>
+</section>
+<section id="spin-executors-y-grupos-de-callbacks">
+<h3>Spin, executors y grupos de callbacks<a class="headerlink" href="#spin-executors-y-grupos-de-callbacks" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">spin</span></code> atiende callbacks de las entidades de un nodo mediante un executor.
+Los grupos de callbacks determinan qué funciones pueden ejecutarse de forma
+concurrente.</p>
+<table class="docutils align-default" id="id12">
+<caption><span class="caption-text">Funciones de ejecución en ROS 2 Jazzy</span><a class="headerlink" href="#id12" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 38.0%" />
+<col style="width: 62.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API</p></th>
+<th class="head"><p>Uso típico</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rclpy.spin(node)</span></code></p></td>
+<td><p>Mantener activo un nodo sencillo.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rclpy.spin_once(node)</span></code></p></td>
+<td><p>Procesar eventos desde un bucle principal que <strong>no esté girando en
+otro executor</strong>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rclpy.spin_until_future_complete(node,</span> <span class="pre">futuro)</span></code></p></td>
+<td><p>Esperar una respuesta fuera de callbacks, sin un <code class="docutils literal notranslate"><span class="pre">spin</span></code> paralelo.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MultiThreadedExecutor</span></code></p></td>
+<td><p>Permitir que diferentes hilos atiendan callbacks del nodo.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ReentrantCallbackGroup</span></code></p></td>
+<td><p>Permitir que los callbacks de su grupo puedan solaparse.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MutuallyExclusiveCallbackGroup</span></code></p></td>
+<td><p>Evitar ejecución simultánea de callbacks del mismo grupo.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p><strong>Error conocido durante la migración a Jazzy:</strong> la implementación antigua
+del servidor <code class="docutils literal notranslate"><span class="pre">MoverA</span></code> llamaba a <code class="docutils literal notranslate"><span class="pre">rclpy.spin_once(self)</span></code> <strong>dentro de
+``execute_callback()``</strong>, mientras el nodo ya estaba ejecutando
+<code class="docutils literal notranslate"><span class="pre">rclpy.spin(node)</span></code>. En el entorno probado produjo
+<code class="docutils literal notranslate"><span class="pre">RuntimeError:</span> <span class="pre">Executor</span> <span class="pre">is</span> <span class="pre">already</span> <span class="pre">spinning</span></code>. La solución es <strong>no
+anidar el procesamiento del mismo executor</strong>; para la práctica con
+cancelación se usa <code class="docutils literal notranslate"><span class="pre">MultiThreadedExecutor</span></code> y
+<code class="docutils literal notranslate"><span class="pre">ReentrantCallbackGroup</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">spin_once()</span></code> <strong>no fue eliminado en Jazzy</strong>, y la cancelación de acciones
+<strong>ya existía en Humble</strong>. Lo que cambió en esta práctica es el patrón de
+concurrencia y la forma en que evitamos la reentrada indebida del executor.</p>
+</div>
+<p>En <strong>Conclusión:</strong> Las acciones combinan lo mejor de los servicios y
+tópicos, permitiendo tareas de larga duración con control dinámico.</p>
 <p><strong>Casos de Uso Típicos</strong></p>
 <ul class="simple">
 <li><p>Navegar a una posición (navegación autónoma).</p></li>
@@ -642,7 +1244,6 @@ resultados o feedback.</p></li>
 <li><p>Esperar eventos con tiempo prolongado.</p></li>
 <li><p>Controlar movimiento con retroalimentación.</p></li>
 </ul>
-<hr class="docutils" />
 <p><strong>Ejemplos de acciones existentes</strong></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">nav2_msgs/action/NavigateToPose</span></code></p></li>
@@ -650,6 +1251,98 @@ resultados o feedback.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">moveit_msgs/action/MoveGroup</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">lifecycle_msgs/action/Transition</span></code></p></li>
 </ul>
+</section>
+</section>
+<section id="parametros-configurar-nodos-sin-editar-el-programa">
+<h2>Parámetros: configurar nodos sin editar el programa<a class="headerlink" href="#parametros-configurar-nodos-sin-editar-el-programa" title="Link to this heading"></a></h2>
+<p>Un parámetro debe declararse antes de consultarse en el esquema básico de
+<code class="docutils literal notranslate"><span class="pre">rclpy</span></code>. Puede recibir un valor inicial y ser sobrescrito al lanzar el nodo.</p>
+<div class="literal-block-wrapper docutils container" id="id13">
+<div class="code-block-caption"><span class="caption-text">mi_pkg_python/estructura_parametros.py</span><a class="headerlink" href="#id13" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">NodoParametros</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'nodo_parametros'</span><span class="p">)</span>
+
+      <span class="c1"># Declarar un parámetro de texto, con valor predeterminado.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">declare_parameter</span><span class="p">(</span><span class="s1">'saludo'</span><span class="p">,</span> <span class="s1">'Hola desde ROS 2'</span><span class="p">)</span>
+
+      <span class="c1"># El timer mostrará el valor actual cada segundo.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_timer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_callback</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">timer_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="n">saludo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="s1">'saludo'</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">saludo</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">NodoParametros</span><span class="p">()</span>
+   <span class="k">try</span><span class="p">:</span>
+      <span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+         <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+   <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class="w"> </span>estructura_parametros<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ros-args<span class="w"> </span>-p<span class="w"> </span>saludo:<span class="o">=</span><span class="s1">'Bienvenido a AvigTech'</span>
+
+<span class="c1"># Desde otra terminal:</span>
+ros2<span class="w"> </span>param<span class="w"> </span>list<span class="w"> </span>/nodo_parametros
+ros2<span class="w"> </span>param<span class="w"> </span>get<span class="w"> </span>/nodo_parametros<span class="w"> </span>saludo
+ros2<span class="w"> </span>param<span class="w"> </span><span class="nb">set</span><span class="w"> </span>/nodo_parametros<span class="w"> </span>saludo<span class="w"> </span><span class="s1">'Mensaje modificado'</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El temporizador mantiene su período de 1.0 s. Cambiar el valor de un
+parámetro llamado <code class="docutils literal notranslate"><span class="pre">frecuencia_hz</span></code> no reconfiguraría automáticamente
+un timer existente: el programa tendría que aplicar ese cambio.</p>
+</div>
+</section>
+<section id="launch-ejecutar-y-parametrizar-varios-nodos">
+<h2>Launch: ejecutar y parametrizar varios nodos<a class="headerlink" href="#launch-ejecutar-y-parametrizar-varios-nodos" title="Link to this heading"></a></h2>
+<p>El archivo <code class="docutils literal notranslate"><span class="pre">.launch.py</span></code> describe <strong>qué ejecutables se iniciarán</strong>, sus
+nombres, parámetros y remapeos. <code class="docutils literal notranslate"><span class="pre">launch</span></code> <strong>no es un nodo ROS 2 por sí mismo</strong>.</p>
+<div class="literal-block-wrapper docutils container" id="id14">
+<div class="code-block-caption"><span class="caption-text">launch/ejemplo_nodos.launch.py</span><a class="headerlink" href="#id14" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_launch_description</span><span class="p">():</span>
+   <span class="k">return</span> <span class="n">LaunchDescription</span><span class="p">([</span>
+      <span class="n">Node</span><span class="p">(</span>
+         <span class="n">package</span><span class="o">=</span><span class="s1">'mi_pkg_python'</span><span class="p">,</span>
+         <span class="n">executable</span><span class="o">=</span><span class="s1">'estructura_publicador'</span><span class="p">,</span>
+         <span class="n">name</span><span class="o">=</span><span class="s1">'publicador_clase'</span><span class="p">,</span>
+         <span class="n">output</span><span class="o">=</span><span class="s1">'screen'</span>
+      <span class="p">),</span>
+      <span class="n">Node</span><span class="p">(</span>
+         <span class="n">package</span><span class="o">=</span><span class="s1">'mi_pkg_python'</span><span class="p">,</span>
+         <span class="n">executable</span><span class="o">=</span><span class="s1">'estructura_suscriptor'</span><span class="p">,</span>
+         <span class="n">name</span><span class="o">=</span><span class="s1">'suscriptor_clase'</span><span class="p">,</span>
+         <span class="n">output</span><span class="o">=</span><span class="s1">'screen'</span>
+      <span class="p">)</span>
+   <span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>mi_pkg_python<span class="w"> </span>ejemplo_nodos.launch.py
+</pre></div>
+</div>
+<p>Para que ROS 2 encuentre ese <code class="docutils literal notranslate"><span class="pre">launch</span></code>, se debe instalar desde <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>
+mediante <code class="docutils literal notranslate"><span class="pre">data_files</span></code> (véase la sección siguiente).</p>
 </section>
 </section>
 

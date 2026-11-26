@@ -1,11 +1,6 @@
 Conexión con dispositivos
 =========================
 
-.. note::
-
-   El uso de ESP32 y MQTT se incorpora como ampliación de :doc:`proyecto integrador xArm 6 <../tema_5/xarm_integrador>`.
-
-
 MQTT
 ----
 

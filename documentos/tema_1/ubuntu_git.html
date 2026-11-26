@@ -71,7 +71,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tema_2/tutoriales.html">Tutoriales</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_practicas.html">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
 <ul>
@@ -118,17 +117,14 @@
 <h1>Ubuntu y GitHub<a class="headerlink" href="#ubuntu-y-github" title="Link to this heading"></a></h1>
 <section id="instalacion-de-ubuntu">
 <h2>Instalación de Ubuntu<a class="headerlink" href="#instalacion-de-ubuntu" title="Link to this heading"></a></h2>
-<div class="line-block">
-<div class="line">Para el funcionamiento de ROS2 es necesario instalar Ubuntu.</div>
-<div class="line">En este curso trabajaremos con <strong>Ubuntu 24.04</strong> y <strong>ROS Jazzy</strong>.</div>
-</div>
+<p>ROS2 puede funcionario en sistemas operativos como Windows o Ubuntu, en este repositorio trabajaremos con <strong>Ubuntu 24.04</strong> y <strong>ROS Jazzy</strong>.</p>
 <p><strong>Recursos de descarga</strong></p>
 <ul class="simple">
 <li><p><strong>Imagen ISO Ubuntu 24.04:</strong>
 <a class="reference external" href="https://releases.ubuntu.com/24.04/">Descarga Oficial</a></p></li>
 </ul>
 <p><strong>Instalación recomendada</strong></p>
-<p>Para las prácticas del manipulador se recomienda instalar Ubuntu 24.04 LTS
+<p>Para prácticas con equipos físicos se recomienda instalar Ubuntu 24.04 LTS
 nativamente, de modo que RViz 2, los periféricos y la aceleración gráfica
 puedan utilizar los recursos del equipo. Sigue las instrucciones oficiales
 de Ubuntu y verifica que la versión instalada sea 24.04 antes de continuar.</p>
@@ -152,8 +148,8 @@ en servidores, entornos de desarrollo, sistemas embebidos, ciencia y
 escritorios personales.</p>
 <p>Usos comunes de Ubuntu:</p>
 <ul class="simple">
-<li><p>Desarrollo de software (Python, C++, ROS 2, Web)</p></li>
-<li><p>Educación y simulación (Gazebo, R)</p></li>
+<li><p>Desarrollo de software</p></li>
+<li><p>Educación y simulación</p></li>
 <li><p>Administración de sistemas y redes (SSH, Docker, servidores web)</p></li>
 <li><p>Automatización de tareas con Bash scripting</p></li>
 <li><p>Entornos gráficos personalizados y ligeros</p></li>
@@ -217,7 +213,7 @@ Essentials</a></p>
 <figure class="align-default">
 <img alt="img2" src="../../_images/1-ubuntu2.jpg" />
 </figure>
-<p>los comandos que permiten modificar los permisos de directorios son:</p>
+<p>uno de los comandos que permiten modificar los permisos de directorios son:</p>
 <ul class="simple">
 <li><p>chmod: Cambia los permisos de archivos y directorios.</p></li>
 </ul>
@@ -276,10 +272,9 @@ manera remota. estructura:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ping</span> <span class="n">google</span><span class="o">.</span><span class="n">com</span> <span class="c1"># verifica si hay conexión con Google.</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt>::</dt><dd><p>ss -tulnp # Muestra sockets TCP/UDP en escucha.</p>
-</dd>
-</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ss</span> <span class="o">-</span><span class="n">tulnp</span> <span class="c1"># Muestra sockets TCP/UDP en escucha.</span>
+</pre></div>
+</div>
 <ul class="simple">
 <li><p>UFW (Uncomplicated Firewall): Firewall básico en Ubuntu.</p></li>
 </ul>
@@ -292,13 +287,10 @@ manera remota. estructura:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">ufw</span> <span class="n">allow</span> <span class="mi">22</span> <span class="c1">#Permitir conexiones SSH (puerto 22).</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ROS 2 usa DDS, no el puerto 11311 de ROS 1.</span>
-<span class="c1"># Revisa la política de red y los puertos DDS de tu RMW antes de abrir el firewall.</span>
-</pre></div>
-</div>
+<p>ROS 2 usa DDS, no el puerto 11311 de ROS 1.
+Es necesario revisar la política de red y los puertos DDS de tu RMW antes de abrir el firewall.</p>
 </section>
 </section>
-<hr class="docutils" />
 <section id="github">
 <h2>GitHub<a class="headerlink" href="#github" title="Link to this heading"></a></h2>
 <p>GitHub es una plataforma de control de versiones basada en Git que

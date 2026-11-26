@@ -53,11 +53,8 @@
 <li class="toctree-l1"><a class="reference internal" href="ubuntu_git.html">Ubuntu y GitHub</a></li>
 <li class="toctree-l1"><a class="reference internal" href="instalacionROS2.html">Instalación de ROS 2 Jazzy en Ubuntu 24.04</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Compatibilidad, dependencias y validación en Jazzy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#objetivo">Objetivo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#versiones-y-dependencias">Versiones y dependencias</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#instalacion-tipica-de-componentes-roboticos">Instalación típica de componentes robóticos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#limites-de-las-pruebas">Límites de las pruebas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#lista-de-verificacion-en-ubuntu-24-04">Lista de verificación en Ubuntu 24.04</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#buenas-practicas-de-seguridad">Buenas prácticas de seguridad</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#fuentes-oficiales">Fuentes oficiales</a></li>
 </ul>
@@ -69,7 +66,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../tema_2/conceptos_basicos.html">Conceptos Básicos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tema_2/tutoriales.html">Tutoriales</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_practicas.html">Práctica xArm 6: ROS 2, MoveIt 2 y planificación sin robot físico</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tema_2/xarm_reto_resuelto.html">Solución del reto de programación: monitor de articulaciones</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Dispositivos y modelos robóticos</span></p>
 <ul>
@@ -114,13 +110,6 @@
              
   <section id="compatibilidad-dependencias-y-validacion-en-jazzy">
 <h1>Compatibilidad, dependencias y validación en Jazzy<a class="headerlink" href="#compatibilidad-dependencias-y-validacion-en-jazzy" title="Link to this heading"></a></h1>
-<section id="objetivo">
-<h2>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h2>
-<p>Esta documentación conserva la estructura y los ejemplos didácticos de
-AvigTech y actualiza su plataforma a ROS 2 Jazzy en Ubuntu 24.04.
-Los fragmentos están orientados al aprendizaje y pueden depender de
-archivos de hardware, calibración o modelos no incluidos en el ZIP.</p>
-</section>
 <section id="versiones-y-dependencias">
 <h2>Versiones y dependencias<a class="headerlink" href="#versiones-y-dependencias" title="Link to this heading"></a></h2>
 <table class="docutils align-default" id="id1">
@@ -138,8 +127,8 @@ archivos de hardware, calibración o modelos no incluidos en el ZIP.</p>
 <tr class="row-even"><td><p>Ubuntu</p></td>
 <td><p>24.04 LTS, arquitectura amd64 o arm64</p></td>
 </tr>
-<tr class="row-odd"><td><p>ROS</p></td>
-<td><p>Jazzy (<code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">/opt/ros/jazzy/setup.bash</span></code>)</p></td>
+<tr class="row-odd"><td><p>ROS2</p></td>
+<td><p>Jazzy</p></td>
 </tr>
 <tr class="row-even"><td><p>Python</p></td>
 <td><p>3.12 del sistema, paquetes ROS mediante APT</p></td>
@@ -151,10 +140,7 @@ archivos de hardware, calibración o modelos no incluidos en el ZIP.</p>
 <td><p>Paho MQTT 2.x, <code class="docutils literal notranslate"><span class="pre">CallbackAPIVersion.VERSION2</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>ESP32</p></td>
-<td><p>Firmware para ESP32 Arduino core 3.x; revisar dependencias</p></td>
-</tr>
-<tr class="row-even"><td><p>Sphinx</p></td>
-<td><p>RST, tema Read the Docs, tabs y botón de copiar</p></td>
+<td><p>Firmware para ESP32 Arduino core 3.x</p></td>
 </tr>
 </tbody>
 </table>
@@ -172,25 +158,6 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 <p>Si falta un paquete APT en una arquitectura concreta, consúltalo en el
 <a class="reference external" href="https://index.ros.org/">índice oficial de paquetes</a> y adapta el
 método de instalación, sin mezclar distribuciones de ROS.</p>
-</section>
-<section id="limites-de-las-pruebas">
-<h2>Límites de las pruebas<a class="headerlink" href="#limites-de-las-pruebas" title="Link to this heading"></a></h2>
-<p>La validación estática de los fragmentos Python comprueba sintaxis y
-coherencia documental, pero <strong>no equivale</strong> a compilar el workspace ni a
-probar ROS, sensores o actuadores. Las demostraciones con AprilTags,
-modelos Xacro/URDF, ESP32 o cámaras requieren sus archivos y su hardware.</p>
-</section>
-<section id="lista-de-verificacion-en-ubuntu-24-04">
-<h2>Lista de verificación en Ubuntu 24.04<a class="headerlink" href="#lista-de-verificacion-en-ubuntu-24-04" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lsb_release<span class="w"> </span>-rs
-python3<span class="w"> </span>--version
-<span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$ROS_DISTRO</span><span class="s2">"</span>
-ros2<span class="w"> </span>doctor<span class="w"> </span>--report
-ros2<span class="w"> </span>pkg<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">'rclpy|tf2_ros|robot_state_publisher'</span>
-ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_cpp<span class="w"> </span>talker
-</pre></div>
-</div>
-<p>En otra terminal: <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span> <span class="pre">demo_nodes_py</span> <span class="pre">listener</span></code>.</p>
 </section>
 <section id="buenas-practicas-de-seguridad">
 <h2>Buenas prácticas de seguridad<a class="headerlink" href="#buenas-practicas-de-seguridad" title="Link to this heading"></a></h2>
