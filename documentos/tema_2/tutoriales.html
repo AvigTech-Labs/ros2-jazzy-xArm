@@ -1156,152 +1156,316 @@ hasta alcanzar la meta o recibir una cancelación. Se utiliza
 <code class="docutils literal notranslate"><span class="pre">asyncio.sleep</span></code> para evitar llamar a <code class="docutils literal notranslate"><span class="pre">rclpy.spin_once</span></code> desde un callback
 que ya está gestionado por el ejecutor de ROS 2.</p>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-3-YWN0aW9uX3NlcnZlci5weQ==" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-3-YWN0aW9uX3NlcnZlci5weQ==" name="YWN0aW9uX3NlcnZlci5weQ==" role="tab" tabindex="0">action_server.py</button><button aria-controls="panel-3-YWN0aW9uX2NsaWVudC5weQ==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-3-YWN0aW9uX2NsaWVudC5weQ==" name="YWN0aW9uX2NsaWVudC5weQ==" role="tab" tabindex="-1">action_client.py</button></div><div aria-labelledby="tab-3-YWN0aW9uX3NlcnZlci5weQ==" class="sphinx-tabs-panel group-tab" id="panel-3-YWN0aW9uX3NlcnZlci5weQ==" name="YWN0aW9uX3NlcnZlci5weQ==" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-3-YWN0aW9uX3NlcnZlci5weQ==" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-3-YWN0aW9uX3NlcnZlci5weQ==" name="YWN0aW9uX3NlcnZlci5weQ==" role="tab" tabindex="0">action_server.py</button><button aria-controls="panel-3-YWN0aW9uX2NsaWVudC5weQ==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-3-YWN0aW9uX2NsaWVudC5weQ==" name="YWN0aW9uX2NsaWVudC5weQ==" role="tab" tabindex="-1">action_client.py</button></div><div aria-labelledby="tab-3-YWN0aW9uX3NlcnZlci5weQ==" class="sphinx-tabs-panel group-tab" id="panel-3-YWN0aW9uX3NlcnZlci5weQ==" name="YWN0aW9uX3NlcnZlci5weQ==" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
+<span class="c1"># Componentes principales de ROS 2.</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionServer</span><span class="p">,</span> <span class="n">CancelResponse</span><span class="p">,</span> <span class="n">GoalResponse</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionServer</span><span class="p">,</span> <span class="n">GoalResponse</span><span class="p">,</span> <span class="n">CancelResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.callback_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReentrantCallbackGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.executors</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiThreadedExecutor</span>
 
+<span class="c1"># Acción definida en el paquete de interfaces avig_msg.</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">avig_msg.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoverA</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MoverAServer</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'movera_server'</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_action_server</span> <span class="o">=</span> <span class="n">ActionServer</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">MoverA</span><span class="p">,</span> <span class="s1">'mover_a'</span><span class="p">,</span>
+<span class="w">   </span><span class="sd">"""Nodo que recibe metas (x, y) y simula su ejecución."""</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="c1"># Nombre con el que aparecerá el nodo en 'ros2 node list'.</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'movera_server'</span><span class="p">)</span>
+
+      <span class="c1"># Permite que los callbacks de ejecución y de cancelación se atiendan</span>
+      <span class="c1"># concurrentemente cuando se utilice un MultiThreadedExecutor.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_callback_group</span> <span class="o">=</span> <span class="n">ReentrantCallbackGroup</span><span class="p">()</span>
+
+      <span class="c1"># 'mover_a' es el nombre de la acción; debe coincidir con el cliente.</span>
+      <span class="c1"># Los tres callbacks resuelven etapas diferentes del ciclo de vida:</span>
+      <span class="c1"># aceptar la meta, aceptar la cancelación y ejecutar el movimiento.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_action_server</span> <span class="o">=</span> <span class="n">ActionServer</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">MoverA</span><span class="p">,</span>
+            <span class="s1">'mover_a'</span><span class="p">,</span>
             <span class="n">execute_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execute_callback</span><span class="p">,</span>
             <span class="n">goal_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">goal_callback</span><span class="p">,</span>
             <span class="n">cancel_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_callback</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="n">callback_group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_callback_group</span>
+      <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">goal_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_request</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Meta recibida'</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">GoalResponse</span><span class="o">.</span><span class="n">ACCEPT</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Servidor de la acción /mover_a listo.'</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">cancel_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_handle</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Cancelación solicitada'</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">CancelResponse</span><span class="o">.</span><span class="n">ACCEPT</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">goal_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_request</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Decide si el servidor acepta la nueva meta recibida."""</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">'Meta recibida: '</span>
+            <span class="sa">f</span><span class="s1">'(</span><span class="si">{</span><span class="n">goal_request</span><span class="o">.</span><span class="n">x_actual</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">goal_request</span><span class="o">.</span><span class="n">y_actual</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">) -&gt; '</span>
+            <span class="sa">f</span><span class="s1">'(</span><span class="si">{</span><span class="n">goal_request</span><span class="o">.</span><span class="n">x_meta</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">goal_request</span><span class="o">.</span><span class="n">y_meta</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">)'</span>
+      <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">execute_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_handle</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">x_actual</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">y_actual</span><span class="p">)</span>
-        <span class="n">gx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">x_meta</span><span class="p">)</span>
-        <span class="n">gy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">y_meta</span><span class="p">)</span>
-        <span class="n">feedback</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Feedback</span><span class="p">()</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Result</span><span class="p">()</span>
-        <span class="n">step</span> <span class="o">=</span> <span class="mf">0.1</span>
-        <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">0.1</span>
+      <span class="c1"># En esta práctica se aceptan todas las metas.</span>
+      <span class="c1"># En un robot real habría que validar límites y rechazar conflictos.</span>
+      <span class="k">return</span> <span class="n">GoalResponse</span><span class="o">.</span><span class="n">ACCEPT</span>
 
-        <span class="k">while</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">cancel_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_handle</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Autoriza la solicitud de cancelación emitida por el cliente."""</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Solicitud de cancelación recibida.'</span><span class="p">)</span>
+
+      <span class="c1"># ACCEPT autoriza la cancelación, pero NO termina la acción por sí solo.</span>
+      <span class="c1"># execute_callback debe detectar la solicitud y llamar a canceled().</span>
+      <span class="k">return</span> <span class="n">CancelResponse</span><span class="o">.</span><span class="n">ACCEPT</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">execute_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal_handle</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Ejecuta la simulación y devuelve el resultado final de la meta."""</span>
+
+      <span class="c1"># Los valores vienen dentro de la petición de la acción MoverA.Goal.</span>
+      <span class="c1"># Se guardan en variables LOCALES: una ejecución no pisa los datos de</span>
+      <span class="c1"># otra (aunque este ejemplo no modela un robot con varias metas reales).</span>
+      <span class="n">x_actual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">x_actual</span><span class="p">)</span>
+      <span class="n">y_actual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">y_actual</span><span class="p">)</span>
+      <span class="n">x_meta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">x_meta</span><span class="p">)</span>
+      <span class="n">y_meta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">goal_handle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">y_meta</span><span class="p">)</span>
+
+      <span class="c1"># Parámetros de la simulación: 0.1 unidades cada 0.5 segundos.</span>
+      <span class="n">paso</span> <span class="o">=</span> <span class="mf">0.1</span>
+      <span class="n">periodo</span> <span class="o">=</span> <span class="mf">0.5</span>
+      <span class="n">tolerancia</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># Distancia máxima para considerar alcanzada la meta.</span>
+
+      <span class="c1"># Mensajes tipados definidos por MoverA.action:</span>
+      <span class="c1"># Feedback.distancia_restante y Result.success.</span>
+      <span class="n">feedback</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Feedback</span><span class="p">()</span>
+      <span class="n">resultado</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Result</span><span class="p">()</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'Iniciando: (</span><span class="si">{</span><span class="n">x_actual</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">y_actual</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">) -&gt; '</span>
+            <span class="sa">f</span><span class="s1">'(</span><span class="si">{</span><span class="n">x_meta</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">y_meta</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">)'</span>
+      <span class="p">)</span>
+
+      <span class="c1"># El bucle de trabajo NO llama a rclpy.spin_once(self): el executor ya</span>
+      <span class="c1"># se ocupa del nodo y hacerlo causaba 'Executor is already spinning'.</span>
+      <span class="k">while</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+
+            <span class="c1"># 1) Priorizar una cancelación solicitada por el cliente.</span>
+            <span class="c1">#    Gracias al executor multihilo, otro hilo puede procesar</span>
+            <span class="c1">#    cancel_callback mientras esta función está simulando pasos.</span>
             <span class="k">if</span> <span class="n">goal_handle</span><span class="o">.</span><span class="n">is_cancel_requested</span><span class="p">:</span>
-                <span class="n">goal_handle</span><span class="o">.</span><span class="n">canceled</span><span class="p">()</span>
-                <span class="n">result</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">return</span> <span class="n">result</span>
+               <span class="n">goal_handle</span><span class="o">.</span><span class="n">canceled</span><span class="p">()</span>  <span class="c1"># Estado terminal: CANCELED.</span>
+               <span class="n">resultado</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">'Movimiento cancelado por el cliente.'</span><span class="p">)</span>
+               <span class="k">return</span> <span class="n">resultado</span>
 
-            <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">gx</span> <span class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="n">gy</span> <span class="o">-</span> <span class="n">y</span>
-            <span class="n">distance</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
-            <span class="n">feedback</span><span class="o">.</span><span class="n">distancia_restante</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+            <span class="c1"># 2) Vector desde la posición actual hacia la meta.</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="n">x_meta</span> <span class="o">-</span> <span class="n">x_actual</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">y_meta</span> <span class="o">-</span> <span class="n">y_actual</span>
+
+            <span class="c1"># Distancia euclidiana: sqrt(dx² + dy²).</span>
+            <span class="n">distancia</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+
+            <span class="c1"># 3) Comprobar si ya alcanzamos la tolerancia de llegada.</span>
+            <span class="k">if</span> <span class="n">distancia</span> <span class="o">&lt;=</span> <span class="n">tolerancia</span><span class="p">:</span>
+               <span class="n">goal_handle</span><span class="o">.</span><span class="n">succeed</span><span class="p">()</span>  <span class="c1"># Estado terminal: SUCCEEDED.</span>
+               <span class="n">resultado</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Objetivo alcanzado.'</span><span class="p">)</span>
+               <span class="k">return</span> <span class="n">resultado</span>
+
+            <span class="c1"># 4) Avanzar en línea recta hacia B sin sobrepasarla.</span>
+            <span class="c1">#    dx/distancia y dy/distancia forman un vector unitario.</span>
+            <span class="n">avance</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">paso</span><span class="p">,</span> <span class="n">distancia</span><span class="p">)</span>
+            <span class="n">x_actual</span> <span class="o">+=</span> <span class="n">avance</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">/</span> <span class="n">distancia</span>
+            <span class="n">y_actual</span> <span class="o">+=</span> <span class="n">avance</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">distancia</span>
+
+            <span class="c1"># 5) Calcular la distancia DESPUÉS de avanzar y comunicarla.</span>
+            <span class="n">restante</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">x_meta</span> <span class="o">-</span> <span class="n">x_actual</span><span class="p">,</span> <span class="n">y_meta</span> <span class="o">-</span> <span class="n">y_actual</span><span class="p">)</span>
+            <span class="n">feedback</span><span class="o">.</span><span class="n">distancia_restante</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">restante</span><span class="p">)</span>
             <span class="n">goal_handle</span><span class="o">.</span><span class="n">publish_feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;=</span> <span class="n">tolerance</span><span class="p">:</span>
-                <span class="n">goal_handle</span><span class="o">.</span><span class="n">succeed</span><span class="p">()</span>
-                <span class="n">result</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">return</span> <span class="n">result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Distancia restante: </span><span class="si">{</span><span class="n">restante</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
-            <span class="n">advance</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">distance</span><span class="p">)</span>
-            <span class="n">x</span> <span class="o">+=</span> <span class="n">advance</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">/</span> <span class="n">distance</span>
-            <span class="n">y</span> <span class="o">+=</span> <span class="n">advance</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">distance</span>
-            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="c1"># 6) Simular el tiempo entre pasos. Bloquea únicamente el hilo</span>
+            <span class="c1">#    que ejecuta esta meta; NO es apropiado para control en tiempo</span>
+            <span class="c1">#    real de motores. La cancelación se atiende en otro hilo.</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">periodo</span><span class="p">)</span>
 
-        <span class="n">goal_handle</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
-        <span class="n">result</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="n">result</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">destroy_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_action_server</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="c1"># Si ROS 2 se está apagando, evitar dejar la meta sin estado terminal.</span>
+      <span class="k">if</span> <span class="n">goal_handle</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">goal_handle</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span>
+      <span class="n">resultado</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+      <span class="k">return</span> <span class="n">resultado</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
-    <span class="n">node</span> <span class="o">=</span> <span class="n">MoverAServer</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-        <span class="k">pass</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+<span class="w">   </span><span class="sd">"""Inicializa ROS 2, ejecuta el servidor y libera sus recursos."""</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">MoverAServer</span><span class="p">()</span>
+
+   <span class="c1"># Dos hilos: uno puede ejecutar el movimiento y otro atender cancelaciones.</span>
+   <span class="c1"># El ReentrantCallbackGroup permite ejecutar sus callbacks en paralelo.</span>
+   <span class="n">executor</span> <span class="o">=</span> <span class="n">MultiThreadedExecutor</span><span class="p">(</span><span class="n">num_threads</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+   <span class="n">executor</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+   <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># Único punto de spin del servidor: NO usar spin_once dentro de callbacks.</span>
+      <span class="n">executor</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
             <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+   <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
 </div><div aria-labelledby="tab-3-YWN0aW9uX2NsaWVudC5weQ==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-3-YWN0aW9uX2NsaWVudC5weQ==" name="YWN0aW9uX2NsaWVudC5weQ==" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionClient</span>
 
+<span class="c1"># Permite distinguir SUCCEEDED, CANCELED y ABORTED (no solo el bool success).</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">action_msgs.msg</span><span class="w"> </span><span class="kn">import</span> <span class="n">GoalStatus</span>
+
+<span class="c1"># Interfaz personalizada: debe haberse compilado el paquete avig_msg.</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">avig_msg.action</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoverA</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MoverAClient</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'movera_client'</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">ActionClient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MoverA</span><span class="p">,</span> <span class="s1">'mover_a'</span><span class="p">)</span>
+<span class="w">   </span><span class="sd">"""Nodo cliente que controla el ciclo de vida de una meta MoverA."""</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">send_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">xm</span><span class="p">,</span> <span class="n">ym</span><span class="p">):</span>
-        <span class="n">goal</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Goal</span><span class="p">()</span>
-        <span class="n">goal</span><span class="o">.</span><span class="n">x_actual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
-        <span class="n">goal</span><span class="o">.</span><span class="n">y_actual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
-        <span class="n">goal</span><span class="o">.</span><span class="n">x_meta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xm</span><span class="p">)</span>
-        <span class="n">goal</span><span class="o">.</span><span class="n">y_meta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ym</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">wait_for_server</span><span class="p">()</span>
-        <span class="n">future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_goal_async</span><span class="p">(</span>
-            <span class="n">goal</span><span class="p">,</span> <span class="n">feedback_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_feedback</span>
-        <span class="p">)</span>
-        <span class="n">future</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_goal_response</span><span class="p">)</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'movera_client'</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="n">distance</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">feedback</span><span class="o">.</span><span class="n">distancia_restante</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Distancia restante: </span><span class="si">{</span><span class="n">distance</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+      <span class="c1"># 'mover_a' debe coincidir exactamente con el nombre del servidor.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">ActionClient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MoverA</span><span class="p">,</span> <span class="s1">'mover_a'</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_goal_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">):</span>
-        <span class="n">goal_handle</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">goal_handle</span><span class="o">.</span><span class="n">accepted</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Meta rechazada'</span><span class="p">)</span>
-            <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_goal_handle</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># Se asigna cuando el servidor acepta la meta.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_cancel_solicitada</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Impide peticiones duplicadas.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_terminado</span> <span class="o">=</span> <span class="kc">False</span>     <span class="c1"># Señal para salir del bucle de main().</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">send_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">xm</span><span class="p">,</span> <span class="n">ym</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Construye y envía la meta de forma asíncrona al servidor."""</span>
+
+      <span class="c1"># La clase Goal contiene los cuatro campos definidos en MoverA.action.</span>
+      <span class="n">goal_msg</span> <span class="o">=</span> <span class="n">MoverA</span><span class="o">.</span><span class="n">Goal</span><span class="p">()</span>
+      <span class="n">goal_msg</span><span class="o">.</span><span class="n">x_actual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+      <span class="n">goal_msg</span><span class="o">.</span><span class="n">y_actual</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+      <span class="n">goal_msg</span><span class="o">.</span><span class="n">x_meta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xm</span><span class="p">)</span>
+      <span class="n">goal_msg</span><span class="o">.</span><span class="n">y_meta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ym</span><span class="p">)</span>
+
+      <span class="c1"># Evita esperar indefinidamente si no se inició el servidor.</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">wait_for_server</span><span class="p">(</span><span class="n">timeout_sec</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'El servidor /mover_a no está disponible.'</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_terminado</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">return</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Meta aceptada'</span><span class="p">)</span>
-        <span class="n">result_future</span> <span class="o">=</span> <span class="n">goal_handle</span><span class="o">.</span><span class="n">get_result_async</span><span class="p">()</span>
-        <span class="n">result_future</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_result</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">):</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">'Estado=</span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s1">, éxito=</span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">success</span><span class="si">}</span><span class="s1">'</span>
-        <span class="p">)</span>
-        <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'Enviando meta: (</span><span class="si">{</span><span class="n">xi</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">yi</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">) -&gt; (</span><span class="si">{</span><span class="n">xm</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">ym</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">)'</span>
+      <span class="p">)</span>
+
+      <span class="c1"># send_goal_async NO espera al final del movimiento; devuelve un Future.</span>
+      <span class="c1"># feedback_callback recibe actualizaciones durante la ejecución.</span>
+      <span class="n">futuro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">send_goal_async</span><span class="p">(</span>
+            <span class="n">goal_msg</span><span class="p">,</span>
+            <span class="n">feedback_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feedback_callback</span>
+      <span class="p">)</span>
+
+      <span class="c1"># Cuando el servidor conteste si acepta/rechaza la meta, ejecutar el</span>
+      <span class="c1"># método goal_response_callback para registrar el goal_handle.</span>
+      <span class="n">futuro</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goal_response_callback</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">goal_response_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Procesa la aceptación o el rechazo de la meta."""</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_goal_handle</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goal_handle</span><span class="o">.</span><span class="n">accepted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'El servidor rechazó la meta.'</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_terminado</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Meta aceptada. Esperando feedback y resultado.'</span><span class="p">)</span>
+
+      <span class="c1"># El resultado final llegará después (SUCCEEDED, CANCELED o ABORTED).</span>
+      <span class="n">futuro_resultado</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goal_handle</span><span class="o">.</span><span class="n">get_result_async</span><span class="p">()</span>
+      <span class="n">futuro_resultado</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_callback</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">feedback_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feedback_msg</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Muestra distancia restante y solicita cancelación si corresponde."""</span>
+
+      <span class="c1"># Los datos de aplicación están anidados en feedback_msg.feedback.</span>
+      <span class="n">distancia</span> <span class="o">=</span> <span class="n">feedback_msg</span><span class="o">.</span><span class="n">feedback</span><span class="o">.</span><span class="n">distancia_restante</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Feedback: distancia = </span><span class="si">{</span><span class="n">distancia</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+      <span class="c1"># Solo cancelar si la meta ya fue aceptada y no hemos pedido cancelar.</span>
+      <span class="k">if</span> <span class="p">(</span>
+            <span class="n">distancia</span> <span class="o">&lt;</span> <span class="mf">0.8</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goal_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancel_solicitada</span>
+      <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cancel_solicitada</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">'Solicitando cancelación (distancia &lt; 0.8).'</span><span class="p">)</span>
+
+            <span class="c1"># Petición asíncrona de cancelación: todavía NO equivale a CANCELED.</span>
+            <span class="n">futuro_cancelar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goal_handle</span><span class="o">.</span><span class="n">cancel_goal_async</span><span class="p">()</span>
+            <span class="n">futuro_cancelar</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel_callback</span><span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">cancel_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Indica si el servidor aceptó procesar la cancelación."""</span>
+      <span class="n">respuesta</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+      <span class="k">if</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">goals_canceling</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+               <span class="s1">'Cancelación aceptada; esperando estado final CANCELED.'</span>
+            <span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+               <span class="s1">'Cancelación no aceptada (la meta pudo terminar antes).'</span>
+            <span class="p">)</span>
+
+   <span class="k">def</span><span class="w"> </span><span class="nf">result_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">"""Consulta el resultado y el ESTADO TERMINAL de la acción."""</span>
+      <span class="n">respuesta</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+      <span class="n">estado</span> <span class="o">=</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">status</span>
+      <span class="n">resultado</span> <span class="o">=</span> <span class="n">respuesta</span><span class="o">.</span><span class="n">result</span>
+
+      <span class="k">if</span> <span class="n">estado</span> <span class="o">==</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">STATUS_SUCCEEDED</span> <span class="ow">and</span> <span class="n">resultado</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Meta completada: SUCCEEDED.'</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">estado</span> <span class="o">==</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">STATUS_CANCELED</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">'Meta cancelada: CANCELED.'</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">estado</span> <span class="o">==</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">STATUS_ABORTED</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'Meta abortada por el servidor: ABORTED.'</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+               <span class="sa">f</span><span class="s1">'La acción terminó con estado=</span><span class="si">{</span><span class="n">estado</span><span class="si">}</span><span class="s1">, success=</span><span class="si">{</span><span class="n">resultado</span><span class="o">.</span><span class="n">success</span><span class="si">}</span><span class="s1">'</span>
+            <span class="p">)</span>
+
+      <span class="c1"># Señal para que main termine de procesar callbacks y cierre el nodo.</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_terminado</span> <span class="o">=</span> <span class="kc">True</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
-    <span class="n">node</span> <span class="o">=</span> <span class="n">MoverAClient</span><span class="p">()</span>
-    <span class="n">node</span><span class="o">.</span><span class="n">send_goal</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-        <span class="k">pass</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
+<span class="w">   </span><span class="sd">"""Inicia el cliente y procesa respuestas hasta recibir el resultado."""</span>
+   <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">node</span> <span class="o">=</span> <span class="n">MoverAClient</span><span class="p">()</span>
+
+   <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># Coordenadas de ejemplo: desde A=(3,3) hasta B=(0,0.1).</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">send_goal</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+      <span class="c1"># Aquí spin_once SÍ es válido porque está en main(), NO en un callback</span>
+      <span class="c1"># ni dentro de otro spin concurrente para el mismo nodo.</span>
+      <span class="k">while</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">_terminado</span><span class="p">:</span>
+            <span class="n">rclpy</span><span class="o">.</span><span class="n">spin_once</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+   <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">pass</span>
+   <span class="k">finally</span><span class="p">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">rclpy</span><span class="o">.</span><span class="n">ok</span><span class="p">():</span>
             <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+   <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
 </div></div>
