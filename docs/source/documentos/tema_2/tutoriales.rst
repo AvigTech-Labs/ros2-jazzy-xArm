@@ -1167,155 +1167,321 @@ que ya está gestionado por el ejecutor de ROS 2.
 
       .. code-block:: python
 
-         import asyncio
          import math
+         import time
 
+         # Componentes principales de ROS 2.
          import rclpy
-         from rclpy.action import ActionServer, CancelResponse, GoalResponse
          from rclpy.node import Node
+         from rclpy.action import ActionServer, GoalResponse, CancelResponse
+         from rclpy.callback_groups import ReentrantCallbackGroup
+         from rclpy.executors import MultiThreadedExecutor
 
+         # Acción definida en el paquete de interfaces avig_msg.
          from avig_msg.action import MoverA
 
 
          class MoverAServer(Node):
-             def __init__(self):
-                 super().__init__('movera_server')
-                 self._action_server = ActionServer(
-                     self, MoverA, 'mover_a',
+            """Nodo que recibe metas (x, y) y simula su ejecución."""
+
+            def __init__(self):
+               # Nombre con el que aparecerá el nodo en 'ros2 node list'.
+               super().__init__('movera_server')
+
+               # Permite que los callbacks de ejecución y de cancelación se atiendan
+               # concurrentemente cuando se utilice un MultiThreadedExecutor.
+               self._callback_group = ReentrantCallbackGroup()
+
+               # 'mover_a' es el nombre de la acción; debe coincidir con el cliente.
+               # Los tres callbacks resuelven etapas diferentes del ciclo de vida:
+               # aceptar la meta, aceptar la cancelación y ejecutar el movimiento.
+               self._action_server = ActionServer(
+                     self,
+                     MoverA,
+                     'mover_a',
                      execute_callback=self.execute_callback,
                      goal_callback=self.goal_callback,
                      cancel_callback=self.cancel_callback,
-                 )
+                     callback_group=self._callback_group
+               )
 
-             def goal_callback(self, goal_request):
-                 self.get_logger().info('Meta recibida')
-                 return GoalResponse.ACCEPT
+               self.get_logger().info('Servidor de la acción /mover_a listo.')
 
-             def cancel_callback(self, goal_handle):
-                 self.get_logger().info('Cancelación solicitada')
-                 return CancelResponse.ACCEPT
+            def goal_callback(self, goal_request):
+               """Decide si el servidor acepta la nueva meta recibida."""
+               self.get_logger().info(
+                     'Meta recibida: '
+                     f'({goal_request.x_actual:.2f}, {goal_request.y_actual:.2f}) -> '
+                     f'({goal_request.x_meta:.2f}, {goal_request.y_meta:.2f})'
+               )
 
-             async def execute_callback(self, goal_handle):
-                 x = float(goal_handle.request.x_actual)
-                 y = float(goal_handle.request.y_actual)
-                 gx = float(goal_handle.request.x_meta)
-                 gy = float(goal_handle.request.y_meta)
-                 feedback = MoverA.Feedback()
-                 result = MoverA.Result()
-                 step = 0.1
-                 tolerance = 0.1
+               # En esta práctica se aceptan todas las metas.
+               # En un robot real habría que validar límites y rechazar conflictos.
+               return GoalResponse.ACCEPT
 
-                 while rclpy.ok():
+            def cancel_callback(self, goal_handle):
+               """Autoriza la solicitud de cancelación emitida por el cliente."""
+               self.get_logger().info('Solicitud de cancelación recibida.')
+
+               # ACCEPT autoriza la cancelación, pero NO termina la acción por sí solo.
+               # execute_callback debe detectar la solicitud y llamar a canceled().
+               return CancelResponse.ACCEPT
+
+            def execute_callback(self, goal_handle):
+               """Ejecuta la simulación y devuelve el resultado final de la meta."""
+
+               # Los valores vienen dentro de la petición de la acción MoverA.Goal.
+               # Se guardan en variables LOCALES: una ejecución no pisa los datos de
+               # otra (aunque este ejemplo no modela un robot con varias metas reales).
+               x_actual = float(goal_handle.request.x_actual)
+               y_actual = float(goal_handle.request.y_actual)
+               x_meta = float(goal_handle.request.x_meta)
+               y_meta = float(goal_handle.request.y_meta)
+
+               # Parámetros de la simulación: 0.1 unidades cada 0.5 segundos.
+               paso = 0.1
+               periodo = 0.5
+               tolerancia = 0.1  # Distancia máxima para considerar alcanzada la meta.
+
+               # Mensajes tipados definidos por MoverA.action:
+               # Feedback.distancia_restante y Result.success.
+               feedback = MoverA.Feedback()
+               resultado = MoverA.Result()
+
+               self.get_logger().info(
+                     f'Iniciando: ({x_actual:.2f}, {y_actual:.2f}) -> '
+                     f'({x_meta:.2f}, {y_meta:.2f})'
+               )
+
+               # El bucle de trabajo NO llama a rclpy.spin_once(self): el executor ya
+               # se ocupa del nodo y hacerlo causaba 'Executor is already spinning'.
+               while rclpy.ok():
+
+                     # 1) Priorizar una cancelación solicitada por el cliente.
+                     #    Gracias al executor multihilo, otro hilo puede procesar
+                     #    cancel_callback mientras esta función está simulando pasos.
                      if goal_handle.is_cancel_requested:
-                         goal_handle.canceled()
-                         result.success = False
-                         return result
+                        goal_handle.canceled()  # Estado terminal: CANCELED.
+                        resultado.success = False
+                        self.get_logger().warn('Movimiento cancelado por el cliente.')
+                        return resultado
 
-                     dx, dy = gx - x, gy - y
-                     distance = math.hypot(dx, dy)
-                     feedback.distancia_restante = float(distance)
+                     # 2) Vector desde la posición actual hacia la meta.
+                     dx = x_meta - x_actual
+                     dy = y_meta - y_actual
+
+                     # Distancia euclidiana: sqrt(dx² + dy²).
+                     distancia = math.hypot(dx, dy)
+
+                     # 3) Comprobar si ya alcanzamos la tolerancia de llegada.
+                     if distancia <= tolerancia:
+                        goal_handle.succeed()  # Estado terminal: SUCCEEDED.
+                        resultado.success = True
+                        self.get_logger().info('Objetivo alcanzado.')
+                        return resultado
+
+                     # 4) Avanzar en línea recta hacia B sin sobrepasarla.
+                     #    dx/distancia y dy/distancia forman un vector unitario.
+                     avance = min(paso, distancia)
+                     x_actual += avance * dx / distancia
+                     y_actual += avance * dy / distancia
+
+                     # 5) Calcular la distancia DESPUÉS de avanzar y comunicarla.
+                     restante = math.hypot(x_meta - x_actual, y_meta - y_actual)
+                     feedback.distancia_restante = float(restante)
                      goal_handle.publish_feedback(feedback)
-                     if distance <= tolerance:
-                         goal_handle.succeed()
-                         result.success = True
-                         return result
+                     self.get_logger().info(f'Distancia restante: {restante:.2f}')
 
-                     advance = min(step, distance)
-                     x += advance * dx / distance
-                     y += advance * dy / distance
-                     await asyncio.sleep(0.5)
+                     # 6) Simular el tiempo entre pasos. Bloquea únicamente el hilo
+                     #    que ejecuta esta meta; NO es apropiado para control en tiempo
+                     #    real de motores. La cancelación se atiende en otro hilo.
+                     time.sleep(periodo)
 
-                 goal_handle.abort()
-                 result.success = False
-                 return result
-
-             def destroy_node(self):
-                 self._action_server.destroy()
-                 return super().destroy_node()
+               # Si ROS 2 se está apagando, evitar dejar la meta sin estado terminal.
+               if goal_handle.is_active:
+                     goal_handle.abort()
+               resultado.success = False
+               return resultado
 
 
          def main(args=None):
-             rclpy.init(args=args)
-             node = MoverAServer()
-             try:
-                 rclpy.spin(node)
-             except KeyboardInterrupt:
-                 pass
-             finally:
-                 node.destroy_node()
-                 if rclpy.ok():
+            """Inicializa ROS 2, ejecuta el servidor y libera sus recursos."""
+            rclpy.init(args=args)
+            node = MoverAServer()
+
+            # Dos hilos: uno puede ejecutar el movimiento y otro atender cancelaciones.
+            # El ReentrantCallbackGroup permite ejecutar sus callbacks en paralelo.
+            executor = MultiThreadedExecutor(num_threads=2)
+            executor.add_node(node)
+
+            try:
+               # Único punto de spin del servidor: NO usar spin_once dentro de callbacks.
+               executor.spin()
+            except KeyboardInterrupt:
+               pass
+            finally:
+               executor.shutdown()
+               node.destroy_node()
+               if rclpy.ok():
                      rclpy.shutdown()
 
 
          if __name__ == '__main__':
-             main()
+            main()
+
 
    .. group-tab:: action_client.py
 
       .. code-block:: python
 
          import rclpy
-         from rclpy.action import ActionClient
          from rclpy.node import Node
+         from rclpy.action import ActionClient
 
+         # Permite distinguir SUCCEEDED, CANCELED y ABORTED (no solo el bool success).
+         from action_msgs.msg import GoalStatus
+
+         # Interfaz personalizada: debe haberse compilado el paquete avig_msg.
          from avig_msg.action import MoverA
 
 
          class MoverAClient(Node):
-             def __init__(self):
-                 super().__init__('movera_client')
-                 self.client = ActionClient(self, MoverA, 'mover_a')
+            """Nodo cliente que controla el ciclo de vida de una meta MoverA."""
 
-             def send_goal(self, xi, yi, xm, ym):
-                 goal = MoverA.Goal()
-                 goal.x_actual = float(xi)
-                 goal.y_actual = float(yi)
-                 goal.x_meta = float(xm)
-                 goal.y_meta = float(ym)
-                 self.client.wait_for_server()
-                 future = self.client.send_goal_async(
-                     goal, feedback_callback=self.on_feedback
-                 )
-                 future.add_done_callback(self.on_goal_response)
+            def __init__(self):
+               super().__init__('movera_client')
 
-             def on_feedback(self, msg):
-                 distance = msg.feedback.distancia_restante
-                 self.get_logger().info(f'Distancia restante: {distance:.2f}')
+               # 'mover_a' debe coincidir exactamente con el nombre del servidor.
+               self._client = ActionClient(self, MoverA, 'mover_a')
 
-             def on_goal_response(self, future):
-                 goal_handle = future.result()
-                 if not goal_handle.accepted:
-                     self.get_logger().error('Meta rechazada')
-                     rclpy.shutdown()
+               self._goal_handle = None     # Se asigna cuando el servidor acepta la meta.
+               self._cancel_solicitada = False  # Impide peticiones duplicadas.
+               self._terminado = False     # Señal para salir del bucle de main().
+
+            def send_goal(self, xi, yi, xm, ym):
+               """Construye y envía la meta de forma asíncrona al servidor."""
+
+               # La clase Goal contiene los cuatro campos definidos en MoverA.action.
+               goal_msg = MoverA.Goal()
+               goal_msg.x_actual = float(xi)
+               goal_msg.y_actual = float(yi)
+               goal_msg.x_meta = float(xm)
+               goal_msg.y_meta = float(ym)
+
+               # Evita esperar indefinidamente si no se inició el servidor.
+               if not self._client.wait_for_server(timeout_sec=5.0):
+                     self.get_logger().error('El servidor /mover_a no está disponible.')
+                     self._terminado = True
                      return
-                 self.get_logger().info('Meta aceptada')
-                 result_future = goal_handle.get_result_async()
-                 result_future.add_done_callback(self.on_result)
 
-             def on_result(self, future):
-                 response = future.result()
-                 self.get_logger().info(
-                     f'Estado={response.status}, éxito={response.result.success}'
-                 )
-                 rclpy.shutdown()
+               self.get_logger().info(
+                     f'Enviando meta: ({xi:.2f}, {yi:.2f}) -> ({xm:.2f}, {ym:.2f})'
+               )
+
+               # send_goal_async NO espera al final del movimiento; devuelve un Future.
+               # feedback_callback recibe actualizaciones durante la ejecución.
+               futuro = self._client.send_goal_async(
+                     goal_msg,
+                     feedback_callback=self.feedback_callback
+               )
+
+               # Cuando el servidor conteste si acepta/rechaza la meta, ejecutar el
+               # método goal_response_callback para registrar el goal_handle.
+               futuro.add_done_callback(self.goal_response_callback)
+
+            def goal_response_callback(self, future):
+               """Procesa la aceptación o el rechazo de la meta."""
+               self._goal_handle = future.result()
+
+               if not self._goal_handle.accepted:
+                     self.get_logger().error('El servidor rechazó la meta.')
+                     self._terminado = True
+                     return
+
+               self.get_logger().info('Meta aceptada. Esperando feedback y resultado.')
+
+               # El resultado final llegará después (SUCCEEDED, CANCELED o ABORTED).
+               futuro_resultado = self._goal_handle.get_result_async()
+               futuro_resultado.add_done_callback(self.result_callback)
+
+            def feedback_callback(self, feedback_msg):
+               """Muestra distancia restante y solicita cancelación si corresponde."""
+
+               # Los datos de aplicación están anidados en feedback_msg.feedback.
+               distancia = feedback_msg.feedback.distancia_restante
+               self.get_logger().info(f'Feedback: distancia = {distancia:.2f}')
+
+               # Solo cancelar si la meta ya fue aceptada y no hemos pedido cancelar.
+               if (
+                     distancia < 0.8
+                     and self._goal_handle is not None
+                     and not self._cancel_solicitada
+               ):
+                     self._cancel_solicitada = True
+                     self.get_logger().warn('Solicitando cancelación (distancia < 0.8).')
+
+                     # Petición asíncrona de cancelación: todavía NO equivale a CANCELED.
+                     futuro_cancelar = self._goal_handle.cancel_goal_async()
+                     futuro_cancelar.add_done_callback(self.cancel_callback)
+
+            def cancel_callback(self, future):
+               """Indica si el servidor aceptó procesar la cancelación."""
+               respuesta = future.result()
+
+               if respuesta.goals_canceling:
+                     self.get_logger().info(
+                        'Cancelación aceptada; esperando estado final CANCELED.'
+                     )
+               else:
+                     self.get_logger().warn(
+                        'Cancelación no aceptada (la meta pudo terminar antes).'
+                     )
+
+            def result_callback(self, future):
+               """Consulta el resultado y el ESTADO TERMINAL de la acción."""
+               respuesta = future.result()
+               estado = respuesta.status
+               resultado = respuesta.result
+
+               if estado == GoalStatus.STATUS_SUCCEEDED and resultado.success:
+                     self.get_logger().info('Meta completada: SUCCEEDED.')
+               elif estado == GoalStatus.STATUS_CANCELED:
+                     self.get_logger().warn('Meta cancelada: CANCELED.')
+               elif estado == GoalStatus.STATUS_ABORTED:
+                     self.get_logger().error('Meta abortada por el servidor: ABORTED.')
+               else:
+                     self.get_logger().warn(
+                        f'La acción terminó con estado={estado}, success={resultado.success}'
+                     )
+
+               # Señal para que main termine de procesar callbacks y cierre el nodo.
+               self._terminado = True
 
 
          def main(args=None):
-             rclpy.init(args=args)
-             node = MoverAClient()
-             node.send_goal(2.0, 3.0, 0.0, 0.1)
-             try:
-                 rclpy.spin(node)
-             except KeyboardInterrupt:
-                 pass
-             finally:
-                 node.destroy_node()
-                 if rclpy.ok():
+            """Inicia el cliente y procesa respuestas hasta recibir el resultado."""
+            rclpy.init(args=args)
+            node = MoverAClient()
+
+            try:
+               # Coordenadas de ejemplo: desde A=(3,3) hasta B=(0,0.1).
+               node.send_goal(3.0, 3.0, 0.0, 0.1)
+
+               # Aquí spin_once SÍ es válido porque está en main(), NO en un callback
+               # ni dentro de otro spin concurrente para el mismo nodo.
+               while rclpy.ok() and not node._terminado:
+                     rclpy.spin_once(node, timeout_sec=0.1)
+            except KeyboardInterrupt:
+               pass
+            finally:
+               node.destroy_node()
+               if rclpy.ok():
                      rclpy.shutdown()
 
 
          if __name__ == '__main__':
-             main()
+            main()
+
 
 .. note::
 
