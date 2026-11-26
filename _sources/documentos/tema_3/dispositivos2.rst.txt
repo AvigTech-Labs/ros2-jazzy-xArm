@@ -1,291 +1,658 @@
 Estructura de programación MQTT con Mosquitto y Python
 ======================================================
 
-1. ¿Qué es Mosquitto y qué programa se escribe en Python?
----------------------------------------------------------
+Objetivos de aprendizaje
+------------------------
 
-**Mosquitto** es un **broker MQTT**: recibe mensajes publicados por los
-clientes y los distribuye a los clientes suscritos a los tópicos
-correspondientes.
+* Distinguir el protocolo MQTT, el broker Mosquitto y la biblioteca Paho.
+* Identificar las partes obligatorias y opcionales de un cliente MQTT.
+* Comprender los tópicos, publicaciones, suscripciones, payload, QoS y sesión.
+* Definir callbacks compatibles con la API ``VERSION2`` de Paho MQTT 2.x.
+* Implementar programas independientes de publicación y suscripción.
+* Reconocer las condiciones necesarias para conectar equipos por red local.
+* Combinar MQTT y ROS 2 sin bloquear sus respectivos bucles de ejecución.
+* Registrar programas Python en un paquete ROS 2 existente cuando corresponda.
 
-**Paho MQTT** es la biblioteca usada por los programas Python para
-comunicarse con Mosquitto. No se necesita escribir el broker en Python.
+1. Fundamentos generales de MQTT
+--------------------------------
+
+**MQTT (Message Queuing Telemetry Transport)** es un protocolo de mensajería
+basado en el modelo **publicación/suscripción** (*publish/subscribe*). Los
+clientes no intercambian mensajes directamente entre ellos: normalmente se
+conectan a un **broker**, que distribuye cada publicación entre los clientes
+suscritos a su tópico.
 
 .. code-block:: text
 
-                       Broker Mosquitto
-                            :1883
-                        /            \
-                       /              \
-              Publica y recibe    Publica y recibe
-                     /                  \
-          Equipo 1: Python       Equipo 2: ESP32 o Python
-          rm1/acciones  -------->  Suscripción a acciones
-          rm1/sensores  <--------  Publicación de sensores
-          rm1/estados   <--------  Publicación de estados
+                  +------------------------+
+                  |     BROKER MQTT        |
+                  |  (ej.: Mosquitto)     |
+                  +------------------------+
+                      ^              |
+                      | Publica      | Reenvía
+                      |              v
+               +-------------+  +-------------+
+               |  Cliente A  |  |  Cliente B  |
+               | Publicador  |  | Suscriptor  |
+               +-------------+  +-------------+
+
+Un mismo cliente puede publicar, suscribirse a varios tópicos o realizar
+ambas operaciones de forma simultánea.
+
+1.1. Componentes fundamentales
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table:: Elementos de una arquitectura MQTT
+   :header-rows: 1
+   :widths: 24 76
+
+   * - Elemento
+     - Función
+   * - Protocolo MQTT
+     - Define cómo se conectan los clientes y cómo intercambian mensajes.
+   * - Broker
+     - Recibe publicaciones, gestiona suscripciones y distribuye mensajes.
+   * - Cliente
+     - Programa o dispositivo que mantiene una conexión con un broker.
+   * - Publicador
+     - Cliente que envía mensajes a un tópico.
+   * - Suscriptor
+     - Cliente que declara qué tópicos desea recibir.
+   * - Tópico
+     - Nombre jerárquico empleado para clasificar mensajes.
+   * - Payload
+     - Contenido del mensaje, transportado como una secuencia de bytes.
+   * - Client ID
+     - Identificador de una conexión MQTT ante el broker.
+   * - Callback
+     - Función que atiende un evento, por ejemplo una conexión o un mensaje.
+   * - Bucle de red
+     - Procesa comunicaciones, keepalive, respuestas y reconexiones.
+
+1.2. Diferencia entre MQTT, Mosquitto y Paho
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table:: Tres elementos distintos
+   :header-rows: 1
+   :widths: 24 45 31
+
+   * - Nombre
+     - Qué es
+     - Dónde se utiliza
+   * - MQTT
+     - Protocolo de intercambio de mensajes.
+     - Entre clientes y broker.
+   * - Mosquitto
+     - Implementación de un broker MQTT.
+     - En un equipo servidor, Raspberry Pi o PC.
+   * - Eclipse Paho MQTT
+     - Biblioteca cliente para diversos lenguajes, incluido Python.
+     - En los programas que publican y se suscriben.
+   * - ``mosquitto_pub`` / ``mosquitto_sub``
+     - Aplicaciones de consola incluidas en ``mosquitto-clients``.
+     - En pruebas y diagnóstico sin escribir Python.
 
 .. important::
 
-   Los **tópicos MQTT** (por ejemplo ``rm1/sensores``) no son tópicos ROS 2.
-   La coincidencia en la palabra «tópico» no implica que un mensaje pase
-   automáticamente entre ambos sistemas. Para eso se programa un **puente**.
+   **Instalar Mosquitto no instala automáticamente Paho MQTT para Python.**
+   Por otro lado, instalar Paho no crea un broker: el cliente todavía necesita
+   conectarse a uno.
 
-1.1. Elementos de un sistema MQTT
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1.3. Tópicos y jerarquía
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. list-table:: Conceptos básicos
+Los tópicos son cadenas de texto separadas habitualmente por ``/``. No se
+necesita crearlos previamente en el broker para publicar un mensaje.
+
+.. code-block:: text
+
+   laboratorio/sensores/temperatura
+   laboratorio/sensores/humedad
+   laboratorio/estados/conexion
+
+En las suscripciones pueden emplearse comodines:
+
+* ``+``: sustituye **un nivel**; por ejemplo ``laboratorio/sensores/+``.
+* ``#``: sustituye **uno o varios niveles, incluidos cero** y debe aparecer
+  al final; por ejemplo ``laboratorio/#``.
+
+Los comodines se utilizan como filtros de suscripción, no como nombres para
+publicar mensajes. El broker distingue mayúsculas de minúsculas: ``Sensor``
+y ``sensor`` son tópicos diferentes.
+
+1.4. Payload y formatos
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Un mensaje MQTT contiene un **payload de bytes**. El formato de esos bytes
+lo acuerdan las aplicaciones: texto UTF-8, JSON, datos binarios, etc.
+
+Ejemplo conceptual de JSON:
+
+.. code-block:: json
+
+   {
+     "temperatura": 24.5,
+     "humedad": 60,
+     "unidad": "C"
+   }
+
+Cuando se utiliza JSON en Python:
+
+* ``json.dumps(diccionario)``: convierte datos Python a texto JSON.
+* ``json.loads(texto)``: convierte texto JSON a estructuras Python.
+* ``msg.payload.decode('utf-8')``: convierte los bytes de una publicación
+  recibida a texto UTF-8.
+
+Ni MQTT ni el broker verifican que un JSON represente valores válidos para
+una aplicación. Esa validación corresponde al programa receptor.
+
+1.5. Calidad de servicio: QoS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table:: Niveles de QoS
    :header-rows: 1
-   :widths: 24 41 35
+   :widths: 10 35 55
 
-   * - Concepto
-     - Función
-     - Ejemplo del curso
-   * - Broker
-     - Recibe y distribuye mensajes.
-     - Mosquitto en el puerto 1883.
-   * - Cliente
-     - Aplicación conectada al broker.
-     - ``equipo1.py``, ``equipo2.py`` o ESP32.
-   * - Publicador
-     - Envía un contenido a un tópico.
-     - Equipo 2 publica ``rm1/sensores``.
-   * - Suscriptor
-     - Recibe publicaciones de un tópico.
-     - Equipo 1 se suscribe a ``rm1/sensores``.
-   * - Tópico MQTT
-     - Dirección lógica para distribuir mensajes.
-     - ``rm1/acciones``.
-   * - Payload
-     - Datos transportados (bytes).
-     - ``{"EncoderI": 20, "EncoderD": 30}``.
-   * - Client ID
-     - Identifica una conexión ante el broker.
-     - ``avigtech_equipo1``.
-   * - Callback
-     - Función invocada cuando ocurre un evento.
-     - ``on_connect()`` y ``on_message()``.
    * - QoS
-     - Nivel de entrega MQTT.
-     - QoS 0 en las prácticas de ESP32.
+     - Garantía de transporte
+     - Consideración
+   * - 0
+     - Como máximo una entrega.
+     - No hay confirmación MQTT de recepción del mensaje por el broker.
+   * - 1
+     - Al menos una entrega.
+     - Puede haber duplicados; la aplicación debe tolerarlos.
+   * - 2
+     - Entrega exactamente una vez a nivel de protocolo MQTT.
+     - Implica más intercambio de paquetes; no garantiza por sí solo que
+       una operación física se ejecute exactamente una vez.
 
-1.2. Tópicos y estructuras JSON del repositorio
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+El QoS aplicado al reenvío depende también del QoS de la suscripción.
+Para órdenes que cambian el estado de una máquina, la aplicación debe
+incorporar identificadores, validaciones y mecanismos para prevenir
+repeticiones peligrosas, incluso si se usa QoS 1 o 2.
 
-En esta guía se mantienen los nombres usados en ``dispositivos.rst``.
+1.6. Retain, keepalive y última voluntad (LWT)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. list-table:: Contrato de comunicación del laboratorio
+``retain=True`` permite almacenar el último mensaje retenido de un tópico,
+para entregarlo a nuevos suscriptores. Resulta útil para ciertos **estados**
+pero es arriesgado para **comandos de movimiento**, que podrían ejecutarse
+más tarde de lo previsto.
+
+``keepalive`` indica el intervalo máximo aproximado entre intercambios
+necesarios para mantener y vigilar la conexión. No es un temporizador de
+control de motores.
+
+La **última voluntad** (*Last Will and Testament*, LWT) es un mensaje que el
+broker puede publicar cuando detecta una desconexión inesperada del cliente.
+Puede servir para anunciar que un dispositivo dejó de estar disponible.
+
+1.7. Identificación, sesiones y reconexión
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Dos clientes conectados a un mismo broker no deberían usar simultáneamente
+el mismo ``client_id``: el broker puede desconectar la conexión anterior.
+
+Tras una desconexión, el cliente debe recuperar la comunicación y, cuando
+corresponda, las suscripciones. Una práctica sencilla consiste en realizar
+``subscribe()`` dentro de ``on_connect()``, que se ejecuta después de una
+conexión o reconexión exitosa.
+
+Los mecanismos de sesión persistente y mensajes pendientes dependen de la
+versión del protocolo, de los parámetros de sesión y de la configuración
+del broker; no deben asumirse por el mero hecho de usar QoS 1.
+
+2. Anatomía de un programa MQTT en Python
+-----------------------------------------
+
+Un cliente MQTT completo suele contener los siguientes elementos.
+
+.. list-table:: Estructura mínima y componentes opcionales
    :header-rows: 1
-   :widths: 22 18 60
+   :widths: 31 69
 
-   * - Tópico
-     - Dirección habitual
-     - Ejemplo de contenido
-   * - ``rm1/sensores``
-     - Equipo 2 → Equipo 1
-     - ``{"EncoderI": 20, "EncoderD": 30}``
-   * - ``rm1/estados``
-     - Equipo 2 → Equipo 1
-     - ``{"Estado": "Encendido"}``
-   * - ``rm1/acciones``
-     - Equipo 1 → Equipo 2
-     - ``{"vel": {"u_meta": 0.34, "w_meta": 0.10}, "avanzar": 0, "soltar_obj": 0, "parar": 1}``
+   * - Elemento
+     - Responsabilidad
+   * - Importaciones
+     - Importar Paho y bibliotecas adicionales, como ``json`` y ``os``.
+   * - Configuración
+     - Definir dirección del broker, puerto, tópicos e identificación.
+   * - Funciones callback
+     - Atender conexión, recepción, desconexión y otros eventos necesarios.
+   * - Creación del cliente
+     - Instanciar ``mqtt.Client`` con ``CallbackAPIVersion.VERSION2``.
+   * - Asociación de callbacks
+     - Registrar las funciones mediante ``client.on_connect = ...`` y similares.
+   * - Autenticación (si aplica)
+     - Configurar usuario y contraseña antes de iniciar la conexión.
+   * - Conexión
+     - Invocar ``connect()`` o ``connect_async()``.
+   * - Bucle de red
+     - Utilizar ``loop_forever()`` o ``loop_start()`` para atender MQTT.
+   * - Operación
+     - Suscribirse, publicar, procesar mensajes o combinar tareas.
+   * - Cierre
+     - Desconectar y liberar los recursos de red.
 
-``EncoderI`` y ``EncoderD`` son nombres de campos del JSON del ejemplo; no
-son tipos de mensaje ROS. ``u_meta`` y ``w_meta`` representan consignas de
-velocidad lineal y angular **según la lógica definida por la aplicación**;
-sus unidades físicas deben documentarse en el firmware que las consume.
+El orden lógico habitual es:
 
-**No se debe asumir que un JSON recibido es válido o una orden segura**:
-debe validarse antes de actuar sobre un robot.
+.. code-block:: text
 
-2. ¿Qué debe contener un programa Python con MQTT?
---------------------------------------------------
+   Importar bibliotecas
+          |
+          v
+   Leer configuración
+          |
+          v
+   Definir callbacks
+          |
+          v
+   Crear cliente MQTT
+          |
+          v
+   Registrar callbacks / autenticación
+          |
+          v
+   Conectar y procesar el bucle de red
+          |
+          v
+   Publicar y/o recibir mensajes
+          |
+          v
+   Desconectar ordenadamente
 
-Los programas Paho MQTT suelen seguir **ocho etapas**.
+2.1. Callbacks de Paho MQTT 2.x
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#. Importar bibliotecas (``json``, ``time`` y ``paho.mqtt.client``).
-#. Definir broker, puerto, identificador y tópicos MQTT.
-#. Definir los callbacks de conexión, recepción y desconexión.
-#. Crear la instancia ``mqtt.Client`` con la versión de callbacks.
-#. Asociar callbacks al cliente.
-#. Conectarse y **mantener activo el bucle de red**.
-#. Publicar o procesar mensajes mientras la aplicación funciona.
-#. Desconectarse y liberar recursos al finalizar.
+La versión 2.x introduce una API de callbacks versionada. En esta guía
+**todas las funciones utilizan ``CallbackAPIVersion.VERSION2``**.
 
-.. list-table:: Estructura equivalente a la guía ROS 2
+.. list-table:: Firmas utilizadas en esta guía
    :header-rows: 1
-   :widths: 31 34 35
+   :widths: 38 62
 
    * - Función
-     - ROS 2 (rclpy)
-     - MQTT (Paho)
-   * - Inicializar cliente
-     - ``rclpy.init()`` y ``Node()``
-     - ``mqtt.Client(...)``
-   * - Publicar
-     - ``publisher.publish(msg)``
-     - ``client.publish(topic, payload)``
-   * - Suscribirse
-     - ``create_subscription(...)``
-     - ``client.subscribe(...)``
-   * - Recibir datos
-     - Callback ROS de suscripción
-     - ``on_message(...)``
-   * - Recibir eventos de conexión
-     - Gestión del contexto y entidades ROS
-     - ``on_connect(...)``
-   * - Procesar eventos de red
-     - ``rclpy.spin(node)``
-     - ``loop_start()`` o ``loop_forever()``
-   * - Terminar
-     - ``destroy_node()``, ``rclpy.shutdown()``
-     - ``disconnect()``, ``loop_stop()``
+     - Evento
+   * - ``on_connect(client, userdata, flags, reason_code, properties)``
+     - El broker responde a la solicitud de conexión. Suele incluir las
+       suscripciones del programa.
+   * - ``on_message(client, userdata, msg)``
+     - Se recibe un mensaje publicado en un tópico suscrito.
+   * - ``on_disconnect(client, userdata, disconnect_flags, reason_code, properties)``
+     - Finaliza la conexión, de forma esperada o inesperada.
+   * - ``on_publish(client, userdata, mid, reason_code, properties)``
+     - Se informa sobre el progreso o confirmación de una publicación
+       según su QoS.
+   * - ``on_subscribe(client, userdata, mid, reason_code_list, properties)``
+     - El broker responde a una solicitud de suscripción.
 
-.. warning::
+La firma antigua ``on_connect(client, userdata, flags, rc)`` no debe
+mezclarse con ``CallbackAPIVersion.VERSION2``. Es una diferencia entre
+versiones de **Paho MQTT**, no una diferencia propia de ROS 2 Jazzy.
 
-   ``rclpy.spin()`` y el bucle de red MQTT **no son intercambiables**.
-   Un programa que utiliza únicamente Paho **no necesita** ``rclpy.init()``.
-   Si se combinan ROS 2 y MQTT, cada sistema necesita procesar sus propios
-   eventos sin bloquear al otro.
+2.2. Instrucciones que debe reconocer el estudiante
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-3. Preparación del entorno
---------------------------
+.. list-table:: API principal de Paho
+   :header-rows: 1
+   :widths: 38 62
 
-3.1. Instalación y comprobación de Mosquitto
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   * - Expresión
+     - Significado
+   * - ``mqtt.Client(...)``
+     - Construye una instancia de cliente MQTT.
+   * - ``client.username_pw_set(...)``
+     - Configura autenticación con usuario y contraseña.
+   * - ``client.connect(host, port, keepalive)``
+     - Abre una conexión TCP inicial con el broker.
+   * - ``client.connect_async(...)``
+     - Prepara una conexión asíncrona que requiere procesar el bucle de red.
+   * - ``client.subscribe(topic, qos=...)``
+     - Solicita al broker recibir publicaciones de un tópico.
+   * - ``client.publish(topic, payload, qos=..., retain=...)``
+     - Publica contenido y devuelve información de su envío.
+   * - ``client.loop_forever()``
+     - Procesa eventos de red ocupando el hilo llamante.
+   * - ``client.loop_start()``
+     - Inicia un hilo interno para procesar eventos MQTT.
+   * - ``client.loop_stop()``
+     - Detiene el hilo creado con ``loop_start()``.
+   * - ``client.disconnect()``
+     - Solicita la desconexión del broker.
+   * - ``client.reconnect_delay_set(...)``
+     - Ajusta esperas entre reintentos automáticos de reconexión.
 
-La instalación básica ya está cubierta en ``dispositivos.rst``. Aquí solo
-se incluyen los comandos necesarios para ejecutar las prácticas.
+**``connect()`` no sustituye el bucle de red.** Los callbacks y las
+confirmaciones requieren que el programa procese los paquetes MQTT.
+
+3. Instalación correcta en Ubuntu 24.04
+---------------------------------------
+
+3.1. Instalar el broker y los clientes de terminal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instala Mosquitto mediante APT, sin usar ``pip`` para el broker.
 
 .. code-block:: bash
 
    sudo apt update
-   sudo apt install mosquitto mosquitto-clients
+   sudo apt install -y mosquitto mosquitto-clients python3-pip python3-venv
+
+   # Habilitar el servicio ahora y después de reiniciar.
    sudo systemctl enable --now mosquitto
+
+   # Verificar que el servicio está activo.
+   systemctl is-active mosquitto
+   sudo ss -lntp | grep 1883
+
+El resultado esperado de ``systemctl is-active`` es ``active``. Con una
+configuración local predeterminada de Mosquitto 2.x, el puerto 1883 puede
+escuchar únicamente en ``localhost``; esto es adecuado para comenzar.
+
+3.2. Probar Mosquitto sin Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En dos terminales distintas del mismo computador:
+
+**Terminal 1: suscribirse**
+
+.. code-block:: bash
+
+   mosquitto_sub -h localhost -t "laboratorio/datos" -v
+
+**Terminal 2: publicar**
+
+.. code-block:: bash
+
+   mosquitto_pub -h localhost -t "laboratorio/datos" \
+     -m '{"temperatura":24.5,"unidad":"C"}'
+
+En la primera terminal debería verse el tópico y su contenido JSON.
+
+3.3. Instalar la biblioteca Python Paho MQTT 2.x
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En Ubuntu 24.04, el paquete APT ``python3-paho-mqtt`` pertenece a la
+serie **1.6.1**, mientras que los programas de esta guía requieren
+``CallbackAPIVersion.VERSION2`` de Paho MQTT **2.x**.
+
+Para evitar conflictos con el Python del sistema, se usa el entorno virtual
+``~/venvs/ros2-jazzy`` previsto en la documentación del curso. Si ya lo
+creaste, **no hace falta volver a crearlo**.
+
+.. code-block:: bash
+
+   # Crear el entorno solo si todavía no existe.
+   sudo apt install -y python3-venv python3-pip
+   test -f ~/venvs/ros2-jazzy/bin/activate || \
+     python3 -m venv --system-site-packages ~/venvs/ros2-jazzy
+
+   # Activar el entorno.
+   source /opt/ros/jazzy/setup.bash
+   source ~/venvs/ros2-jazzy/bin/activate
+
+   # Instalar Paho MQTT, versión comprobada para esta guía.
+   python -m pip install "paho-mqtt==2.2.0"
+
+   # Consultar la versión instalada y su ubicación.
+   python -m pip show paho-mqtt
+
+   # Verificar importación y la API moderna de callbacks.
+   python -c "import importlib.metadata as m; import paho.mqtt.client as mqtt; print('Paho MQTT:', m.version('paho-mqtt')); print('Callback API:', mqtt.CallbackAPIVersion.VERSION2)"
+
+.. note::
+
+   La versión ``2.2.0`` de Paho MQTT se publicó el 4 de noviembre de 2026.
+   Se fija aquí para que el laboratorio sea reproducible. Si el curso decide
+   actualizarla, revisa las notas oficiales de la versión y vuelve a probar
+   los callbacks.
+
+.. warning::
+
+   No recomendamos ``sudo pip install`` ni
+   ``--break-system-packages`` para el entorno de ROS 2 Jazzy.
+   Si necesitas ``rclpy`` dentro del mismo entorno, el uso de
+   ``--system-site-packages`` permite acceder a los paquetes ROS 2 instalados
+   por APT, siempre que se use el intérprete compatible con Jazzy.
+   No instales otra versión de ``rclpy`` desde PyPI.
+
+3.4. Comprobar el intérprete utilizado
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   # El intérprete debe pertenecer al entorno activado.
+   which python
+   python --version
+
+   # La ubicación de Paho debe corresponder al Python que ejecuta el script.
+   python -c "import paho.mqtt.client as mqtt; print(mqtt.__file__)"
+
+Para ejecutar los ejemplos **sin ROS 2**, basta con activar el entorno
+virtual y usar ``python nombre_archivo.py``.
+
+3.5. Permitir clientes de otros equipos (opcional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+El acceso remoto **no se habilita simplemente instalando el broker**.
+Para admitir dispositivos de una LAN, crea un listener con autenticación.
+
+.. warning::
+
+   Esta configuración debe aplicarse en una red administrada y confiable.
+   El puerto MQTT 1883 **no cifra** el contenido ni las credenciales.
+   En redes no confiables utiliza TLS (normalmente 8883), controles de
+   acceso y credenciales individuales. Nunca publiques contraseñas en GitHub.
+
+**Crear un usuario MQTT** (el comando solicita la contraseña de forma
+interactiva):
+
+.. code-block:: bash
+
+   sudo mosquitto_passwd -c /etc/mosquitto/passwd usuario_mqtt
+   sudo chown root:mosquitto /etc/mosquitto/passwd
+   sudo chmod 640 /etc/mosquitto/passwd
+
+**Crear una configuración**, por ejemplo
+``/etc/mosquitto/conf.d/laboratorio.conf``:
+
+.. code-block:: bash
+
+   sudo nano /etc/mosquitto/conf.d/laboratorio.conf
+
+Su contenido será:
+
+.. code-block:: text
+
+   listener 1883 0.0.0.0
+   allow_anonymous false
+   password_file /etc/mosquitto/passwd
+
+Reinicia y comprueba el servicio:
+
+.. code-block:: bash
+
+   sudo systemctl restart mosquitto
    sudo systemctl status mosquitto
    sudo ss -lntp | grep 1883
 
-Para una prueba **en el mismo computador** no es necesario abrir Mosquitto
-a toda la red:
+Si utilizas UFW, limita el acceso a la subred autorizada; **sustituye la
+subred de ejemplo por la red real del laboratorio**:
 
 .. code-block:: bash
 
-   # Terminal 1: observar un tópico
-   mosquitto_sub -h localhost -t rm1/sensores -v
+   sudo ufw allow from 192.168.100.0/24 to any port 1883 proto tcp
 
-   # Terminal 2: publicar un JSON de ejemplo
-   mosquitto_pub -h localhost -t rm1/sensores \
-     -m '{"EncoderI":20,"EncoderD":30}'
+Los clientes remotos deberán configurar usuario y contraseña antes de
+``connect()``. Si ya existen otros listeners en la configuración del broker,
+revisa sus puertos para evitar conflictos.
 
-Si el broker recibe conexiones desde una ESP32, será necesario configurar
-un listener accesible desde la LAN, autenticación y reglas de acceso.
+4. Ejemplo 1: programa suscriptor
+---------------------------------
 
-.. important::
-
-   La configuración ``listener 1883`` con ``allow_anonymous true`` que
-   aparece en el repositorio es **exclusivamente para una red aislada de
-   laboratorio**. No debe utilizarse en una red pública o de producción.
-   Para equipos reales usa autenticación, ACL y, cuando corresponda, TLS.
-   No incluyas credenciales en el código publicado en GitHub.
-
-3.2. Instalar Paho MQTT 2.x
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-De acuerdo con el entorno virtual definido en el repositorio para
-Ubuntu 24.04:
-
-.. code-block:: bash
-
-   source ~/venvs/ros2-jazzy/bin/activate
-   python -m pip install 'paho-mqtt>=2,<3'
-   python -m pip show paho-mqtt
-
-El entorno virtual debe tener acceso a las dependencias ROS 2 si también
-se van a ejecutar nodos ``rclpy``. Compila y ejecuta los programas con el
-mismo entorno Python; evita mezclar un ejecutable instalado con un intérprete
-diferente al que tiene Paho.
-
-4. Esqueleto mínimo de un programa MQTT
----------------------------------------
-
-El siguiente ejemplo contiene los elementos fundamentales de un cliente
-que **se suscribe** y además **publica** periódicamente.
+Este programa demuestra una **suscripción genérica**. No está vinculado
+al formato de un sensor o robot particular: muestra el tópico y el payload
+recibido. El ejemplo presupone el broker local de la sección 3.2.
 
 .. code-block:: python
-   :caption: mi_pkg_python/mqtt/cliente_mqtt_base.py
+   :caption: suscriptor_mqtt.py
 
-   import json
    import os
-   import time
    import paho.mqtt.client as mqtt
 
-   # 1. Configuración de conexión.
+   # 1. Datos de conexión.
    BROKER = os.getenv('MQTT_BROKER', 'localhost')
-   PUERTO = 1883
-   CLIENT_ID = 'avigtech_mqtt_base'
-   TOPICO_RECIBIR = 'rm1/sensores'
-   TOPICO_PUBLICAR = 'rm1/acciones'
+   PUERTO = int(os.getenv('MQTT_PORT', '1883'))
+   TOPICO = 'laboratorio/datos'
 
 
-   # 2. Callback: el broker confirmó la conexión.
+   # 2. Callback de conexión (API Paho 2.x).
    def on_connect(client, userdata, flags, reason_code, properties):
        if reason_code == 0:
-           print('Conectado a Mosquitto')
-           # Repetir suscripción al reconectar.
-           client.subscribe(TOPICO_RECIBIR, qos=0)
+           print('Conexión establecida con el broker.')
+
+           # Suscribirse aquí permite recuperar la suscripción
+           # si la conexión se interrumpe y después se restablece.
+           client.subscribe(TOPICO, qos=1)
        else:
            print(f'Conexión rechazada: {reason_code}')
 
 
-   # 3. Callback: llegó un mensaje al tópico suscrito.
+   # 3. Callback de recepción de mensajes.
    def on_message(client, userdata, msg):
        try:
-           datos = json.loads(msg.payload.decode('utf-8'))
-           if msg.topic == TOPICO_RECIBIR:
-               print('Encoder izquierdo:', datos['EncoderI'])
-       except (UnicodeDecodeError, ValueError, KeyError, TypeError) as error:
-           print(f'Mensaje inválido: {error}')
+           texto = msg.payload.decode('utf-8')
+       except UnicodeDecodeError:
+           print('El payload recibido no contiene texto UTF-8.')
+           return
+
+       print(f'Tópico: {msg.topic}')
+       print(f'Contenido: {texto}')
+       print(f'QoS de recepción: {msg.qos}')
 
 
-   # 4. Callback: se perdió o cerró la conexión.
-   def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
-       print(f'Desconectado de MQTT: {reason_code}')
+   # 4. Callback de desconexión.
+   def on_disconnect(client, userdata, flags, reason_code, properties):
+       print(f'Conexión finalizada: {reason_code}')
 
 
    def main():
-       # 5. Crear el cliente con la API de callbacks de Paho 2.x.
+       # 5. Crear el cliente con callbacks VERSION2.
        client = mqtt.Client(
            callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-           client_id=CLIENT_ID,
+           client_id=f'curso_suscriptor_{os.getpid()}',
            protocol=mqtt.MQTTv311
        )
 
-       # 6. Asociar cada evento a su función.
+       # 6. Asociar callbacks a los eventos MQTT.
        client.on_connect = on_connect
        client.on_message = on_message
        client.on_disconnect = on_disconnect
 
-       # 7. Mantener la conexión, incluyendo reintentos automáticos.
-       client.reconnect_delay_set(min_delay=1, max_delay=10)
-       client.connect_async(BROKER, PUERTO, keepalive=60)
+       # 7. Configurar credenciales solamente si se han definido.
+       usuario = os.getenv('MQTT_USER')
+       clave = os.getenv('MQTT_PASSWORD')
+       if usuario:
+           if not clave:
+               raise RuntimeError('Falta la variable MQTT_PASSWORD.')
+           client.username_pw_set(usuario, clave)
+
+       # 8. Conectarse y procesar la red en el hilo principal.
+       try:
+           client.connect(BROKER, PUERTO, keepalive=60)
+           print('Esperando mensajes; Ctrl+C para terminar.')
+           client.loop_forever()
+       except KeyboardInterrupt:
+           print('Finalizando suscriptor...')
+       finally:
+           client.disconnect()
+
+
+   if __name__ == '__main__':
+       main()
+
+**Estructura del programa:** importa Paho, define la conexión, crea
+callbacks, construye el cliente, registra los callbacks, establece la
+conexión, atiende el bucle de red y finaliza.
+
+5. Ejemplo 2: programa publicador
+---------------------------------
+
+Este programa publica una estructura JSON una sola vez. Con QoS 1 puede
+esperar a que Paho procese la confirmación del broker antes de cerrar.
+No garantiza que una aplicación suscriptora haya procesado físicamente
+el mensaje.
+
+.. code-block:: python
+   :caption: publicador_mqtt.py
+
+   import json
+   import os
+   import threading
+   import paho.mqtt.client as mqtt
+
+   BROKER = os.getenv('MQTT_BROKER', 'localhost')
+   PUERTO = int(os.getenv('MQTT_PORT', '1883'))
+   TOPICO = 'laboratorio/datos'
+
+
+   def main():
+       # 1. Evento utilizado para saber cuándo el broker confirma
+       # la conexión; connect() por sí solo no significa CONNACK.
+       conectado = threading.Event()
+
+       def on_connect(client, userdata, flags, reason_code, properties):
+           if reason_code == 0:
+               print('Broker conectado.')
+               conectado.set()
+           else:
+               print(f'Conexión rechazada: {reason_code}')
+
+       # 2. Construir cliente y asociar callback.
+       client = mqtt.Client(
+           callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+           client_id=f'curso_publicador_{os.getpid()}',
+           protocol=mqtt.MQTTv311
+       )
+       client.on_connect = on_connect
+
+       # 3. Autenticación opcional.
+       usuario = os.getenv('MQTT_USER')
+       clave = os.getenv('MQTT_PASSWORD')
+       if usuario:
+           if not clave:
+               raise RuntimeError('Falta la variable MQTT_PASSWORD.')
+           client.username_pw_set(usuario, clave)
+
+       # 4. Conectar e iniciar el bucle de red en un hilo.
+       client.connect(BROKER, PUERTO, keepalive=60)
        client.loop_start()
 
        try:
-           while True:
-               # Solo publicar después de establecer conexión.
-               if client.is_connected():
-                   comando = {'avanzar': 0, 'parar': 1}
-                   texto = json.dumps(comando)
-                   resultado = client.publish(
-                       TOPICO_PUBLICAR, texto, qos=0, retain=False
-                   )
-                   if resultado.rc != mqtt.MQTT_ERR_SUCCESS:
-                       print('Publicación no aceptada por el cliente local')
-               time.sleep(1)
-       except KeyboardInterrupt:
-           print('Finalizando cliente MQTT...')
+           if not conectado.wait(timeout=10):
+               raise TimeoutError('No se confirmó la conexión MQTT.')
+
+           # 5. Convertir un diccionario Python a JSON.
+           datos = {'valor': 24.5, 'unidad': 'C'}
+           payload = json.dumps(datos)
+
+           # 6. Publicar el mensaje. No se retiene en el broker.
+           envio = client.publish(
+               TOPICO, payload=payload, qos=1, retain=False
+           )
+
+           if envio.rc != mqtt.MQTT_ERR_SUCCESS:
+               raise RuntimeError(f'Error al publicar: {envio.rc}')
+
+           # 7. Esperar la confirmación MQTT con un límite de tiempo.
+           envio.wait_for_publish(timeout=10)
+           if not envio.is_published():
+               raise TimeoutError('La publicación no se confirmó.')
+
+           print('Publicación MQTT confirmada por el broker.')
        finally:
-           # 8. Desconectar y terminar el hilo de red.
+           # 8. Cierre ordenado del cliente y su hilo MQTT.
            client.disconnect()
            client.loop_stop()
 
@@ -293,341 +660,90 @@ que **se suscribe** y además **publica** periódicamente.
    if __name__ == '__main__':
        main()
 
-.. note::
-
-   Este programa transmite una **orden de ejemplo**. No debe conectarse a
-   actuadores reales sin validación del mensaje y una estrategia de parada
-   segura ante desconexiones. ``retain=False`` evita que esa orden quede
-   almacenada como mensaje retenido por el broker.
-
-5. Anatomía del cliente MQTT: instrucciones fundamentales
----------------------------------------------------------
-
-5.1. Creación del cliente
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   client = mqtt.Client(
-       callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-       client_id='avigtech_equipo1',
-       protocol=mqtt.MQTTv311
-   )
-
-* ``CallbackAPIVersion.VERSION2``: firma moderna de callbacks de Paho 2.x.
-* ``client_id``: nombre que identifica al cliente ante el broker.
-* ``protocol=mqtt.MQTTv311``: protocolo MQTT 3.1.1, habitual en las prácticas
-  con ``PubSubClient`` de ESP32.
-
-**Cada programa conectado simultáneamente debe usar un ``client_id``
-distinto**; si comparten identificador, el broker puede desconectar
-al cliente anterior.
-
-5.2. Asociación de callbacks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   client.on_connect = on_connect
-   client.on_message = on_message
-   client.on_disconnect = on_disconnect
-
-La asignación **no ejecuta** inmediatamente las funciones. Únicamente
-registra qué función debe invocar Paho cuando ocurra cada evento.
-
-.. list-table:: Callbacks Paho API VERSION2
-   :header-rows: 1
-   :widths: 30 70
-
-   * - Callback
-     - Cuándo se ejecuta y para qué sirve
-   * - ``on_connect(client, userdata, flags, reason_code, properties)``
-     - Cuando se recibe la respuesta CONNACK. Conviene suscribirse aquí
-       para recuperar las suscripciones después de una reconexión.
-   * - ``on_message(client, userdata, msg)``
-     - Cuando llega una publicación coincidente con una suscripción.
-   * - ``on_disconnect(client, userdata, disconnect_flags, reason_code, properties)``
-     - Cuando se cierra o pierde la conexión.
-   * - ``on_publish(client, userdata, mid, reason_code, properties)``
-     - Cuando progresa o se confirma una publicación, según QoS.
-   * - ``on_subscribe(client, userdata, mid, reason_code_list, properties)``
-     - Cuando el broker responde a una solicitud de suscripción.
-
-.. warning::
-
-   El callback antiguo ``on_connect(client, userdata, flags, rc)``
-   pertenece a la API previa. No debe mezclarse con
-   ``mqtt.CallbackAPIVersion.VERSION2``. Este cambio es de **Paho MQTT
-   1.x a 2.x**, no un cambio propio de ROS 2 Humble a Jazzy.
-
-5.3. Conexión y bucle de red
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   client.connect_async(BROKER, 1883, keepalive=60)
-   client.loop_start()
-
-``connect_async()`` prepara una conexión no bloqueante. ``loop_start()``
-crea un hilo que procesa los mensajes MQTT, gestiona las respuestas del
-broker y permite reconectarse. Alternativamente, para un programa MQTT
-simple y exclusivamente receptor, se puede emplear ``loop_forever()``,
-que bloquea el hilo principal hasta la desconexión.
-
 .. important::
 
-   Un programa MQTT que llama solamente a ``connect()`` y luego termina,
-   sin procesar el bucle de red, no mantiene de manera adecuada la recepción
-   de mensajes, los keepalive ni las reconexiones.
+   ``publish()`` devuelve un objeto de seguimiento de la publicación.
+   Con QoS 1, ``wait_for_publish()`` sirve para esperar la confirmación
+   correspondiente; **no es una confirmación de ejecución por parte de un
+   dispositivo remoto**.
 
-5.4. Suscripción
-~~~~~~~~~~~~~~~~
+6. Ejemplo 3: cliente que publica y se suscribe
+-----------------------------------------------
+
+Un mismo cliente puede cumplir ambas funciones. El siguiente ejemplo
+se suscribe a mensajes, publica un estado de demostración periódicamente
+con ``loop_start()`` y puede recuperar la suscripción tras una reconexión.
 
 .. code-block:: python
+   :caption: cliente_mqtt_mixto.py
+
+   import json
+   import os
+   import time
+   import paho.mqtt.client as mqtt
+
+   BROKER = os.getenv('MQTT_BROKER', 'localhost')
+   PUERTO = int(os.getenv('MQTT_PORT', '1883'))
+   TOPICO_ENTRADA = 'laboratorio/datos'
+   TOPICO_SALIDA = 'laboratorio/estados'
+
 
    def on_connect(client, userdata, flags, reason_code, properties):
        if reason_code == 0:
-           client.subscribe('rm1/sensores', qos=0)
-           client.subscribe('rm1/estados', qos=0)
+           print('Conectado; recuperando suscripción.')
+           client.subscribe(TOPICO_ENTRADA, qos=1)
+       else:
+           print(f'Fallo de conexión: {reason_code}')
 
-``subscribe()`` expresa el interés en un tópico. **No es la función que
-procesa su contenido**: los mensajes llegan a ``on_message()``.
-
-5.5. Publicación y codificación JSON
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   comando = {
-       'vel': {'u_meta': 0.34, 'w_meta': 0.10},
-       'avanzar': 0,
-       'soltar_obj': 0,
-       'parar': 1
-   }
-   texto = json.dumps(comando)
-   client.publish('rm1/acciones', texto, qos=0, retain=False)
-
-* ``dict``: estructura Python con nombres y valores.
-* ``json.dumps()``: convierte el diccionario a una cadena JSON.
-* ``publish()``: envía el contenido al tópico MQTT.
-* ``qos=0``: adecuado para comparar con el uso de ``PubSubClient`` del
-  firmware del curso, que publica con QoS 0.
-* ``retain=False``: no conservar esta orden como último mensaje retenido.
-
-5.6. Recepción y decodificación JSON
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
 
    def on_message(client, userdata, msg):
-       if msg.topic != 'rm1/sensores':
-           return
-
        try:
            texto = msg.payload.decode('utf-8')
-           datos = json.loads(texto)
-           encoder_i = int(datos['EncoderI'])
-           encoder_d = int(datos['EncoderD'])
-           print(f'EncoderI={encoder_i}, EncoderD={encoder_d}')
-       except (UnicodeDecodeError, ValueError, KeyError, TypeError) as error:
-           print(f'Datos descartados: {error}')
-
-* ``msg.topic`` identifica el tópico MQTT del mensaje recibido.
-* ``msg.payload`` contiene bytes, que deben interpretarse correctamente.
-* ``json.loads()`` convierte el texto JSON a un objeto Python.
-* ``datos['EncoderI']`` accede a una clave esperada en la estructura.
-* La validación evita que una publicación malformada interrumpa la aplicación.
-
-5.7. QoS, mensajes retenidos y reconexión
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table:: Decisiones de comunicación
-   :header-rows: 1
-   :widths: 20 33 47
-
-   * - Opción
-     - Significado
-     - Recomendación didáctica
-   * - QoS 0
-     - Entrega de mejor esfuerzo.
-     - Telemetría periódica y compatibilidad con ``PubSubClient``.
-   * - QoS 1
-     - Al menos una entrega al receptor MQTT correspondiente.
-     - Requiere gestionar duplicados en aplicaciones sensibles.
-   * - QoS 2
-     - Flujo de entrega exactamente una vez a nivel MQTT.
-     - No significa que un actuador ejecute una acción exactamente una vez.
-   * - ``retain=True``
-     - El broker conserva el último mensaje retenido del tópico.
-     - Estados publicados, cuando convenga; no comandos de movimiento.
-   * - ``on_connect``
-     - Recibe confirmación de conexión y reconexión.
-     - Suscribirse aquí para restaurar las suscripciones.
-
-.. important::
-
-   ``publish()`` no significa que el actuador haya obedecido la orden.
-   Si se necesita conocer el resultado de una acción, el dispositivo
-   debe publicar un **acuse o estado de aplicación** independiente.
-
-6. Práctica del repositorio: Equipo 1 y Equipo 2
-------------------------------------------------
-
-Los programas siguientes reproducen el intercambio de la práctica existente
-pero con funciones separadas, manejo de conexión y comentarios. Ambos pueden
-funcionar **en un solo computador** utilizando ``localhost``.
-
-6.1. Equipo 1: recibe sensores y envía acciones
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-   :caption: mi_pkg_python/mqtt/equipo1.py
-
-   import json
-   import os
-   import time
-   import paho.mqtt.client as mqtt
-
-   BROKER = os.getenv('MQTT_BROKER', 'localhost')
-   TOPICO_SENSORES = 'rm1/sensores'
-   TOPICO_ESTADOS = 'rm1/estados'
-   TOPICO_ACCIONES = 'rm1/acciones'
-
-
-   def on_connect(client, userdata, flags, reason_code, properties):
-       # Se ejecuta al conectar o reconectar con Mosquitto.
-       if reason_code == 0:
-           print('[Equipo 1] Conexión establecida')
-           client.subscribe(TOPICO_SENSORES, qos=0)
-           client.subscribe(TOPICO_ESTADOS, qos=0)
-       else:
-           print(f'[Equipo 1] Conexión rechazada: {reason_code}')
-
-
-   def on_message(client, userdata, msg):
-       # Identificar el tópico y decodificar el JSON recibido.
-       try:
-           datos = json.loads(msg.payload.decode('utf-8'))
-           if msg.topic == TOPICO_SENSORES:
-               print('[Equipo 1] EncoderI:', datos['EncoderI'])
-               print('[Equipo 1] EncoderD:', datos['EncoderD'])
-           elif msg.topic == TOPICO_ESTADOS:
-               print('[Equipo 1] Estado:', datos['Estado'])
-       except (UnicodeDecodeError, ValueError, KeyError, TypeError) as error:
-           print(f'[Equipo 1] Datos inválidos: {error}')
-
-
-   def main():
-       # Identificador único para no desplazar a otros clientes.
-       client = mqtt.Client(
-           callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-           client_id='avigtech_equipo1',
-           protocol=mqtt.MQTTv311
-       )
-       client.on_connect = on_connect
-       client.on_message = on_message
-       client.reconnect_delay_set(min_delay=1, max_delay=10)
-       client.connect_async(BROKER, 1883, keepalive=60)
-       client.loop_start()
-
-       try:
-           while True:
-               if client.is_connected():
-                   # Mensaje con los mismos campos del repositorio.
-                   orden = {
-                       'vel': {'u_meta': 0.34, 'w_meta': 0.10},
-                       'nombre': 'robot1',
-                       'avanzar': 0,
-                       'soltar_obj': 0,
-                       'parar': 1
-                   }
-                   client.publish(
-                       TOPICO_ACCIONES, json.dumps(orden),
-                       qos=0, retain=False
-                   )
-                   print('[Equipo 1] Orden de demostración publicada')
-               time.sleep(1.0)
-       except KeyboardInterrupt:
-           print('[Equipo 1] Finalizando')
-       finally:
-           client.disconnect()
-           client.loop_stop()
-
-
-   if __name__ == '__main__':
-       main()
-
-6.2. Equipo 2: recibe acciones y publica sensores
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-   :caption: mi_pkg_python/mqtt/equipo2.py
-
-   import json
-   import os
-   import time
-   import paho.mqtt.client as mqtt
-
-   BROKER = os.getenv('MQTT_BROKER', 'localhost')
-   TOPICO_SENSORES = 'rm1/sensores'
-   TOPICO_ESTADOS = 'rm1/estados'
-   TOPICO_ACCIONES = 'rm1/acciones'
-
-
-   def on_connect(client, userdata, flags, reason_code, properties):
-       if reason_code == 0:
-           print('[Equipo 2] Conectado a Mosquitto')
-           client.subscribe(TOPICO_ACCIONES, qos=0)
-       else:
-           print(f'[Equipo 2] Conexión rechazada: {reason_code}')
-
-
-   def on_message(client, userdata, msg):
-       if msg.topic != TOPICO_ACCIONES:
+       except UnicodeDecodeError:
+           print('Mensaje no UTF-8 descartado.')
            return
-       try:
-           orden = json.loads(msg.payload.decode('utf-8'))
-           if not isinstance(orden, dict):
-               raise ValueError('La orden debe ser un objeto JSON')
-           print('[Equipo 2] Comando recibido:', orden)
-       except (UnicodeDecodeError, ValueError, TypeError) as error:
-           print(f'[Equipo 2] Comando descartado: {error}')
+       print(f'Recibido en {msg.topic}: {texto}')
 
 
    def main():
        client = mqtt.Client(
            callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-           client_id='avigtech_equipo2',
+           client_id=f'curso_mixto_{os.getpid()}',
            protocol=mqtt.MQTTv311
        )
        client.on_connect = on_connect
        client.on_message = on_message
        client.reconnect_delay_set(min_delay=1, max_delay=10)
-       client.connect_async(BROKER, 1883, keepalive=60)
+
+       usuario = os.getenv('MQTT_USER')
+       clave = os.getenv('MQTT_PASSWORD')
+       if usuario:
+           if not clave:
+               raise RuntimeError('Falta la variable MQTT_PASSWORD.')
+           client.username_pw_set(usuario, clave)
+
+       # La conexión se establece y mantiene desde el hilo MQTT.
+       client.connect_async(BROKER, PUERTO, keepalive=60)
        client.loop_start()
 
        contador = 0
        try:
            while True:
                if client.is_connected():
-                   # Simulación de lecturas de encoders.
-                   sensores = {
-                       'EncoderI': 20 + contador,
-                       'EncoderD': 30 + contador
-                   }
-                   estados = {'Estado': 'Encendido'}
-
-                   client.publish(
-                       TOPICO_SENSORES, json.dumps(sensores), qos=0
+                   datos = {'estado': 'activo', 'contador': contador}
+                   respuesta = client.publish(
+                       TOPICO_SALIDA,
+                       payload=json.dumps(datos),
+                       qos=0,
+                       retain=False
                    )
-                   client.publish(
-                       TOPICO_ESTADOS, json.dumps(estados), qos=0
-                   )
-                   contador += 1
-                   print('[Equipo 2] Sensores publicados:', sensores)
-               time.sleep(1.0)
+                   if respuesta.rc == mqtt.MQTT_ERR_SUCCESS:
+                       contador += 1
+                   else:
+                       print(f'Publicación rechazada localmente: {respuesta.rc}')
+               time.sleep(2)
        except KeyboardInterrupt:
-           print('[Equipo 2] Finalizando')
+           print('Finalizando...')
        finally:
            client.disconnect()
            client.loop_stop()
@@ -638,250 +754,210 @@ funcionar **en un solo computador** utilizando ``localhost``.
 
 .. note::
 
-   El **Equipo 2** es una simulación del intercambio de mensajes que puede
-   realizar la ESP32 del curso. No controla motores reales: las lecturas
-   de encoders se generan artificialmente para probar la comunicación.
+   ``loop_start()`` procesa MQTT en un hilo secundario. No es necesario
+   llamar simultáneamente a ``loop_forever()`` sobre el mismo cliente.
+   Evita operaciones prolongadas dentro de ``on_message()`` y otros
+   callbacks: pueden retrasar la recepción de nuevas publicaciones.
 
-6.3. Ejecutar los dos equipos
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+7. Comparación de los tipos de programas
+----------------------------------------
 
-Si los programas se guardaron dentro del paquete, sigue la configuración
-del capítulo 8 y ejecuta:
+.. list-table:: ¿Qué estructura necesita cada programa?
+   :header-rows: 1
+   :widths: 22 42 36
 
-.. code-block:: bash
+   * - Tipo
+     - Elementos principales
+     - Bucle apropiado
+   * - Suscriptor
+     - ``on_connect``, ``subscribe``, ``on_message``.
+     - ``loop_forever()`` o ``loop_start()``.
+   * - Publicador puntual
+     - ``connect``, ``publish``, confirmación y cierre.
+     - ``loop_start()`` durante el envío.
+   * - Cliente mixto
+     - Callbacks, ``subscribe``, ``publish`` y reconexión.
+     - ``loop_start()`` más lógica principal.
+   * - Puente MQTT–ROS 2
+     - Paho, nodo ``rclpy``, cola de mensajes y callbacks de ROS 2.
+     - ``loop_start()`` para MQTT y ``rclpy.spin()`` para ROS.
 
-   # Terminal 1: broker ya en ejecución
-   sudo systemctl status mosquitto
+8. Integración general de MQTT con ROS 2 Jazzy
+----------------------------------------------
 
-   # Terminal 2: cliente receptor de sensores
-   ros2 run mi_pkg_python mqtt_equipo1
-
-   # Terminal 3: cliente emisor de sensores
-   ros2 run mi_pkg_python mqtt_equipo2
-
-Para verificar sin depender de los scripts:
-
-.. code-block:: bash
-
-   mosquitto_sub -h localhost -t 'rm1/#' -v
-
-El comodín MQTT ``#`` permite observar todos los niveles bajo ``rm1/``.
-Los mensajes deben contener los campos definidos en la tabla del apartado 1.
-
-7. Puente MQTT ↔ ROS 2 dentro de ``mi_pkg_python``
---------------------------------------------------
-
-El repositorio ya incluye una práctica de puente entre MQTT y ROS 2.
-Esta sección detalla la **estructura de programación** que debe seguirse
-para que el programa sea más robusto.
-
-7.1. ¿Cuál es su función?
-~~~~~~~~~~~~~~~~~~~~~~~~~
+MQTT y ROS 2 tienen mecanismos de comunicación distintos. Los tópicos
+MQTT y ROS 2 no se convierten automáticamente. Un **nodo puente** puede
+traducir mensajes entre ambos sistemas.
 
 .. code-block:: text
 
-   ESP32 / Equipo 2
-     |  Publica JSON
-     v
-   Mosquitto: rm1/sensores
-     |
-     v
-   Paho MQTT: on_message()       [hilo MQTT]
-     |
-     v
-   Cola de datos thread-safe
-     |
-     v
-   Temporizador del nodo ROS 2   [executor ROS 2]
-     |
-     v
-   ROS 2: /sensores  (std_msgs/Float32)
+   Cliente MQTT --> Broker Mosquitto --> Puente Python --> ROS 2
+                                                |
+                                                v
+                                          Tópico ROS 2
 
-   ROS 2: /acciones (std_msgs/Int32)
-     |
-     v
-   Callback de suscripción ROS 2
-     |
-     v
-   Paho MQTT: publish()
-     |
-     v
-   Mosquitto: rm1/acciones  ---> ESP32 / Equipo 2
+   Tópico ROS 2 --> Puente Python --> Broker Mosquitto --> Cliente MQTT
 
-.. important::
+8.1. Diferencia entre ``loop_start()`` y ``rclpy.spin()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   ``on_message()`` se ejecuta en el hilo de Paho cuando se usa
-   ``loop_start()``. No conviene hacer trabajo pesado ni llamar a
-   ``rclpy.spin()`` desde ese callback. En este ejemplo se utiliza una
-   ``queue.Queue`` segura entre hilos y el temporizador ROS 2 procesa
-   las lecturas. El nodo ROS se procesa mediante **un solo**
-   ``rclpy.spin(node)`` en ``main()``.
+* ``loop_start()`` mantiene la comunicación MQTT mediante un hilo propio.
+* ``rclpy.spin(node)`` atiende eventos ROS 2 mediante su executor.
+* Un callback MQTT puede ejecutarse en un hilo diferente del que atiende
+  los callbacks ROS 2.
+* Para intercambiar datos entre ambos contextos conviene utilizar una
+  estructura segura para hilos, por ejemplo ``queue.Queue``.
 
-7.2. Ejemplo comentado de puente bidireccional
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+No se debe colocar ``rclpy.spin_once(node)`` dentro de un callback que ya
+está siendo procesado por el mismo executor. Esta precaución es
+especialmente relevante al combinar recepción asíncrona, servicios y
+acciones de ROS 2 Jazzy.
+
+8.2. Ejemplo mínimo de puente bidireccional
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Este ejemplo utiliza mensajes ROS 2 ``std_msgs/String`` y nombres de
+tópicos genéricos. Los nombres MQTT y ROS 2 de entrada y salida son
+distintos para evitar reenviar los mensajes en un bucle involuntario.
 
 .. code-block:: python
-   :caption: mi_pkg_python/mqtt/puente_mqtt_ros2.py
+   :caption: puente_mqtt_ros2.py
 
-   import json
    import os
    import queue
    import threading
-   import time
 
    import paho.mqtt.client as mqtt
    import rclpy
+
    from rclpy.node import Node
-   from std_msgs.msg import Float32, Int32
+   from std_msgs.msg import String
 
 
    class PuenteMQTTROS2(Node):
 
        def __init__(self):
-           # 1. Crear el nodo ROS 2.
-           super().__init__('mqtt_bridge')
+           super().__init__('puente_mqtt_ros2')
 
-           # 2. Parámetros configurables desde ROS 2.
-           self.declare_parameter('broker', os.getenv('MQTT_BROKER', 'localhost'))
+           # 1. Configuración independiente de una aplicación concreta.
+           self.declare_parameter('broker', 'localhost')
            self.declare_parameter('puerto', 1883)
-           self.declare_parameter('topic_mqtt_sensores', 'rm1/sensores')
-           self.declare_parameter('topic_mqtt_acciones', 'rm1/acciones')
-           self.declare_parameter('timeout_s', 2.0)
 
-           self.broker = self.get_parameter('broker').value
-           self.puerto = int(self.get_parameter('puerto').value)
-           self.topic_sensores = self.get_parameter('topic_mqtt_sensores').value
-           self.topic_acciones = self.get_parameter('topic_mqtt_acciones').value
-           self.timeout_s = float(self.get_parameter('timeout_s').value)
+           broker = self.get_parameter('broker').value
+           puerto = self.get_parameter('puerto').value
 
-           # 3. ROS 2: publicación de datos y recepción de acciones.
-           self.pub = self.create_publisher(Float32, 'sensores', 10)
-           self.sub = self.create_subscription(
-               Int32, 'acciones', self.recibir_accion_ros, 10
+           self.mqtt_entrada = 'laboratorio/datos'
+           self.mqtt_salida = 'laboratorio/salida'
+
+           # 2. Recursos de comunicación entre hilos.
+           self.cola = queue.Queue(maxsize=100)
+           self.mqtt_conectado = threading.Event()
+
+           # 3. Entidades ROS 2.
+           self.publicador = self.create_publisher(
+               String, '/mqtt/entrada', 10
+           )
+           self.suscriptor = self.create_subscription(
+               String,
+               '/mqtt/salida',
+               self.enviar_desde_ros,
+               10
+           )
+           self.temporizador = self.create_timer(
+               0.1, self.publicar_en_ros
            )
 
-           # 4. Compartición segura entre hilo MQTT y executor ROS 2.
-           self.cola_lecturas = queue.Queue(maxsize=100)
-           self.mqtt_conectado = threading.Event()
-           self.ultima_lectura = None
-           self.datos_activos = False
-
-           # 5. ROS 2 revisa periódicamente la cola y el watchdog.
-           self.timer_lectura = self.create_timer(0.1, self.publicar_lecturas_ros)
-           self.timer_watchdog = self.create_timer(0.5, self.revisar_timeout)
-
-           # 6. Crear cliente Paho MQTT con API de callbacks VERSION2.
-           self.mqtt_client = mqtt.Client(
+           # 4. Cliente MQTT con API de callbacks VERSION2.
+           self.cliente = mqtt.Client(
                callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-               client_id='avigtech_puente_ros2',
+               client_id=f'puente_mqtt_ros2_{os.getpid()}',
                protocol=mqtt.MQTTv311
            )
-           self.mqtt_client.on_connect = self.on_connect
-           self.mqtt_client.on_message = self.on_message
-           self.mqtt_client.on_disconnect = self.on_disconnect
+           self.cliente.on_connect = self.on_connect
+           self.cliente.on_disconnect = self.on_disconnect
+           self.cliente.on_message = self.on_message
 
-           # 7. Iniciar conexión sin bloquear el executor ROS 2.
-           self.mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
-           self.mqtt_client.connect_async(self.broker, self.puerto, 60)
-           self.mqtt_client.loop_start()
+           usuario = os.getenv('MQTT_USER')
+           clave = os.getenv('MQTT_PASSWORD')
+           if usuario:
+               if not clave:
+                   raise RuntimeError('Falta MQTT_PASSWORD.')
+               self.cliente.username_pw_set(usuario, clave)
 
-           self.get_logger().info('Puente MQTT ↔ ROS 2 iniciado')
+           # 5. Iniciar MQTT sin bloquear el executor ROS 2.
+           self.cliente.reconnect_delay_set(1, 10)
+           self.cliente.connect_async(broker, puerto, keepalive=60)
+           self.cliente.loop_start()
 
        def on_connect(self, client, userdata, flags, reason_code, properties):
-           # Callback de Paho (hilo MQTT).
+           # Se ejecuta en el hilo de red de Paho.
            if reason_code == 0:
                self.mqtt_conectado.set()
-               client.subscribe(self.topic_sensores, qos=0)
+               client.subscribe(self.mqtt_entrada, qos=1)
            else:
                self.mqtt_conectado.clear()
-               print(f'MQTT: conexión rechazada: {reason_code}')
+               print(f'Conexión MQTT rechazada: {reason_code}')
 
-       def on_disconnect(
-           self, client, userdata, disconnect_flags, reason_code, properties
-       ):
-           # Callback de Paho (hilo MQTT).
+       def on_disconnect(self, client, userdata, flags, reason_code, properties):
+           # Se ejecuta cuando la conexión se cierra o se pierde.
            self.mqtt_conectado.clear()
 
        def on_message(self, client, userdata, msg):
-           # Callback de Paho (hilo MQTT).
-           # No procesar nodos ni bloquear aquí: solo validar y encolar.
-           if msg.topic != self.topic_sensores:
+           # Se ejecuta en el hilo MQTT: validar y encolar rápidamente.
+           if msg.topic != self.mqtt_entrada:
                return
-
            try:
-               datos = json.loads(msg.payload.decode('utf-8'))
-               valor = float(datos['EncoderI'])
-               self.cola_lecturas.put_nowait(valor)
-           except (UnicodeDecodeError, ValueError, KeyError, TypeError):
-               print('MQTT: mensaje de sensor inválido')
-           except queue.Full:
-               print('MQTT: cola llena, se descarta una lectura')
+               texto = msg.payload.decode('utf-8')
+               if len(texto) > 2048:
+                   raise ValueError('Mensaje demasiado grande')
+               self.cola.put_nowait(texto)
+           except (UnicodeDecodeError, ValueError, queue.Full):
+               print('Mensaje MQTT descartado.')
 
-       def publicar_lecturas_ros(self):
-           # Callback del temporizador ROS 2 (hilo del executor ROS).
-           # Limitar el número de elementos por ciclo evita saturarlo.
+       def publicar_en_ros(self):
+           # El temporizador procesa la cola desde el executor ROS 2.
            for _ in range(20):
                try:
-                   valor = self.cola_lecturas.get_nowait()
+                   texto = self.cola.get_nowait()
                except queue.Empty:
                    break
 
-               # La marca de tiempo se maneja solo desde ROS 2.
-               self.ultima_lectura = time.monotonic()
-               self.datos_activos = True
+               mensaje = String()
+               mensaje.data = texto
+               self.publicador.publish(mensaje)
 
-               msg = Float32()
-               msg.data = float(valor)
-               self.pub.publish(msg)
-
-       def revisar_timeout(self):
-           # Watchdog: detectar datos desactualizados.
-           if self.ultima_lectura is None:
-               return
-
-           if time.monotonic() - self.ultima_lectura > self.timeout_s:
-               if self.datos_activos:
-                   self.get_logger().warning(
-                       'Sin lecturas MQTT recientes; datos marcados como inactivos'
-                   )
-               self.datos_activos = False
-
-       def recibir_accion_ros(self, msg):
-           # Callback ROS 2: convertir mensaje Int32 a JSON MQTT.
+       def enviar_desde_ros(self, mensaje):
+           # Callback de suscripción ROS 2: enviar hacia MQTT.
            if not self.mqtt_conectado.is_set():
-               self.get_logger().warning('No se publica: MQTT desconectado')
+               self.get_logger().warning('Broker MQTT desconectado.')
                return
 
-           orden = {
-               'vel': {'u_meta': 0.34, 'w_meta': 0.10},
-               'avanzar': int(msg.data)
-           }
-           respuesta = self.mqtt_client.publish(
-               self.topic_acciones,
-               json.dumps(orden),
+           informacion = self.cliente.publish(
+               self.mqtt_salida,
+               payload=mensaje.data,
                qos=0,
                retain=False
            )
-           if respuesta.rc != mqtt.MQTT_ERR_SUCCESS:
-               self.get_logger().warning('La publicación MQTT no fue aceptada')
+           if informacion.rc != mqtt.MQTT_ERR_SUCCESS:
+               self.get_logger().warning('No se pudo encolar la publicación.')
 
-       def detener_mqtt(self):
-           # Liberar recursos MQTT al cerrar el nodo.
-           self.mqtt_client.disconnect()
-           self.mqtt_client.loop_stop()
+       def detener(self):
+           # Cerrar MQTT antes de destruir el nodo ROS 2.
+           self.cliente.disconnect()
+           self.cliente.loop_stop()
 
 
    def main(args=None):
-       # 8. Arranque de ROS 2: un único spin, independiente de loop_start().
        rclpy.init(args=args)
-       node = PuenteMQTTROS2()
+       nodo = PuenteMQTTROS2()
        try:
-           rclpy.spin(node)
+           # Un único spin para el nodo ROS 2.
+           rclpy.spin(nodo)
        except KeyboardInterrupt:
            pass
        finally:
-           node.detener_mqtt()
-           node.destroy_node()
+           nodo.detener()
+           nodo.destroy_node()
            if rclpy.ok():
                rclpy.shutdown()
 
@@ -891,42 +967,46 @@ para que el programa sea más robusto.
 
 .. warning::
 
-   Este puente muestra una **arquitectura educativa**, no un controlador
-   de seguridad industrial. El valor fijo de velocidad del ejemplo proviene
-   del repositorio y debe reemplazarse por consignas verificadas antes de
-   controlar motores. El watchdog solo marca telemetría como inactiva;
-   **no constituye por sí solo un mecanismo de parada segura**.
+   El puente es una **demostración de interoperabilidad de mensajes**, no
+   un controlador en tiempo real ni un mecanismo de seguridad. Para controlar
+   actuadores se necesitan comprobaciones de origen y frescura de órdenes,
+   límites y una parada segura independiente de la red.
 
-7.3. Ejecutar y comprobar el puente
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+8.3. Verificación del puente
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cuando el archivo se haya registrado como ejecutable del paquete, ejecuta:
 
 .. code-block:: bash
 
-   # Terminal 1: iniciar el puente.
-   ros2 run mi_pkg_python puente_mqtt_ros2 \
-     --ros-args -p broker:=localhost
+   # Terminal 1: puente MQTT-ROS 2.
+   ros2 run mi_pkg_python puente_mqtt_ros2
 
-   # Terminal 2: publicar datos MQTT para el puente.
-   mosquitto_pub -h localhost -t rm1/sensores \
-     -m '{"EncoderI":20,"EncoderD":30}'
+   # Terminal 2: suscripción a mensajes ROS 2 provenientes de MQTT.
+   ros2 topic echo /mqtt/entrada
 
-   # Terminal 3: visualizar el mensaje convertido a ROS 2.
-   ros2 topic echo /sensores
+   # Terminal 3: publicar un mensaje MQTT.
+   mosquitto_pub -h localhost -t laboratorio/datos -m "Hola desde MQTT"
 
-   # Terminal 4: enviar un mensaje ROS 2 para publicarlo en MQTT.
-   ros2 topic pub --once /acciones std_msgs/msg/Int32 '{data: 1}'
+   # Terminal 4: observar el otro sentido del puente.
+   mosquitto_sub -h localhost -t laboratorio/salida -v
 
-   # Terminal 5: observar lo que el puente publicó a MQTT.
-   mosquitto_sub -h localhost -t rm1/acciones -v
+   # Terminal 5: enviar el mensaje de ROS 2 hacia MQTT.
+   ros2 topic pub --once /mqtt/salida std_msgs/msg/String \
+     "{data: 'Hola desde ROS 2'}"
 
-El último suscriptor debe iniciarse **antes** de enviar el comando, porque
-las publicaciones de esta práctica no se guardan como retenidas.
+Si el broker requiere autenticación, configura las credenciales del cliente
+Python y de las herramientas de consola antes de realizar la prueba.
 
-8. Incorporación de programas en ``mi_pkg_python``
---------------------------------------------------
+9. Uso con el paquete ``mi_pkg_python`` del repositorio
+-------------------------------------------------------
 
-No se necesita otro paquete ROS 2. En el paquete existente puedes mantener
-los módulos de cada tema y agregar un subdirectorio para MQTT.
+Los conceptos MQTT anteriores son **generales**. Para conservar la
+organización del curso, los programas pueden añadirse opcionalmente a
+``mi_pkg_python``. No se crea un paquete adicional.
+
+9.1. Organización sugerida
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: text
 
@@ -936,143 +1016,196 @@ los módulos de cada tema y agregar un subdirectorio para MQTT.
    ├── setup.cfg
    └── mi_pkg_python/
        ├── __init__.py
-       ├── publicador.py                 # Otros temas del curso
-       ├── suscriptor.py
+       ├── ...                       # Programas previos del curso
        └── mqtt/
-           ├── __init__.py              # Necesario para importar el subpaquete
-           ├── cliente_mqtt_base.py
-           ├── equipo1.py
-           ├── equipo2.py
+           ├── __init__.py
+           ├── suscriptor_mqtt.py
+           ├── publicador_mqtt.py
+           ├── cliente_mqtt_mixto.py
            └── puente_mqtt_ros2.py
 
-8.1. Registrar los ejecutables en ``setup.py``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+También puedes ejecutar las tres prácticas MQTT puras como archivos Python
+independientes: ``python suscriptor_mqtt.py`` y así sucesivamente.
 
-Cuando los archivos Python se encuentran dentro del subdirectorio
-``mi_pkg_python/mqtt/``, el módulo completo es
-``mi_pkg_python.mqtt.nombre_del_archivo``.
+9.2. Registrar programas en ``setup.py``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-El **``setup.py`` existente** debe incluir ese subpaquete. Si utilizas
-``packages=[package_name]``, cambia únicamente ese apartado por
-``find_packages(exclude=['test'])`` (importando ``find_packages`` desde
-``setuptools``), o incluye explícitamente ``mi_pkg_python.mqtt``.
+Si tu paquete ya usa ``packages=[package_name]``, debes incluir el
+subpaquete ``mi_pkg_python.mqtt`` mediante ``find_packages()`` o listarlo
+explícitamente. Dentro del archivo existente:
 
 .. code-block:: python
 
-   # Fragmentos de setup.py: integrar en el archivo existente,
-   # conservando todos los demás ejecutables del curso.
-   from setuptools import setup, find_packages
+   # Importación de setuptools (fusionar con la que ya tengas).
+   from setuptools import find_packages, setup
 
-   # Dentro de la llamada setup(...):
+   # Dentro de setup(...), mantener las demás opciones:
    # packages=find_packages(exclude=['test']),
 
-   # Dentro de entry_points['console_scripts'] agregar:
-   # 'mqtt_base = mi_pkg_python.mqtt.cliente_mqtt_base:main',
-   # 'mqtt_equipo1 = mi_pkg_python.mqtt.equipo1:main',
-   # 'mqtt_equipo2 = mi_pkg_python.mqtt.equipo2:main',
+   # Dentro de entry_points['console_scripts'], conservar los anteriores
+   # y añadir estas cadenas:
+   # 'mqtt_suscriptor = mi_pkg_python.mqtt.suscriptor_mqtt:main',
+   # 'mqtt_publicador = mi_pkg_python.mqtt.publicador_mqtt:main',
+   # 'mqtt_mixto = mi_pkg_python.mqtt.cliente_mqtt_mixto:main',
    # 'puente_mqtt_ros2 = mi_pkg_python.mqtt.puente_mqtt_ros2:main',
 
 .. important::
 
-   No reemplaces toda la lista ``console_scripts`` por este fragmento:
-   perderías los ejecutables de nodos, servicios y acciones ya definidos
-   en ``mi_pkg_python``.
+   Las cuatro líneas anteriores son **fragmentos de configuración**. No
+   sustituyas el contenido de ``setup.py`` ni elimines los ejecutables de
+   nodos, servicios y acciones existentes. Cada nombre corresponde a un
+   archivo Python que debe existir en el paquete.
 
-8.2. Dependencias
-~~~~~~~~~~~~~~~~~
+9.3. Dependencias y ejecución con ROS 2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Para el **puente ROS 2** confirma que ``package.xml`` declara:
+El puente utiliza ``rclpy`` y ``std_msgs``. En ``package.xml`` comprueba
+que estén declaradas las dependencias, sin duplicarlas:
 
 .. code-block:: xml
 
    <exec_depend>rclpy</exec_depend>
    <exec_depend>std_msgs</exec_depend>
 
-``paho-mqtt>=2,<3`` es una dependencia de Python instalada mediante
-``pip`` en el entorno virtual descrito en el apartado 3.2. Su instalación
-**no se obtiene automáticamente** al declarar ``rclpy`` o ``std_msgs``.
-Si se añade un archivo ``requirements.txt`` al paquete, puede contener:
+Paho MQTT 2.x se instala en el entorno Python descrito en la sección 3.
+Para documentar esa dependencia adicional, puedes incluir un
+``requirements.txt`` que contenga:
 
 .. code-block:: text
 
-   paho-mqtt>=2,<3
+   paho-mqtt==2.2.0
 
-8.3. Compilación y ejecución
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+En Ubuntu 24.04, declarar ``python3-paho-mqtt`` como dependencia APT
+podría instalar Paho 1.6.1 en lugar de la versión 2.x requerida; por eso
+no se utiliza esa vía para estos ejemplos.
 
 .. code-block:: bash
 
-   # Mantener activo el entorno que tiene instalado Paho 2.x.
+   # Usar el entorno con Paho 2.x y los módulos ROS 2 accesibles.
+   source /opt/ros/jazzy/setup.bash
    source ~/venvs/ros2-jazzy/bin/activate
    cd ~/ros2_ws
+
+   # Compilar el paquete existente sin crear otro.
    colcon build --symlink-install --packages-select mi_pkg_python
    source install/setup.bash
 
-   # Comprobar que el módulo MQTT está instalado.
+   # Comprobar los ejecutables registrados.
    ros2 pkg executables mi_pkg_python
 
-   # Ejecutar un programa del curso.
-   ros2 run mi_pkg_python mqtt_equipo1
+   # Iniciar la práctica deseada.
+   ros2 run mi_pkg_python mqtt_suscriptor
 
-.. tip::
+.. note::
 
-   Si ``ros2 run`` informa ``ModuleNotFoundError: No module named 'paho'``,
-   comprueba la instalación en el **intérprete Python que ejecuta ese
-   entry point**. Es posible tener Paho instalado en un entorno virtual y
-   ejecutar un script que utiliza otro intérprete. Si ``ros2 run`` no
-   encuentra ``mqtt_equipo1``, revisa ``setup.py``, la instalación del
-   subpaquete y recompila.
+   Si el entorno virtual ya está creado, basta con **activarlo**. Una
+   terminal nueva que carga ROS 2 y el workspace desde ``~/.bashrc``
+   todavía necesita utilizar el intérprete Python donde está Paho 2.x;
+   compruébalo con ``which python`` y ``python -m pip show paho-mqtt``.
 
-9. Problemas frecuentes y soluciones
-------------------------------------
+10. Diagnóstico y problemas frecuentes
+--------------------------------------
 
-.. list-table:: Diagnóstico de MQTT y ROS 2
+.. list-table:: Errores habituales
    :header-rows: 1
-   :widths: 32 37 31
+   :widths: 37 63
 
    * - Síntoma
-     - Posible causa
-     - Primera comprobación
+     - Causa probable y comprobación
+   * - ``ModuleNotFoundError: No module named 'paho'``
+     - La biblioteca no está instalada en el intérprete que ejecuta el
+       programa. Revisar ``which python`` y ``python -m pip show paho-mqtt``.
+   * - Error de firma en ``on_connect``
+     - Callback antiguo mezclado con ``CallbackAPIVersion.VERSION2``.
    * - ``Connection refused``
-     - Broker apagado, puerto incorrecto o permisos de acceso.
-     - ``systemctl status mosquitto`` y ``ss -lntp``.
-   * - Conecta, pero no recibe datos.
-     - Tópico diferente, suscripción no realizada o publicador ausente.
-     - ``mosquitto_sub -t 'rm1/#' -v``.
-   * - Los mensajes llegan con retraso.
-     - Bloqueo del callback o carga elevada.
-     - Evitar tareas largas en ``on_message``.
-   * - Un cliente desconecta a otro.
-     - Ambos usan el mismo ``client_id``.
-     - Asignar identificadores diferentes.
-   * - Error de argumentos en ``on_connect``.
-     - Mezcla de firmas Paho 1.x y VERSION2.
-     - Comprobar firma y versión instalada.
-   * - Un JSON produce excepción.
-     - Claves ausentes o payload no válido.
-     - Validar ``msg.payload`` antes de usarlo.
-   * - ``ros2 topic echo /sensores`` no muestra datos.
-     - El puente no está conectado o no recibe ``EncoderI``.
-     - Inspeccionar ambos tópicos y parámetros.
-   * - Fallo al importar Paho mediante ``ros2 run``.
-     - El ejecutable utiliza otro entorno Python.
-     - Revisar intérprete de los ejecutables instalados.
-   * - ``Executor is already spinning``.
-     - ``spin()`` / ``spin_once()`` anidado sobre un executor ocupado.
-     - Usar un solo spin ROS y el bucle propio de Paho.
+     - Broker inactivo, puerto incorrecto o listener no disponible.
+       Comprobar ``systemctl status mosquitto`` y ``ss -lntp``.
+   * - Conexión local correcta, pero no desde la ESP32
+     - Mosquitto escucha solo en loopback, firewall o red inaccesible.
+   * - Autenticación rechazada
+     - Credenciales incorrectas o configuración del broker incompleta.
+   * - No se reciben mensajes
+     - Tópicos diferentes, suscripción no realizada, ausencia del bucle
+       de red o problemas de conexión.
+   * - El broker desconecta un cliente cuando entra otro
+     - Posible ``client_id`` duplicado entre conexiones.
+   * - Mensajes repetidos
+     - Posible redelivery con QoS 1; usar identificadores y deduplicación
+       cuando la aplicación lo requiera.
+   * - ``externally-managed-environment`` al instalar con pip
+     - Python del sistema protegido por Ubuntu 24.04; utilizar el entorno
+       virtual indicado.
+   * - Un nodo ROS 2 deja de atender callbacks
+     - Código bloqueante o mezcla incorrecta de bucles; usar el executor
+       ROS 2 y Paho en hilos apropiados, con cola de intercambio.
 
+Comandos útiles de diagnóstico:
 
+.. code-block:: bash
 
-12. Referencias
----------------
+   # Estado del broker.
+   systemctl is-active mosquitto
+   sudo journalctl -u mosquitto -n 30 --no-pager
 
-* Eclipse Paho, documentación Python:
-  https://eclipse.dev/paho/files/paho.mqtt.python/html/
-* Eclipse Paho, migración a callbacks API 2.x:
-  https://eclipse.dev/paho/files/paho.mqtt.python/html/migrations.html
-* Eclipse Mosquitto, configuración y autenticación:
-  https://mosquitto.org/documentation/authentication-methods/
-* Eclipse Mosquitto, referencia de configuración:
-  https://mosquitto.org/man/mosquitto-conf-5.html
-* Documentación de ROS 2 Jazzy:
-  https://docs.ros.org/en/jazzy/
+   # Puertos abiertos.
+   sudo ss -lntp | grep 1883
+
+   # Suscripción de prueba.
+   mosquitto_sub -h localhost -t 'laboratorio/#' -v
+
+   # Comprobar instalación Paho para el intérprete activo.
+   python -m pip show paho-mqtt
+
+11. Buenas prácticas para proyectos reales
+------------------------------------------
+
+* Mantener las credenciales fuera del código fuente y usar secretos o
+  archivos de configuración protegidos.
+* Activar autenticación y ACL; usar TLS fuera de una LAN controlada.
+* Usar identificadores de cliente únicos cuando las conexiones sean
+  independientes.
+* Suscribirse en ``on_connect`` si se espera recuperar la suscripción.
+* Elegir QoS y ``retain`` según la semántica del mensaje, no solo por
+  comodidad.
+* Evitar comandos de actuadores como mensajes retenidos.
+* Definir versiones y límites para los datos intercambiados.
+* Comprobar desconexiones, reconexiones y datos vencidos.
+* Mantener los callbacks breves y evitar bloqueos prolongados.
+* No confundir entrega MQTT con ejecución segura y confirmada de una orden.
+* Separar el procesamiento ROS 2 del hilo de recepción Paho.
+
+12. Actividades de aprendizaje
+------------------------------
+
+#. Identificar las partes de un publicador MQTT y de un suscriptor MQTT.
+#. Explicar qué sucede si dos programas utilizan el mismo ``client_id``.
+#. Modificar los ejemplos para transmitir un JSON de dos campos y
+   comprobar su recepción.
+#. Suscribirse al filtro ``laboratorio/#`` y observar dos tópicos diferentes.
+#. Comparar QoS 0 y QoS 1 durante la publicación de mensajes de prueba.
+#. Explicar por qué ``retain=True`` puede ser inconveniente para un comando.
+#. Simular la desconexión y reconexión del broker; observar ``on_connect``.
+#. Identificar qué parte del puente ejecuta ``rclpy.spin()`` y cuál
+   utiliza ``loop_start()``.
+#. Añadir una verificación de formato JSON al receptor sin cambiar los
+   conceptos generales del protocolo.
+
+13. Referencias técnicas
+------------------------
+
+* `Documentación oficial de Eclipse Paho MQTT Python
+  <https://eclipse.dev/paho/clients/python/docs/>`_.
+* `Referencia de la API de Paho MQTT Python
+  <https://eclipse.dev/paho/files/paho.mqtt.python/html/client.html>`_.
+* `Migración de Paho MQTT 1.x a 2.x
+  <https://eclipse.dev/paho/files/paho.mqtt.python/html/migrations.html>`_.
+* `Paquete Paho MQTT en PyPI
+  <https://pypi.org/project/paho-mqtt/>`_.
+* `Migración a Mosquitto 2.x
+  <https://mosquitto.org/documentation/migrating-to-2-0/>`_.
+* `Autenticación en Mosquitto
+  <https://mosquitto.org/documentation/authentication-methods/>`_.
+* `Paquete python3-paho-mqtt de Ubuntu 24.04
+  <https://packages.ubuntu.com/noble/python3-paho-mqtt>`_.
+* `Documentación ROS 2 sobre dependencias Python
+  <https://docs.ros.org/en/rolling/How-To-Guides/Using-Python-Packages.html>`_.
