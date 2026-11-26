@@ -65,7 +65,6 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="dispositivos.html">Conexión con dispositivos</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Estructura de programación MQTT con Mosquitto y Python</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#objetivos-de-aprendizaje">Objetivos de aprendizaje</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#fundamentos-generales-de-mqtt">1. Fundamentos generales de MQTT</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#componentes-fundamentales">1.1. Componentes fundamentales</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#diferencia-entre-mqtt-mosquitto-y-paho">1.2. Diferencia entre MQTT, Mosquitto y Paho</a></li>
@@ -151,19 +150,6 @@
              
   <section id="estructura-de-programacion-mqtt-con-mosquitto-y-python">
 <h1>Estructura de programación MQTT con Mosquitto y Python<a class="headerlink" href="#estructura-de-programacion-mqtt-con-mosquitto-y-python" title="Link to this heading"></a></h1>
-<section id="objetivos-de-aprendizaje">
-<h2>Objetivos de aprendizaje<a class="headerlink" href="#objetivos-de-aprendizaje" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Distinguir el protocolo MQTT, el broker Mosquitto y la biblioteca Paho.</p></li>
-<li><p>Identificar las partes obligatorias y opcionales de un cliente MQTT.</p></li>
-<li><p>Comprender los tópicos, publicaciones, suscripciones, payload, QoS y sesión.</p></li>
-<li><p>Definir callbacks compatibles con la API <code class="docutils literal notranslate"><span class="pre">VERSION2</span></code> de Paho MQTT 2.x.</p></li>
-<li><p>Implementar programas independientes de publicación y suscripción.</p></li>
-<li><p>Reconocer las condiciones necesarias para conectar equipos por red local.</p></li>
-<li><p>Combinar MQTT y ROS 2 sin bloquear sus respectivos bucles de ejecución.</p></li>
-<li><p>Registrar programas Python en un paquete ROS 2 existente cuando corresponda.</p></li>
-</ul>
-</section>
 <section id="fundamentos-generales-de-mqtt">
 <h2>1. Fundamentos generales de MQTT<a class="headerlink" href="#fundamentos-generales-de-mqtt" title="Link to this heading"></a></h2>
 <p><strong>MQTT (Message Queuing Telemetry Transport)</strong> es un protocolo de mensajería
@@ -547,7 +533,7 @@ confirmaciones requieren que el programa procese los paquetes MQTT.</p>
 <h3>3.1. Instalar el broker y los clientes de terminal<a class="headerlink" href="#instalar-el-broker-y-los-clientes-de-terminal" title="Link to this heading"></a></h3>
 <p>Instala Mosquitto mediante APT, sin usar <code class="docutils literal notranslate"><span class="pre">pip</span></code> para el broker.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>mosquitto<span class="w"> </span>mosquitto-clients<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>mosquitto<span class="w"> </span>mosquitto-clients<span class="w"> </span>python3-pip
 
 <span class="c1"># Habilitar el servicio ahora y después de reiniciar.</span>
 sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>mosquitto
@@ -577,60 +563,69 @@ escuchar únicamente en <code class="docutils literal notranslate"><span class="
 </section>
 <section id="instalar-la-biblioteca-python-paho-mqtt-2-x">
 <h3>3.3. Instalar la biblioteca Python Paho MQTT 2.x<a class="headerlink" href="#instalar-la-biblioteca-python-paho-mqtt-2-x" title="Link to this heading"></a></h3>
-<p>En Ubuntu 24.04, el paquete APT <code class="docutils literal notranslate"><span class="pre">python3-paho-mqtt</span></code> pertenece a la
-serie <strong>1.6.1</strong>, mientras que los programas de esta guía requieren
-<code class="docutils literal notranslate"><span class="pre">CallbackAPIVersion.VERSION2</span></code> de Paho MQTT <strong>2.x</strong>.</p>
-<p>Para evitar conflictos con el Python del sistema, se usa el entorno virtual
-<code class="docutils literal notranslate"><span class="pre">~/venvs/ros2-jazzy</span></code> previsto en la documentación del curso. Si ya lo
-creaste, <strong>no hace falta volver a crearlo</strong>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Crear el entorno solo si todavía no existe.</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-venv<span class="w"> </span>python3-pip
-<span class="nb">test</span><span class="w"> </span>-f<span class="w"> </span>~/venvs/ros2-jazzy/bin/activate<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>--system-site-packages<span class="w"> </span>~/venvs/ros2-jazzy
+<p>En Ubuntu 24.04, el paquete APT <code class="docutils literal notranslate"><span class="pre">python3-paho-mqtt</span></code> ofrece la serie
+<strong>1.6.1</strong>, pero los ejemplos de esta guía utilizan la API de callbacks
+<code class="docutils literal notranslate"><span class="pre">CallbackAPIVersion.VERSION2</span></code>, disponible en Paho MQTT <strong>2.x</strong>.</p>
+<p>En este curso <strong>no se crean ni activan entornos virtuales</strong>. Se instala
+Paho MQTT para el usuario actual y se comprueba explícitamente su
+funcionamiento con <code class="docutils literal notranslate"><span class="pre">/usr/bin/python3</span></code>, el intérprete de Python de
+Ubuntu 24.04 empleado normalmente por ROS 2 Jazzy.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instalar pip para el Python del sistema (si aún no está disponible).</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pip
 
-<span class="c1"># Activar el entorno.</span>
-<span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
-<span class="nb">source</span><span class="w"> </span>~/venvs/ros2-jazzy/bin/activate
+<span class="c1"># Instalar Paho MQTT 2.x únicamente para el usuario actual.</span>
+/usr/bin/python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--user<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--break-system-packages<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">"paho-mqtt==2.2.0"</span>
 
-<span class="c1"># Instalar Paho MQTT, versión comprobada para esta guía.</span>
-python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"paho-mqtt==2.2.0"</span>
+<span class="c1"># Consultar versión, ubicación y dependencias instaladas.</span>
+/usr/bin/python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>show<span class="w"> </span>paho-mqtt
 
-<span class="c1"># Consultar la versión instalada y su ubicación.</span>
-python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>show<span class="w"> </span>paho-mqtt
-
-<span class="c1"># Verificar importación y la API moderna de callbacks.</span>
-python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import importlib.metadata as m; import paho.mqtt.client as mqtt; print('Paho MQTT:', m.version('paho-mqtt')); print('Callback API:', mqtt.CallbackAPIVersion.VERSION2)"</span>
+<span class="c1"># Verificar que el Python del sistema reconoce la API VERSION2.</span>
+/usr/bin/python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import importlib.metadata as m; import paho.mqtt.client as mqtt; print('Paho MQTT:', m.version('paho-mqtt')); print('Callback API:', mqtt.CallbackAPIVersion.VERSION2)"</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>La versión <code class="docutils literal notranslate"><span class="pre">2.2.0</span></code> de Paho MQTT se publicó el 4 de noviembre de 2026.
-Se fija aquí para que el laboratorio sea reproducible. Si el curso decide
-actualizarla, revisa las notas oficiales de la versión y vuelve a probar
-los callbacks.</p>
+<p>Se fija <code class="docutils literal notranslate"><span class="pre">paho-mqtt==2.2.0</span></code> para que los ejemplos sean reproducibles.
+No instales <code class="docutils literal notranslate"><span class="pre">python3-paho-mqtt</span></code> mediante APT para estas prácticas,
+porque en Ubuntu 24.04 ese paquete corresponde a la serie 1.x.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Advertencia</p>
-<p>No recomendamos <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span></code> ni
-<code class="docutils literal notranslate"><span class="pre">--break-system-packages</span></code> para el entorno de ROS 2 Jazzy.
-Si necesitas <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> dentro del mismo entorno, el uso de
-<code class="docutils literal notranslate"><span class="pre">--system-site-packages</span></code> permite acceder a los paquetes ROS 2 instalados
-por APT, siempre que se use el intérprete compatible con Jazzy.
-No instales otra versión de <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> desde PyPI.</p>
+<p>Ubuntu 24.04 protege el Python gestionado por APT mediante el mecanismo
+<code class="docutils literal notranslate"><span class="pre">EXTERNALLY-MANAGED</span></code> (PEP 668). La opción
+<code class="docutils literal notranslate"><span class="pre">--break-system-packages</span></code> permite instalar Paho en el directorio
+del usuario, pero <strong>puede provocar conflictos con otras bibliotecas</strong>
+que utiliza el Python del sistema. Se usa aquí por la decisión del curso
+de trabajar sin entornos virtuales. No utilices <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span></code>
+ni instales versiones de <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> desde PyPI. Si se produce un conflicto,
+revisa primero la ruta y la versión de los módulos importados.</p>
 </div>
 </section>
 <section id="comprobar-el-interprete-utilizado">
 <h3>3.4. Comprobar el intérprete utilizado<a class="headerlink" href="#comprobar-el-interprete-utilizado" title="Link to this heading"></a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># El intérprete debe pertenecer al entorno activado.</span>
-which<span class="w"> </span>python
-python<span class="w"> </span>--version
+<p>Ejecuta siempre las comprobaciones con el Python del sistema, incluso
+cuando invoques los programas a través de <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/usr/bin/python3<span class="w"> </span>--version
 
-<span class="c1"># La ubicación de Paho debe corresponder al Python que ejecuta el script.</span>
-python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import paho.mqtt.client as mqtt; print(mqtt.__file__)"</span>
+<span class="c1"># Verificar la ubicación real de Paho y del intérprete.</span>
+/usr/bin/python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import sys; import paho.mqtt.client as mqtt; print('Python:', sys.executable); print('Paho:', mqtt.__file__)"</span>
+
+<span class="c1"># Verificar que la instalación del usuario está habilitada.</span>
+/usr/bin/python3<span class="w"> </span>-m<span class="w"> </span>site<span class="w"> </span>--user-site
+
+<span class="c1"># Verificar también ROS 2 Jazzy en la misma sesión.</span>
+<span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+/usr/bin/python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import rclpy; import paho.mqtt.client as mqtt; print('rclpy y Paho disponibles')"</span>
 </pre></div>
 </div>
-<p>Para ejecutar los ejemplos <strong>sin ROS 2</strong>, basta con activar el entorno
-virtual y usar <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">nombre_archivo.py</span></code>.</p>
+<p>Los programas independientes se ejecutan mediante
+<code class="docutils literal notranslate"><span class="pre">/usr/bin/python3</span> <span class="pre">nombre_archivo.py</span></code>. Los nodos registrados en
+<code class="docutils literal notranslate"><span class="pre">mi_pkg_python</span></code> se ejecutan con <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">run</span></code> después de compilar el
+paquete y cargar <code class="docutils literal notranslate"><span class="pre">~/ros2_ws/install/setup.bash</span></code>.</p>
 </section>
 <section id="permitir-clientes-de-otros-equipos-opcional">
 <h3>3.5. Permitir clientes de otros equipos (opcional)<a class="headerlink" href="#permitir-clientes-de-otros-equipos-opcional" title="Link to this heading"></a></h3>
@@ -1216,7 +1211,7 @@ organización del curso, los programas pueden añadirse opcionalmente a
 </pre></div>
 </div>
 <p>También puedes ejecutar las tres prácticas MQTT puras como archivos Python
-independientes: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">suscriptor_mqtt.py</span></code> y así sucesivamente.</p>
+independientes: <code class="docutils literal notranslate"><span class="pre">/usr/bin/python3</span> <span class="pre">suscriptor_mqtt.py</span></code> y así sucesivamente.</p>
 </section>
 <section id="registrar-programas-en-setup-py">
 <h3>9.2. Registrar programas en <code class="docutils literal notranslate"><span class="pre">setup.py</span></code><a class="headerlink" href="#registrar-programas-en-setup-py" title="Link to this heading"></a></h3>
@@ -1253,23 +1248,32 @@ que estén declaradas las dependencias, sin duplicarlas:</p>
 <span class="nt">&lt;exec_depend&gt;</span>std_msgs<span class="nt">&lt;/exec_depend&gt;</span>
 </pre></div>
 </div>
-<p>Paho MQTT 2.x se instala en el entorno Python descrito en la sección 3.
-Para documentar esa dependencia adicional, puedes incluir un
-<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> que contenga:</p>
+<p>Paho MQTT 2.x se instala <strong>para el usuario actual del Python del
+sistema</strong>, según la sección 3. Para documentar esa dependencia adicional,
+puedes incluir un <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> que contenga:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>paho-mqtt==2.2.0
+</pre></div>
+</div>
+<p>El <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> no implica utilizar un entorno virtual. Para
+instalarlo explícitamente con el Python de Ubuntu, utiliza:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/usr/bin/python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--user<span class="w"> </span>--break-system-packages<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-r<span class="w"> </span>requirements.txt
 </pre></div>
 </div>
 <p>En Ubuntu 24.04, declarar <code class="docutils literal notranslate"><span class="pre">python3-paho-mqtt</span></code> como dependencia APT
 podría instalar Paho 1.6.1 en lugar de la versión 2.x requerida; por eso
 no se utiliza esa vía para estos ejemplos.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Usar el entorno con Paho 2.x y los módulos ROS 2 accesibles.</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Cargar ROS 2 Jazzy y el espacio de trabajo habitual.</span>
 <span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
-<span class="nb">source</span><span class="w"> </span>~/venvs/ros2-jazzy/bin/activate
 <span class="nb">cd</span><span class="w"> </span>~/ros2_ws
 
 <span class="c1"># Compilar el paquete existente sin crear otro.</span>
 colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-select<span class="w"> </span>mi_pkg_python
 <span class="nb">source</span><span class="w"> </span>install/setup.bash
+
+<span class="c1"># Comprobar la importación desde el mismo Python del sistema.</span>
+/usr/bin/python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import rclpy; import paho.mqtt.client as mqtt; print('Dependencias disponibles')"</span>
 
 <span class="c1"># Comprobar los ejecutables registrados.</span>
 ros2<span class="w"> </span>pkg<span class="w"> </span>executables<span class="w"> </span>mi_pkg_python
@@ -1280,10 +1284,11 @@ ros2<span class="w"> </span>run<span class="w"> </span>mi_pkg_python<span class=
 </div>
 <div class="admonition note">
 <p class="admonition-title">Nota</p>
-<p>Si el entorno virtual ya está creado, basta con <strong>activarlo</strong>. Una
-terminal nueva que carga ROS 2 y el workspace desde <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>
-todavía necesita utilizar el intérprete Python donde está Paho 2.x;
-compruébalo con <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">python</span></code> y <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">show</span> <span class="pre">paho-mqtt</span></code>.</p>
+<p>La instalación <code class="docutils literal notranslate"><span class="pre">--user</span></code> persiste entre terminales y reinicios; no
+requiere ejecutar ningún comando de activación. Si el workspace ya se
+carga desde <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>, no hace falta repetir <code class="docutils literal notranslate"><span class="pre">source</span></code> al abrir
+una terminal Bash nueva. Si se cambia de usuario o se ejecuta mediante
+<code class="docutils literal notranslate"><span class="pre">sudo</span></code>, la ubicación de los paquetes Python puede ser diferente.</p>
 </div>
 </section>
 </section>
@@ -1303,7 +1308,7 @@ compruébalo con <code class="docutils literal notranslate"><span class="pre">wh
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ModuleNotFoundError:</span> <span class="pre">No</span> <span class="pre">module</span> <span class="pre">named</span> <span class="pre">'paho'</span></code></p></td>
 <td><p>La biblioteca no está instalada en el intérprete que ejecuta el
-programa. Revisar <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">python</span></code> y <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">show</span> <span class="pre">paho-mqtt</span></code>.</p></td>
+programa. Revisar <code class="docutils literal notranslate"><span class="pre">/usr/bin/python3</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">show</span> <span class="pre">paho-mqtt</span></code> y <code class="docutils literal notranslate"><span class="pre">/usr/bin/python3</span> <span class="pre">-m</span> <span class="pre">site</span> <span class="pre">--user-site</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Error de firma en <code class="docutils literal notranslate"><span class="pre">on_connect</span></code></p></td>
 <td><p>Callback antiguo mezclado con <code class="docutils literal notranslate"><span class="pre">CallbackAPIVersion.VERSION2</span></code>.</p></td>
@@ -1330,8 +1335,9 @@ de red o problemas de conexión.</p></td>
 cuando la aplicación lo requiera.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">externally-managed-environment</span></code> al instalar con pip</p></td>
-<td><p>Python del sistema protegido por Ubuntu 24.04; utilizar el entorno
-virtual indicado.</p></td>
+<td><p>Python del sistema protegido por Ubuntu 24.04; utilizar
+<code class="docutils literal notranslate"><span class="pre">--user</span> <span class="pre">--break-system-packages</span></code> como en la sección 3, teniendo
+en cuenta su advertencia de compatibilidad.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Un nodo ROS 2 deja de atender callbacks</p></td>
 <td><p>Código bloqueante o mezcla incorrecta de bucles; usar el executor
@@ -1351,7 +1357,7 @@ sudo<span class="w"> </span>ss<span class="w"> </span>-lntp<span class="w"> </sp
 mosquitto_sub<span class="w"> </span>-h<span class="w"> </span>localhost<span class="w"> </span>-t<span class="w"> </span><span class="s1">'laboratorio/#'</span><span class="w"> </span>-v
 
 <span class="c1"># Comprobar instalación Paho para el intérprete activo.</span>
-python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>show<span class="w"> </span>paho-mqtt
+/usr/bin/python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>show<span class="w"> </span>paho-mqtt
 </pre></div>
 </div>
 </section>
@@ -1401,6 +1407,7 @@ conceptos generales del protocolo.</p></li>
 <li><p><a class="reference external" href="https://mosquitto.org/documentation/migrating-to-2-0/">Migración a Mosquitto 2.x</a>.</p></li>
 <li><p><a class="reference external" href="https://mosquitto.org/documentation/authentication-methods/">Autenticación en Mosquitto</a>.</p></li>
 <li><p><a class="reference external" href="https://packages.ubuntu.com/noble/python3-paho-mqtt">Paquete python3-paho-mqtt de Ubuntu 24.04</a>.</p></li>
+<li><p><a class="reference external" href="https://peps.python.org/pep-0668/">PEP 668: entornos Python gestionados externamente</a>.</p></li>
 <li><p><a class="reference external" href="https://docs.ros.org/en/rolling/How-To-Guides/Using-Python-Packages.html">Documentación ROS 2 sobre dependencias Python</a>.</p></li>
 </ul>
 </section>
