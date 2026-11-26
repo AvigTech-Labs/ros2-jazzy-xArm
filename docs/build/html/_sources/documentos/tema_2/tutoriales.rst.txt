@@ -1,11 +1,6 @@
 Tutoriales
 ==========
 
-.. note::
-
-   Los ejemplos de servicios y acciones se complementan con :doc:`prácticas de xArm 6 <xarm_servicios>`, que distinguen interfaces de consulta y de movimiento.
-
-
 Creación de un espacio de trabajo
 ---------------------------------
 
@@ -273,8 +268,6 @@ mensaje personalizado ``AprilTagPixel.msg`` con los siguientes campos:
    string id
    int32 posx
    int32 posy
-
---------------
 
 1. Crear el paquete
 

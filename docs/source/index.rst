@@ -30,7 +30,6 @@ Contenido del curso
    documentos/tema_2/conceptos_basicos
    documentos/tema_2/tutoriales
    documentos/tema_2/xarm_practicas
-   documentos/tema_2/xarm_reto_resuelto
 
 .. toctree::
    :maxdepth: 2

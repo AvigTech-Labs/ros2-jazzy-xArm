@@ -1,11 +1,6 @@
 ¿Qué es ROS2?
 =============
 
-.. note::
-
-   Los conceptos generales incluyen prácticas con el xArm 6. Comienza con :doc:`../tema_2/xarm_comunicacion` cuando hayas preparado el entorno ROS 2.
-
-
 ROS 2 (**Robot Operating System 2**) es la evolución del sistema
 original ROS. Aporta mejoras clave en seguridad, rendimiento,
 escalabilidad y soporte para sistemas distribuidos. ROS 2 está diseñado
@@ -19,13 +14,13 @@ para la comunicación entre procesos.
 
 
 Ecosistema ROS 2
-----------------
+-----------------
 
 El ecosistema de ROS 2 incluye:
 
-- **Paquetes (packages):** Componentes de software reutilizables que
+- **Packages:** Componentes de software reutilizables que
   contienen nodos, configuraciones, interfaces, etc.
-- **Nodos (nodes):** Programas individuales que se comunican entre sí.
+- **Nodes:** Programas individuales que se comunican entre sí.
 - **Topics:** Canales para mensajes unidireccionales y asíncronos.
 - **Services:** Para llamadas sincrónicas tipo request-response.
 - **Actions:** Para tareas que pueden tomar tiempo y requieren feedback
@@ -41,8 +36,7 @@ Arquitectura de ROS 2
 ---------------------
 
 ROS 2 está basado en una arquitectura distribuida sobre DDS (**Data
-Distribution Service**), eliminando la dependencia del nodo maestro
-(``roscore`` ya no existe). Componentes clave incluyen:
+Distribution Service**). Sus componentes clave incluyen:
 
 - ``ros2 run``: Ejecuta un nodo de un paquete
 - ``ros2 topic``: Inspecciona y publica topics
@@ -64,7 +58,7 @@ Plumbing & Capabilities
 - **MoveIt 2:** Planificación y control de brazos robóticos
 - **Percepción:** Procesamiento de imágenes y datos de sensores
 
-ROS 2 te permite:
+ROS 2 permite:
 
 - Desarrollar robots modernos con comunicación robusta y segura
 - Reutilizar componentes y colaborar en proyectos a gran escala

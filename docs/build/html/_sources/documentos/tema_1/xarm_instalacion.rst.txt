@@ -1,9 +1,7 @@
 Instalación de xArm ROS 2 para Jazzy
 =====================================
 
-Este tutorial complementa :doc:`instalacionROS2` y utiliza el repositorio
-oficial `xarm_ros2 <https://github.com/xArm-Developer/xarm_ros2/tree/jazzy>`__.
-Comienza con una ejecución **sin hardware**.
+Repositorio oficial `xarm_ros2 <https://github.com/xArm-Developer/xarm_ros2/tree/jazzy>`__.
 
 0. Verificar el entorno
 -----------------------
@@ -16,10 +14,6 @@ Abre una terminal nueva:
    lsb_release -rs       # Debe imprimir 24.04
    python3 --version     # Python 3.12 en Ubuntu 24.04
 
-.. note::
-
-   Se recomienda Ubuntu 24.04 instalado de manera nativa para el trabajo
-   con RViz, MoveIt 2 y Gazebo Harmonic.
 
 1. Preparar un espacio de trabajo
 ---------------------------------
@@ -39,7 +33,8 @@ haber generado ``install/setup.bash`` con ``colcon build``:
 
 .. code-block:: bash
 
-   echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
+   grep -qxF 'source ~/ros2_ws/install/setup.bash' ~/.bashrc || \
+       echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
    source ~/.bashrc
 
 .. important::
@@ -105,19 +100,6 @@ El repositorio puede requerir dependencias adicionales. Se resolverán con
    colcon build --symlink-install
    source install/setup.bash
 
-**Cargar el workspace automáticamente en terminales nuevas (una vez):**
-
-.. code-block:: bash
-
-   grep -qxF 'source ~/ros2_ws/install/setup.bash' ~/.bashrc || \
-       echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
-   source ~/.bashrc
-
-La configuración de ``~/.bashrc`` debe activar **primero Jazzy** y
-**después el workspace**. No repitas el ``echo`` si la línea ya existe;
-verifica con ``tail -n 10 ~/.bashrc``. Si prefieres el procedimiento
-completo, consulta :doc:`instalacionROS2`.
-
 .. note::
 
    Las dependencias y la compilación deben verificarse en Ubuntu 24.04
@@ -143,7 +125,7 @@ los paquetes ``xarm_description``, ``xarm_msgs`` o ``xarm_controller``.
 El aviso de ``on_init(const HardwareInfo&) is deprecated`` en
 ``xarm_controller`` es una **advertencia**, no el fallo de compilación.
 
-**Paso A. Verificar los paquetes vendor de Jazzy**
+**1. Verificar los paquetes vendor de Jazzy**
 
 .. code-block:: bash
 
@@ -152,7 +134,7 @@ El aviso de ``on_init(const HardwareInfo&) is deprecated`` en
    ros2 pkg prefix gz_sim_vendor
    ros2 pkg prefix sdformat_vendor
 
-**Paso B. Adaptar la búsqueda de dependencias en CMake**
+**2. Adaptar la búsqueda de dependencias en CMake**
 
 Abre el archivo local (esto modifica la copia clonada del fabricante):
 
@@ -194,7 +176,7 @@ Utiliza el objetivo expuesto por el paquete vendor:
      gz-sim::gz-sim
    )
 
-**Paso C. Recompilar y verificar**
+**3. Recompilar y verificar**
 
 .. code-block:: bash
 
@@ -240,8 +222,7 @@ antes de ajustar las dependencias declaradas.
 6. Primera ejecución: solo visualización
 ----------------------------------------
 
-En una terminal nueva, el entorno de Jazzy y el workspace se cargarán
-mediante ``~/.bashrc`` (configurado en el paso 4):
+En una terminal nueva ejecuta:
 
 .. code-block:: bash
 
@@ -260,7 +241,7 @@ En otra terminal, con el mismo entorno activado:
    ros2 param list
 
 El nombre del tópico articular puede variar según el lanzamiento y
-namespace. **No supongas** que es siempre ``/xarm/joint_states``.
+namespace.
 
 7. Segunda ejecución: planificación con MoveIt 2
 ------------------------------------------------
@@ -285,9 +266,7 @@ Si no aparece ``xarm_moveit_config`` al ejecutar ``ros2 launch``, comprueba
 primero que cargaste el workspace y que se compiló ese paquete:
 
 .. code-block:: bash
-
-   source /opt/ros/jazzy/setup.bash
-   source ~/ros2_ws/install/setup.bash
+   
    ros2 pkg prefix xarm_moveit_config
    colcon list --names-only | grep -x xarm_moveit_config
 
