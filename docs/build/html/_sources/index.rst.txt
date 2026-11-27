@@ -34,8 +34,7 @@ Contenido del curso
 .. toctree::
    :maxdepth: 2
    :caption: Dispositivos y modelos robóticos
-
-   documentos/tema_3/dispositivos
+   
    documentos/tema_3/dispositivos2
    documentos/tema_4/drivers
    documentos/tema_4/modelo_digital

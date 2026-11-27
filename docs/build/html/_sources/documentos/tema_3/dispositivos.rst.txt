@@ -38,7 +38,7 @@ que envían y reciben los dispositivos. Para este caso se usará
 
    sudo apt update
    sudo apt upgrade
-   sudo apt install mosquitto mosquitto-clients
+   sudo apt install -y python3-pip mosquitto mosquitto-clients
 
 Esto instalará: - ``mosquitto``: el servicio que actuará como broker -
 ``mosquitto_pub`` y ``mosquitto_sub``: herramientas para
@@ -62,9 +62,14 @@ publicar/suscribirse a tópicos MQTT desde consola
 
 .. code:: bash
 
-   sudo ufw status
-   source ~/venvs/ros2-jazzy/bin/activate
-   python -m pip install 'paho-mqtt>=2,<3' 
+   /usr/bin/python3 -m pip install \
+      --user \
+      --break-system-packages \
+      "paho-mqtt>=2.0,<3.0"
+   
+   # 3. Comprobar biblioteca Python
+   /usr/bin/python3 -m pip show paho-mqtt
+
 
 ``paho-mqtt`` es una biblioteca mantenida por Eclipse que permite
 conectarse a brokers MQTT desde Python. Los fragmentos del curso usan
